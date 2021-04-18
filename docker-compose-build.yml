@@ -1,0 +1,16 @@
+# docker-compose-build.yml
+version: '3.3'
+
+services:
+  client:
+    image: hangekinobaka/dvc-app-client:0.0.1
+    build:
+      context: .
+      dockerfile: docker/dockerfiles/client/Dockerfile.prod
+
+  server:
+    image: hangekinobaka/dvc-app-server:0.0.1
+    build:
+      context: .
+      dockerfile: docker/dockerfiles/server/Dockerfile.prod
+

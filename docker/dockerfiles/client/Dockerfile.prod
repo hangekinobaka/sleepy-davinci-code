@@ -1,0 +1,14 @@
+# Dockerfile
+FROM node:alpine3.13
+
+WORKDIR '/var/www/app'
+
+COPY client/package*.json ./
+
+RUN npm ci
+
+COPY ./client/ .
+
+RUN ["npm", "run", "build"]
+
+CMD ["npm", "run", "start"]

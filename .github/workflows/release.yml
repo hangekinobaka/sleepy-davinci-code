@@ -1,0 +1,25 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+      
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: docker login
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}   
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - name: docker compose build
+      run: |
+        docker-compose -f ./docker-compose-build.yml build
+    - name: docker push
+      run: |
+        docker push hangekinobaka/dvc-app-server:0.0.1
+        docker push hangekinobaka/dvc-app-client:0.0.1

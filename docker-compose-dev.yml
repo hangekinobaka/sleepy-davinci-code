@@ -1,0 +1,53 @@
+# docker-compose-dev.yml
+version: '3.3'
+
+services:
+  client:
+    image: hangekinobaka/dvc-app-client:dev
+    container_name: dvc_node_client_dev
+    build:
+      context: .
+      dockerfile: docker/dockerfiles/client/Dockerfile.dev
+    volumes:
+      - ./client:/var/www/app
+    ports:
+      - '3000:3000'
+    restart: unless-stopped
+
+  server:
+    image: hangekinobaka/dvc-app-server:dev
+    container_name: dvc_node_server_dev
+    build:
+      context: .
+      dockerfile: docker/dockerfiles/server/Dockerfile.dev
+    ports:
+     - "${SERVER_PORT}:${SERVER_PORT}"
+    environment:
+      - PORT=${SERVER_PORT}
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT}
+    volumes:
+      - ./server:/var/www/app
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine3.13
+    container_name: dvc_redis_cache_dev
+    volumes:
+      - "./data/redis:/data"
+    restart: unless-stopped
+    
+  redis-admin:
+    image: rediscommander/redis-commander:latest
+    container_name: dvc_redis_admin_dev
+    hostname: redis-commander
+    environment:
+      - REDIS_HOSTS=local:redis:${REDIS_PORT}
+      - HTTP_USER=${REDIS_ADMIN_USER}
+      - HTTP_PASSWORD=${REDIS_ADMIN_PASSWORD}
+      - PORT=${REDIS_ADMIN_PORT}
+    ports:
+      - "${REDIS_ADMIN_PORT}:${REDIS_ADMIN_PORT}"
+    restart: unless-stopped

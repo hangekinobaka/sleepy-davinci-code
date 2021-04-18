@@ -1,0 +1,92 @@
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Ignore Mac OSX temp files
+.DS_Store
+._.DS_Store
+._*
+
+# sub git repo
+*/.git
+
+# Ignore PHPStorm project files
+.idea
+
+# Ignore NetBeans project file
+nbproject
+
+# Ignore Sublime Text 2 files
+*.sublime-projectcompletions
+*.sublime-project
+*.sublime-workspace
+
+# ---------- web ---------------#
+
+# node
+node_modules
+/dist
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+#------------ Drupal -------------#
+# Ignore configuration files that may contain sensitive information.
+sites/*/settings*.php
+
+# Ignore paths that contain user-generated content.
+sites/*/files
+sites/*/private
+
+# Ignore sites.php that is handled by the server
+sites/sites.php
+
+# Ignore Eclipse project files
+.settings
+.buildpath
+.project
+
+# Ignore development modules
+sites/all/modules/local
+
+# Ignore .git in composer managed directories
+sites/all/vendor/**/.git
+sites/all/modules/**/.git
+
+# Ignore development folders
+FirePHPCore
+/log
+
+#------------ Python -------------#
+# Ignore Python compiled files
+*.pyc
+
+#------------ others -------------#
+# Ignore docker files
+docker/local.env
+docker-compose.override.yml
+
+# Ignore local sync files and directories
+.sass-cache
+.sql-cache
+scripts/sync-local.conf
+
+# Ignore RVM files
+.ruby-version
+
+# Ignore db data
+data
+*.rdb
+
+# docker
+docker-compose.yml

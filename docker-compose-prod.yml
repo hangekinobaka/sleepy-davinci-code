@@ -40,7 +40,7 @@ services:
     image: dvc-app-nginx
     container_name: dvc_nginx
     build:
-      context: ./docker/Dockerfiles/nginx
+      context: ./docker/nginx
       dockerfile: Dockerfile
     ports:
       - '8080:80'

@@ -6,11 +6,11 @@ services:
     image: hangekinobaka/dvc-app-client:0.0.1
     build:
       context: .
-      dockerfile: docker/dockerfiles/client/Dockerfile.prod
+      dockerfile: docker/client/Dockerfile.prod
 
   server:
     image: hangekinobaka/dvc-app-server:0.0.1
     build:
       context: .
-      dockerfile: docker/dockerfiles/server/Dockerfile.prod
+      dockerfile: docker/server/Dockerfile.prod
 

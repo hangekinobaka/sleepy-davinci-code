@@ -7,7 +7,7 @@ services:
     container_name: dvc_node_client_dev
     build:
       context: .
-      dockerfile: docker/dockerfiles/client/Dockerfile.dev
+      dockerfile: docker/client/Dockerfile.dev
     volumes:
       - ./client:/var/www/app
     ports:
@@ -19,7 +19,7 @@ services:
     container_name: dvc_node_server_dev
     build:
       context: .
-      dockerfile: docker/dockerfiles/server/Dockerfile.dev
+      dockerfile: docker/server/Dockerfile.dev
     ports:
      - "${SERVER_PORT}:${SERVER_PORT}"
     environment:

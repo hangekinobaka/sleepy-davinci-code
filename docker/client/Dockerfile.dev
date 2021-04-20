@@ -3,10 +3,10 @@ FROM node:alpine3.13
 
 WORKDIR '/var/www/app'
 
-COPY server/package*.json ./
+# COPY client/package*.json ./
 
-RUN npm ci
+# RUN npm ci
 
-COPY ./server .
+COPY ./client/ .
 
 CMD ["npm", "run", "dev"]

@@ -8,10 +8,8 @@ export default function Join({ENDPOINT}) {
   const [usernameClicked, setUsernameClicked] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [inviteCode, setInviteCode] = useState('');
-  const [inviteCodeClicked, setInviteCodeClicked] = useState(false);
   // Check if the username is valid
   const usernameIsInvalid = () => usernameClicked && username === ''
-  const inviteCodeIsInvalid = () => inviteCodeClicked && inviteCode === ''
   
   // Methods
   const formSubmit = (e)=>{
@@ -120,17 +118,14 @@ export default function Join({ENDPOINT}) {
                     onClick={() => setUsernameClicked(true)}
                   />
                   <TextInputField
-                    isInvalid={inviteCodeIsInvalid()}
                     name="inviteCode"
                     label="Invite Code"
                     id="inviteCode"
                     placeholder="Enter invite code..."
                     width="100%"
                     maxLength="4"
-                    required
                     value={inviteCode}
                     onChange={e => setInviteCode(e.target.value)}
-                    onClick={() => setInviteCodeClicked(true)}
                   />
                   <Button type="submit" appearance="primary" height={40} fontSize={20} 
                     justifyContent="center" 

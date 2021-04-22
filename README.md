@@ -4,6 +4,7 @@
   - [Links](#links)
   - [Local Develop and Remote Deploy Structure](#local-develop-and-remote-deploy-structure)
   - [Application Logic Structure](#application-logic-structure)
+  - [Data Flow](#data-flow)
   - [Game Description](#game-description)
   - [Dev Env](#dev-env)
     - [Docker command](#docker-command)
@@ -23,7 +24,11 @@
 
 ## Application Logic Structure
 
-![](design/dvc-app-logic.png)
+![](design/dvc-app-logic.png)    
+
+## Data Flow
+
+![](design/data-flow.png)
 ## Game Description
 
 Reveal all of your opponent's secret code before they crack yours!

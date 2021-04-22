@@ -1,5 +1,15 @@
-export default function Home() {
+import Login from 'components/login'
+
+export default function Home({ENDPOINT}) {
   return (
-    <h1>This is the DVC client</h1>
+    <Login ENDPOINT={ENDPOINT}/>
   )
+}
+
+export async function getStaticProps() {
+  const ENDPOINT = process.env.REACT_APP_ENDPOINT || 'localhost:5000'
+
+  return {
+    props: {ENDPOINT}, // will be passed to the page component as props
+  }
 }

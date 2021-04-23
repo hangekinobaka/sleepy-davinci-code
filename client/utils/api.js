@@ -1,24 +1,24 @@
-import axios from "axios";
+import axios from 'axios'
 
-axios.defaults.timeout = 100000;
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL|| 'http://localhost:5000';
+axios.defaults.timeout = 100000
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL|| 'http://localhost:5000'
 
 /**
 * http request 
 */
 axios.interceptors.request.use(
   (config) => {
-    config.data = JSON.stringify(config.data);
+    config.data = JSON.stringify(config.data)
     config.withCredentials = true
     config.headers = {
-      "Content-Type": "application/json",
-    };
-    return config;
+      'Content-Type': 'application/json',
+    }
+    return config
   },
   (error) => {
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
-);
+)
  
 /**
 * http response 
@@ -26,14 +26,14 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   (response) => {
     if (response.data.errCode === 2) {
-      console.log("timeout");
+      console.log('timeout')
     }
-    return response;
+    return response
   },
   (error) => {
-    console.log("error: ", error);
+    console.log('error: ', error)
   }
-);
+)
 
 /**
 * get method
@@ -44,15 +44,14 @@ axios.interceptors.response.use(
 export function get(url, params = {}) {
   return new Promise((resolve, reject) => {
     axios.get(url, {
-        params: params,
-      }).then((response) => {
-        landing(url, params, response.data);
-        resolve(response.data);
-      })
+      params: params,
+    }).then((response) => {
+      resolve(response.data)
+    })
       .catch((error) => {
-        reject(error);
-      });
-  });
+        reject(error)
+      })
+  })
 }
 
 /**
@@ -67,44 +66,44 @@ export function post(url, data) {
     axios.post(url, data).then(
       (response) => {
         // turn off prograss bar here
-        resolve(response.data);
+        resolve(response.data)
       },
       (err) => {
-        reject(err);
+        reject(err)
       }
-    );
-  });
+    )
+  })
 }
 
 export default function api(fecth, url, param) {
-  let _data = "";
+  let _data = ''
   return new Promise((resolve, reject) => {
     switch (fecth) {
-      case "get":
-        console.log("begin a get request,and url:", url);
-        get(url, param)
-          .then(function (response) {
-            resolve(response);
-          })
-          .catch(function (error) {
-            console.log("get request GET failed.", error);
-            reject(error);
-          });
-        break;
-      case "post":
-        post(url, param)
-          .then(function (response) {
-            resolve(response);
-          })
-          .catch(function (error) {
-            console.log("get request POST failed.", error);
-            reject(error);
-          });
-        break;
-      default:
-        break;
+    case 'get':
+      console.log('begin a get request,and url:', url)
+      get(url, param)
+        .then(function (response) {
+          resolve(response)
+        })
+        .catch(function (error) {
+          console.log('get request GET failed.', error)
+          reject(error)
+        })
+      break
+    case 'post':
+      post(url, param)
+        .then(function (response) {
+          resolve(response)
+        })
+        .catch(function (error) {
+          console.log('get request POST failed.', error)
+          reject(error)
+        })
+      break
+    default:
+      break
     }
-  });
+  })
 }
 
  

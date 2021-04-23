@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState } from 'react'
 import styles from 'styles/login.module.scss'
-import Component from "@reach/component-component";
+import Component from '@reach/component-component'
 import { Pane, Tablist, Tab, TextInputField, Switch, Button, CaretRightIcon, Text, Heading} from 'evergreen-ui'
-import api from "utils/api"
+import api from 'utils/api'
+import {USERNAME_LEN,INVITE_CODE_LEN} from 'configs/variables'
 
 export default function Join() {
-  const [username, setUsername] = useState('');
-  const [usernameClicked, setUsernameClicked] = useState(false);
-  const [isPrivate, setIsPrivate] = useState(false);
-  const [inviteCode, setInviteCode] = useState('');
+  const [username, setUsername] = useState('')
+  const [usernameClicked, setUsernameClicked] = useState(false)
+  const [isPrivate, setIsPrivate] = useState(false)
+  const [inviteCode, setInviteCode] = useState('')
 
   // Check if the username is valid
   const usernameIsInvalid = () => usernameClicked && username === ''
@@ -18,29 +19,29 @@ export default function Join() {
     e.preventDefault()
     
     switch(e.target.name){
-      case 'start':
-        console.log(username)
-        console.log(isPrivate)
-        sendLogin()
-        break;
-      case 'join':
-        console.log(username)
-        console.log(inviteCode)
-        break;
-      default:
-        break;
+    case 'start':
+      console.log(username)
+      console.log(isPrivate)
+      sendLogin()
+      break
+    case 'join':
+      console.log(username)
+      console.log(inviteCode)
+      break
+    default:
+      break
     }
   } 
 
   // APIs
   const sendLogin = async () => {
-    const res = await api("post", '/login', { username, isPrivate })
+    const res = await api('post', '/login', { username, isPrivate })
     console.log(res)
   }
 
   return (
-    <Pane className={styles["login-container"]}
-      >
+    <Pane className={styles['login-container']}
+    >
       <Component
         initialState={{
           selectedIndex: 0,
@@ -82,7 +83,7 @@ export default function Join() {
                     id="username"
                     placeholder="Enter username..."
                     width="100%"
-                    maxLength="10"
+                    maxLength={USERNAME_LEN}
                     required
                     value={username}
                     onChange={e => setUsername(e.target.value)}
@@ -97,10 +98,10 @@ export default function Join() {
                       marginLeft={16}
                     />
                   </Pane>
-                    <Button type="submit" appearance="primary" height={40} fontSize={20} 
-                      justifyContent="center" 
-                      width="100%"
-                    >Start! <CaretRightIcon /></Button>
+                  <Button type="submit" appearance="primary" height={40} fontSize={20} 
+                    justifyContent="center" 
+                    width="100%"
+                  >Start! <CaretRightIcon /></Button>
                 </form>
               </Pane>
             
@@ -121,7 +122,7 @@ export default function Join() {
                     id="username"
                     placeholder="Enter username..."
                     width="100%"
-                    maxLength="10"
+                    maxLength={USERNAME_LEN}
                     required
                     value={username}
                     onChange={e => setUsername(e.target.value)}
@@ -133,7 +134,7 @@ export default function Join() {
                     id="inviteCode"
                     placeholder="Enter invite code..."
                     width="100%"
-                    maxLength="4"
+                    maxLength={INVITE_CODE_LEN}
                     value={inviteCode}
                     onChange={e => setInviteCode(e.target.value)}
                   />
@@ -149,5 +150,5 @@ export default function Join() {
         )}
       </Component>
     </Pane>
-  );
+  )
 }

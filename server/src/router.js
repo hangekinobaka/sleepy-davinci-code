@@ -1,13 +1,13 @@
-var cors = require('cors');
-var express = require('express');
-var cookieParser = require('cookie-parser')
+var cors = require("cors");
+var express = require("express");
+var cookieParser = require("cookie-parser");
 
-const {corsOption} = require('./configs/options')
+const {corsOption} = require("./configs/options");
 
 var router = express.Router();
 
-router.use(cors(corsOption))
-router.use(cookieParser())
+router.use(cors(corsOption));
+router.use(cookieParser());
 
 // GET method routes
 router.get("/", cookieValidator, (req, res) => {
@@ -18,22 +18,23 @@ router.get("/test", (req, res) => {
 });
 
 // POST method routes
-router.post('/login', function (req, res) {
-  res.cookie('session_id', '12234455')
+router.post("/login", function (req, res) {
+  res.cookie("session_id", "12234455");
   res.status(200).json({msg:"success"});
-})
+});
 
 // Middlewares
 function cookieValidator(req, res, next){
-  const {cookies} = req
-  console.log(cookies)
-  if('session_id' in cookies){
+  const {cookies} = req;
+  console.log(cookies);
+  // eslint-disable-next-line no-empty
+  if("session_id" in cookies){
 
   }else{
-    res.status(403).send({ msg: "validation failed" })
+    res.status(403).send({ msg: "validation failed" });
   }
 
-  next()
+  next();
 }
 
 module.exports = router;

@@ -1,15 +1,15 @@
 import Login from 'components/login'
 
-export default function Home({ENDPOINT}) {
+export default function Home({API_URL}) {
   return (
-    <Login ENDPOINT={ENDPOINT}/>
+    <Login API_URL={API_URL}/>
   )
 }
 
 export async function getStaticProps() {
-  const ENDPOINT = process.env.REACT_APP_ENDPOINT || 'localhost:5000'
+  const API_URL = process.env.REACT_APP_API_URL|| 'http://localhost:5000'
 
   return {
-    props: {ENDPOINT}, // will be passed to the page component as props
+    props: {API_URL}, // will be passed to the page component as props
   }
 }

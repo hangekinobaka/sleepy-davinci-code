@@ -2,12 +2,14 @@ import { useState } from "react";
 import styles from 'styles/login.module.scss'
 import Component from "@reach/component-component";
 import { Pane, Tablist, Tab, TextInputField, Switch, Button, CaretRightIcon, Text, Heading} from 'evergreen-ui'
+import api from "utils/api"
 
-export default function Join({ENDPOINT}) {
+export default function Join({API_URL}) {
   const [username, setUsername] = useState('');
   const [usernameClicked, setUsernameClicked] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [inviteCode, setInviteCode] = useState('');
+
   // Check if the username is valid
   const usernameIsInvalid = () => usernameClicked && username === ''
   
@@ -19,6 +21,7 @@ export default function Join({ENDPOINT}) {
       case 'start':
         console.log(username)
         console.log(isPrivate)
+        sendLogin()
         break;
       case 'join':
         console.log(username)
@@ -28,6 +31,13 @@ export default function Join({ENDPOINT}) {
         break;
     }
   } 
+
+  // APIs
+  const sendLogin = async () => {
+    const res = await api("post", API_URL + '/login', { username, isPrivate })
+    console.log(res)
+  }
+
   return (
     <Pane className={styles["login-container"]}
       >

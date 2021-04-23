@@ -13,6 +13,9 @@ router.use(cookieParser())
 router.get("/", cookieValidator, (req, res) => {
   res.send({ response: "Hello, World!!!" }).status(200);
 });
+router.get("/test", (req, res) => {
+  res.send({ response: "test" }).status(200);
+});
 
 // POST method routes
 router.post('/login', function (req, res) {

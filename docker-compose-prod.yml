@@ -5,9 +5,6 @@ services:
   client:
     image: hangekinobaka/dvc-app-client:0.0.1
     container_name: dvc_node_client
-    environment:
-      - REACT_APP_ENDPOINT=${SERVER_URL}/api
-      - REACT_APP_API_URL=${ORIGIN}/api
     restart: unless-stopped
 
   server:

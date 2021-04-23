@@ -1,7 +1,7 @@
 import axios from "axios";
 
 axios.defaults.timeout = 100000;
-axios.defaults.baseURL = process.env.REACT_APP_API_URL|| 'http://localhost:1000';
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL|| 'http://localhost:5000';
 
 /**
 * http request 

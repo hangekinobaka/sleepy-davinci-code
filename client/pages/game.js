@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import io from "socket.io-client"
 
-const ENDPOINT = process.env.REACT_APP_ENDPOINT|| 'localhost:5000';
+const ENDPOINT = process.env.RNEXT_PUBLIC_ENDPOINT|| 'localhost:5000';
 
 let socket
 

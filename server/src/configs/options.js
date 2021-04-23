@@ -1,9 +1,8 @@
 
-const CLIENT_PORT = process.env.CLIENT_PORT || 3000;
-const ORIGIN = process.env.ORIGIN || 'http://localhost';
+const CLIENT_ENDPOINT = process.env.CLIENT_ENDPOINT || 'http://localhost:3000';
 
 const corsOption = {
-  origin: `${ORIGIN}:${CLIENT_PORT}`,
+  origin: CLIENT_ENDPOINT,
   credentials: true
 }
 

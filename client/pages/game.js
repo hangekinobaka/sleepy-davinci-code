@@ -1,9 +1,13 @@
 import { useEffect } from 'react'
 import io from "socket.io-client";
+import getConfig from 'next/config'
 
+const { publicRuntimeConfig } = getConfig()
+
+const ENDPOINT = publicRuntimeConfig.REACT_APP_API_URL|| 'localhost:5000';
 let socket
 
-export default function Game({ENDPOINT}) {
+export default function Game() {
 
   useEffect(() => {
     socket = io(ENDPOINT)
@@ -13,12 +17,4 @@ export default function Game({ENDPOINT}) {
   return (
     <h1 className="heading">Game</h1>
   );
-}
-
-export async function getStaticProps() {
-  const ENDPOINT = process.env.REACT_APP_ENDPOINT || 'localhost:5000'
-
-  return {
-    props: {ENDPOINT}, // will be passed to the page component as props
-  }
 }

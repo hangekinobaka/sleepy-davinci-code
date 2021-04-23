@@ -4,7 +4,7 @@ import Component from "@reach/component-component";
 import { Pane, Tablist, Tab, TextInputField, Switch, Button, CaretRightIcon, Text, Heading} from 'evergreen-ui'
 import api from "utils/api"
 
-export default function Join({API_URL}) {
+export default function Join() {
   const [username, setUsername] = useState('');
   const [usernameClicked, setUsernameClicked] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
@@ -34,7 +34,7 @@ export default function Join({API_URL}) {
 
   // APIs
   const sendLogin = async () => {
-    const res = await api("post", API_URL + '/login', { username, isPrivate })
+    const res = await api("post", '/login', { username, isPrivate })
     console.log(res)
   }
 

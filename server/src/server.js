@@ -15,7 +15,7 @@ app.use(router)
 
 const server = http.createServer(app)
 
-const io = socketio(server, {corsOption});
+const io = socketio(server, {cors: corsOption});
 
 const client = redis.createClient(REDIS_PORT, REDIS_HOST);
 

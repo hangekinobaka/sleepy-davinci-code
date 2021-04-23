@@ -1,7 +1,10 @@
 import axios from "axios";
+import getConfig from 'next/config'
+
+const { publicRuntimeConfig } = getConfig()
 
 axios.defaults.timeout = 100000;
-// axios.defaults.baseURL = process.env.REACT_APP_API_URL|| 'http://localhost:5000';
+axios.defaults.baseURL = publicRuntimeConfig.REACT_APP_API_URL|| 'http://localhost:2000';
 
 /**
 * http request 

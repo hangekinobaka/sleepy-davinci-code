@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 axios.defaults.timeout = 100000
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL|| 'http://localhost:5000'
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+axios.defaults.baseURL += process.env.NODE_ENV === 'production' ? '/api' : ''
 
 /**
 * http request 

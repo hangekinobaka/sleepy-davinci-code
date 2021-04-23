@@ -4,8 +4,8 @@ module.exports = {
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },
-  publicRuntimeConfig: {
-    // Will be available on both server and client
+  env: {
     REACT_APP_API_URL: process.env.REACT_APP_API_URL,
+    REACT_APP_ENDPOINT: process.env.REACT_APP_ENDPOINT,
   },
 }

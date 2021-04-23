@@ -1,10 +1,8 @@
 import { useEffect } from 'react'
-import io from "socket.io-client";
-import getConfig from 'next/config'
+import io from "socket.io-client"
 
-const { publicRuntimeConfig } = getConfig()
+const ENDPOINT = process.env.REACT_APP_ENDPOINT|| 'localhost:5000';
 
-const ENDPOINT = publicRuntimeConfig.REACT_APP_API_URL|| 'localhost:5000';
 let socket
 
 export default function Game() {

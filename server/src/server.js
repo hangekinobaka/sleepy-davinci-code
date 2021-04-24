@@ -18,6 +18,14 @@ const io = socketio(server, {cors: corsOption});
 io.on("connection", socket => {
   console.log(`Socket ${socket.id} connected.`);
 
+  socket.on("join", ({ name, room }, callback) => {
+
+    socket.join(room);
+
+    socket.emit("message", { user: "admin", text: `${name}, welcome to room ${room}.`});
+    callback();
+  });
+
   socket.on("disconnect", () => {
     console.log(`Socket ${socket.id} disconnected.`);
   });

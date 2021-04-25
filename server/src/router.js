@@ -1,40 +1,21 @@
-var cors = require("cors");
-var express = require("express");
-var cookieParser = require("cookie-parser");
+const cors = require("cors");
+const express = require("express");
 
-const {corsOption} = require("./configs/options");
+const {corsOption} = require("./utils/config");
+const authController = require("./controller/auth");
 
 var router = express.Router();
 
 router.use(cors(corsOption));
-router.use(cookieParser());
 
 // GET method routes
-router.get("/", cookieValidator, (req, res) => {
-});
-
-router.get("/test", (req, res) => {
-  res.send({ response: "test" }).status(200);
+router.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
 // POST method routes
-router.post("/login", function (req, res) {
-  res.cookie("session_id", "12234455");
-  res.status(200).json({msg:"success"});
-});
-
-// Middlewares
-function cookieValidator(req, res, next){
-  const {cookies} = req;
-  console.log(cookies);
-  // eslint-disable-next-line no-empty
-  if("session_id" in cookies){
-
-  }else{
-    res.status(403).send({ msg: "validation failed" });
-  }
-
-  next();
-}
+router.post("/login", authController.login);
+router.post("/init", authController.init);
+router.post("/exit", authController.exit);
 
 module.exports = router;

@@ -1,15 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import styles from 'styles/login.module.scss'
 import Component from '@reach/component-component'
 import { Pane, Tablist, Tab, TextInputField, Switch, Button, CaretRightIcon, Text, Heading} from 'evergreen-ui'
+
 import api from 'utils/api'
-import {USERNAME_LEN,INVITE_CODE_LEN} from 'configs/variables'
+import {USERNAME_LEN,INVITE_CODE_LEN, API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA} from 'configs/variables'
 
 export default function Join() {
+  const router = useRouter()
+
   const [username, setUsername] = useState('')
   const [usernameClicked, setUsernameClicked] = useState(false)
   const [isPrivate, setIsPrivate] = useState(false)
   const [inviteCode, setInviteCode] = useState('')
+
+
+  useEffect(() => {
+    sendInit()
+  }, [])
 
   // Check if the username is valid
   const usernameIsInvalid = () => usernameClicked && username === ''
@@ -36,7 +45,26 @@ export default function Join() {
   // APIs
   const sendLogin = async () => {
     const res = await api('post', '/login', { username, isPrivate })
-    console.log(res)
+    switch (res.code) {
+    case API_CODE_SUCCESS:
+      router.push('/game')
+      break
+    case API_CODE_FAIL:
+    default:
+      break
+    }
+  }
+  const sendInit = async () => {
+    const res = await api('post', '/init')
+    switch (res.code) {
+    case API_CODE_SUCCESS:
+      router.push('/game')
+      break
+    case API_CODE_FAIL:
+    case API_CODE_NO_DATA:
+    default:
+      break
+    }
   }
 
   return (

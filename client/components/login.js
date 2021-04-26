@@ -60,8 +60,8 @@ export default function Join() {
     case API_CODE_SUCCESS:
       router.push('/game')
       break
-    case API_CODE_FAIL:
     case API_CODE_NO_DATA:
+    case API_CODE_FAIL:
     default:
       break
     }

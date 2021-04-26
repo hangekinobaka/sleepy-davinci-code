@@ -18,22 +18,6 @@ const io = socketio(server, {
 expressInitializer(app);
 ioInitializer(io);
 
-// Run when client connects
-io.on("connection", socket => {
-  console.log(`Socket ${socket.id} connected.`);
-  console.log(socket.handshake.session);
-
-  socket.on("join", ({ name, room }, callback) => {
-    socket.join(room);
-    socket.emit("message", { user: "admin", text: `${name}, welcome to room ${room}.`});
-    callback();
-  });
-
-  socket.on("disconnect", () => {
-    console.log(`Socket ${socket.id} disconnected.`);
-  });
-});
-
 server.listen(PORT, () => {
   const port = server.address().port;
   console.log(`listening at port ${port}...`);

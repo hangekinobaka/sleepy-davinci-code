@@ -15,8 +15,6 @@ export default function Game() {
   useEffect(() => {
     sendInit()
     // Connect the web socket
-    document.cookie = 'foo=bar' + Math.random()
-
     socket = io(ENDPOINT,{
       path: process.env.NODE_ENV === 'production' ? '/api/socket.io' : '/socket.io',
       withCredentials: true

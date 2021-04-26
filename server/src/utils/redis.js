@@ -10,6 +10,8 @@ function PromiseClient () {
   // method binding
   this.set = promisify(this._client.set).bind(this._client);
   this.get = promisify(this._client.get).bind(this._client);
+  this.del = promisify(this._client.del).bind(this._client);
+  this.pexpire = promisify(this._client.pexpire).bind(this._client);
 
   this.sadd = promisify(this._client.sadd).bind(this._client);
   this.smembers = promisify(this._client.smembers).bind(this._client);

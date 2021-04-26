@@ -1,7 +1,7 @@
 const session = require("express-session");
 const redisStore = require("connect-redis")(session);
 
-const { SESSION_SECRET} = require("../variables/config");
+const { SESSION_SECRET, SESSION_EXPIRE_TIME } = require("../variables/config");
 
 const PromiseClient = require("../utils/redis");
 const promiseClient = new PromiseClient();
@@ -18,6 +18,6 @@ module.exports = session({
   cookie: {
     secure: false, // if true: only transmit cookie over https
     httpOnly: true, // if true: prevents client side JS from reading the cookie
-    maxAge: 1000 * 60 * 60 * 3 // session max age in milliseconds 3 hours here
+    maxAge: SESSION_EXPIRE_TIME// session max age in milliseconds
   }
 });

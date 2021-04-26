@@ -1,13 +1,14 @@
-const {REDIS_PORT, REDIS_HOST} = require("./config");
+const {REDIS_PORT, REDIS_HOST} = require("../variables/config");
 const redis = require("redis");
 const { promisify } = require("util");
 
 
-function PromiseClient() {
+function PromiseClient () {
   // constructor
   this._client = redis.createClient(REDIS_PORT, REDIS_HOST);
   
   // method binding
+  this.set = promisify(this._client.set).bind(this._client);
   this.get = promisify(this._client.get).bind(this._client);
 
   this.sadd = promisify(this._client.sadd).bind(this._client);
@@ -27,4 +28,4 @@ function PromiseClient() {
 
 }
 
-module.exports = new PromiseClient();
+module.exports = PromiseClient;

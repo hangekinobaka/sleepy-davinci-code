@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import io from 'socket.io-client'
+import {io} from 'socket.io-client'
 
 import api from 'utils/api'
 import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA} from 'configs/variables'
@@ -15,8 +15,11 @@ export default function Game() {
   useEffect(() => {
     sendInit()
     // Connect the web socket
+    document.cookie = 'foo=bar' + Math.random()
+
     socket = io(ENDPOINT,{
-      path: process.env.NODE_ENV === 'production' ? '/api/socket.io' : '/socket.io'
+      path: process.env.NODE_ENV === 'production' ? '/api/socket.io' : '/socket.io',
+      withCredentials: true
     })
 
     socket.emit('join', { user:'irene', room:'room1' }, (error) => {

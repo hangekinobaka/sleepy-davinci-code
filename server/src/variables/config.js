@@ -10,10 +10,17 @@ const corsOption = {
   credentials: true
 };
 
+const redis_keys = {
+  ROOM_POINTER: "room_pointer",
+  ROOM_DATA:"room_data:",
+  USER_DATA:"user_data:"
+};
+
 module.exports = {
   corsOption,
   CLIENT_ENDPOINT,
   REDIS_PORT,
   REDIS_HOST,
-  SESSION_SECRET
+  SESSION_SECRET,
+  redis_keys
 };

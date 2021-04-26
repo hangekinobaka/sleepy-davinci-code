@@ -1,9 +1,11 @@
 const session = require("express-session");
 const redisStore = require("connect-redis")(session);
 
-const { SESSION_SECRET} = require("../utils/config");
+const { SESSION_SECRET} = require("../variables/config");
 
-const client  = require("../utils/redis").getClient();
+const PromiseClient = require("../utils/redis");
+const promiseClient = new PromiseClient();
+const client = promiseClient.getClient();
 
 
 module.exports = session({

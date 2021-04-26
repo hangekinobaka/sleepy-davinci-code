@@ -1,6 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect,useState } from 'react'
 import { useRouter } from 'next/router'
 import {io} from 'socket.io-client'
+import { Pane, Spinner} from 'evergreen-ui'
+
 
 import api from 'utils/api'
 import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA} from 'configs/variables'
@@ -10,6 +12,8 @@ const ENDPOINT = process.env.NEXT_PUBLIC_API_URL|| 'localhost:5000'
 let socket
 
 export default function Game() {
+  const [initState, setInitState] = useState(false)
+  
   const router = useRouter()
 
   useEffect(() => {
@@ -55,20 +59,30 @@ export default function Game() {
     case API_CODE_FAIL:
     case API_CODE_NO_DATA:
       router.push('/')
-      break
+      return
     case API_CODE_SUCCESS:
     default:
       break
     }
+    setInitState(true)
   }
-
 
   return (
     <>
-      <h1 className="heading">Game</h1>
-      <button onClick={sendExit}>
-        exit
-      </button>
+      {
+        initState ? 
+          <>
+            <h1 className="heading">Game</h1>
+            <button onClick={sendExit}>
+          exit
+            </button>
+          </>
+          : 
+
+          <Pane display="flex" alignItems="center" justifyContent="center" height={600}>
+            <Spinner />
+          </Pane>
+      }
     </>
   )
 }

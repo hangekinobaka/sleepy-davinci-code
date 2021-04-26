@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import styles from 'styles/login.module.scss'
 import Component from '@reach/component-component'
-import { Pane, Tablist, Tab, TextInputField, Switch, Button, CaretRightIcon, Text, Heading, Spinner} from 'evergreen-ui'
+import { Pane, Tablist, Tab, TextInputField, Switch, Button, CaretRightIcon, Text, Heading, Spinner, Overlay,toaster} from 'evergreen-ui'
 
 import api from 'utils/api'
 import {USERNAME_LEN,INVITE_CODE_LEN, API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA} from 'configs/variables'
@@ -15,6 +15,7 @@ export default function Join() {
   const [isPrivate, setIsPrivate] = useState(false)
   const [inviteCode, setInviteCode] = useState('')
   const [initState, setInitState] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     sendInit()
@@ -44,15 +45,26 @@ export default function Join() {
 
   // APIs
   const sendLogin = async () => {
-    const res = await api('post', '/login', { username, isPrivate })
-    switch (res.code) {
-    case API_CODE_SUCCESS:
-      router.push('/game')
-      break
-    case API_CODE_FAIL:
-    default:
-      break
+    setLoading(true)
+    try {
+      const res = await api('post', '/login', { username, isPrivate })
+      switch (res.code) {
+      case API_CODE_SUCCESS:
+        router.push('/game')
+        return 
+      case API_CODE_FAIL:
+      default:
+        toaster.danger(
+          'Oops! login error. Please try it later...'
+        )
+        break
+      }
+    } catch (error) {
+      toaster.danger(
+        'Oops! Network error. Please try it later...'
+      )
     }
+    setLoading(false)
   }
   const sendInit = async () => {
     const res = await api('post', '/init')
@@ -120,7 +132,7 @@ export default function Join() {
                         onChange={e => setUsername(e.target.value)}
                         onClick={() => setUsernameClicked(true)}
                       />
-                      <Pane alignItems="center" display="flex" height={48} justifyContent="space-between" >
+                      <Pane alignItems="center" display="flex" height={48} justifyContent="space-between" marginBottom={16}>
                         <Text onClick={()=>setIsPrivate(!isPrivate)} cursor="pointer" >Private Room?</Text>
                         <Switch
                           height={20}
@@ -187,6 +199,19 @@ export default function Join() {
             <Spinner />
           </Pane>
       }
+
+      <Overlay 
+        isShown={loading} 
+        preventBodyScrolling={true}
+        shouldCloseOnClick={false}
+        shouldCloseOnEscapePress={false}
+      >
+        <div>
+          <Pane display="flex" alignItems="center" justifyContent="center" height={600}>
+            <Spinner />
+          </Pane>
+        </div>
+      </Overlay>
       
     </Pane>
   )

@@ -18,7 +18,7 @@ jobs:
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - name: docker compose build
       run: |
-        docker-compose -f ./docker-compose-build.yml build
+        ./scripts/build.sh
     - name: docker push
       run: |
         docker push hangekinobaka/dvc-app-server:0.0.1

@@ -5,17 +5,14 @@ services:
   client:
     image: hangekinobaka/dvc-app-client:0.0.1
     container_name: dvc_node_client
-    environment:
-      - REACT_APP_ENDPOINT=${SERVER_URL}:${SERVER_PORT}
     restart: unless-stopped
 
   server:
     image: hangekinobaka/dvc-app-server:0.0.1
     container_name: dvc_node_server
     environment:
-      - ORIGIN=${ORIGIN}
+      - CLIENT_ENDPOINT=${CLIENT_ENDPOINT}
       - PORT=${SERVER_PORT}
-      - CLIENT_PORT=${CLIENT_PORT}
       - REDIS_HOST=redis
       - REDIS_PORT=${REDIS_PORT}
     depends_on:

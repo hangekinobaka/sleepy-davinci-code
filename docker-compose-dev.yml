@@ -13,7 +13,8 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - REACT_APP_ENDPOINT=${SERVER_URL}:${SERVER_PORT}
+      - NEXT_PUBLIC_ENDPOINT=${NEXT_PUBLIC_ENDPOINT}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     restart: unless-stopped
 
   server:
@@ -25,8 +26,7 @@ services:
     ports:
      - "${SERVER_PORT}:${SERVER_PORT}"
     environment:
-      - ORIGIN=${ORIGIN}
-      - CLIENT_PORT=${CLIENT_PORT}
+      - CLIENT_ENDPOINT=${CLIENT_ENDPOINT}
       - PORT=${SERVER_PORT}
       - REDIS_HOST=redis
       - REDIS_PORT=${REDIS_PORT}

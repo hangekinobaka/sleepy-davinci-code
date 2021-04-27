@@ -1,24 +1,88 @@
-import { useEffect } from 'react'
-import io from "socket.io-client";
+import { useEffect,useState } from 'react'
+import { useRouter } from 'next/router'
+import {io} from 'socket.io-client'
+import { Pane, Spinner} from 'evergreen-ui'
+
+
+import api from 'utils/api'
+import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA} from 'configs/variables'
+
+const ENDPOINT = process.env.NEXT_PUBLIC_API_URL|| 'localhost:5000'
 
 let socket
 
-export default function Game({ENDPOINT}) {
+export default function Game() {
+  const [initState, setInitState] = useState(false)
+  
+  const router = useRouter()
 
   useEffect(() => {
-    socket = io(ENDPOINT)
+    sendInit()
+    // Connect the web socket
+    socket = io(ENDPOINT,{
+      path: process.env.NODE_ENV === 'production' ? '/api/socket.io' : '/socket.io',
+      withCredentials: true
+    })
 
-  },[ENDPOINT]);
+    socket.emit('join', { user:'irene', room:'room1' }, (error) => {
+      if(error) {
+        alert(error)
+      }
+    })
+
+  },[ENDPOINT])
+
+  useEffect(() => {
+
+    socket.on('message', message => {
+      console.log(message)
+    })
+
+  }, [])
+
+  // APIs
+  const sendExit = async () => {
+    const res = await api('post', '/exit')
+    switch (res.code) {
+    case API_CODE_SUCCESS:
+      router.push('/')
+      break
+    case API_CODE_FAIL:
+      break
+    default:
+      break
+    }
+  }
+  const sendInit = async () => {
+    const res = await api('post', '/init')
+    switch (res.code) {
+    case API_CODE_FAIL:
+    case API_CODE_NO_DATA:
+      router.push('/')
+      return
+    case API_CODE_SUCCESS:
+    default:
+      break
+    }
+    setInitState(true)
+  }
 
   return (
-    <h1 className="heading">Game</h1>
-  );
-}
+    <>
+      {
+        initState ? 
+          <>
+            <h1 className="heading">Game</h1>
+            <button onClick={sendExit}>
+          exit
+            </button>
+          </>
+          : 
 
-export async function getStaticProps() {
-  const ENDPOINT = process.env.REACT_APP_ENDPOINT || 'localhost:5000'
-
-  return {
-    props: {ENDPOINT}, // will be passed to the page component as props
-  }
+          <Pane display="flex" alignItems="center" justifyContent="center" height={600}>
+            <Spinner />
+          </Pane>
+      }
+    </>
+  )
 }

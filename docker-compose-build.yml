@@ -7,7 +7,9 @@ services:
     build:
       context: .
       dockerfile: docker/client/Dockerfile.prod
-
+      args: 
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        
   server:
     image: hangekinobaka/dvc-app-server:0.0.1
     build:

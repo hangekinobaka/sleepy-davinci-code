@@ -17,5 +17,6 @@ router.get("/", (req, res) => {
 router.post("/login", authController.login);
 router.post("/init", authController.init);
 router.post("/exit", authController.exit);
+router.post("/join", authController.join);
 
 module.exports = router;

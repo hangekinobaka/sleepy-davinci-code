@@ -6,3 +6,4 @@ export const API_CODE_FAIL = 0
 export const API_CODE_SUCCESS = 1
 export const API_CODE_NO_DATA = 2
 export const API_CODE_ROOM_GEN_FAIL = 3
+export const API_CODE_NO_ROOM = 4

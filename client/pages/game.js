@@ -1,20 +1,20 @@
-import { useEffect,useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import {io} from 'socket.io-client'
-import { Pane, Spinner} from 'evergreen-ui'
+import { io } from 'socket.io-client'
 
-
-import api from 'utils/api'
 import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA} from 'configs/variables'
+import api from 'utils/api'
+
+import GameUI from 'components/game/game-ui'
 
 const ENDPOINT = process.env.NEXT_PUBLIC_API_URL|| 'localhost:5000'
 
 let socket
 
 export default function Game() {
-  const [initState, setInitState] = useState(false)
-  
   const router = useRouter()
+
+  const [initState, setInitState] = useState(true)
 
   useEffect(() => {
     sendInit()
@@ -40,19 +40,7 @@ export default function Game() {
 
   }, [])
 
-  // APIs
-  const sendExit = async () => {
-    const res = await api('post', '/exit')
-    switch (res.code) {
-    case API_CODE_SUCCESS:
-      router.push('/')
-      break
-    case API_CODE_FAIL:
-      break
-    default:
-      break
-    }
-  }
+  // methods
   const sendInit = async () => {
     const res = await api('post', '/init')
     switch (res.code) {
@@ -67,22 +55,10 @@ export default function Game() {
     setInitState(true)
   }
 
+
   return (
     <>
-      {
-        initState ? 
-          <>
-            <h1 className="heading">Game</h1>
-            <button onClick={sendExit}>
-          exit
-            </button>
-          </>
-          : 
-
-          <Pane display="flex" alignItems="center" justifyContent="center" height={600}>
-            <Spinner />
-          </Pane>
-      }
+      <GameUI initState/>
     </>
   )
 }

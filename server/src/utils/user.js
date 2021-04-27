@@ -22,7 +22,6 @@ const roomCodeGenerator = async function(client){
   } catch (err) {
     console.error(err);
   }
-  return null;
 };
 
 module.exports = {roomCodeGenerator};

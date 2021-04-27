@@ -99,6 +99,8 @@ const join = async (req, res)=>{
     }
     // save the user 2 to the room
     room_data = JSON.parse(room_data);
+    // If for some reason the room is already taken, return a msg
+    if("user_2" in room_data) {res.status(200).json({code: 5, msg:"the room is taken"}); return;}
     await client.setex(
       `${redis_keys.ROOM_DATA}${room_num}`, 
       ROOM_DATA_EXPIRE_TIME,

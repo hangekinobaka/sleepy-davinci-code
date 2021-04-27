@@ -7,7 +7,7 @@ import { Pane, Tablist, Tab, TextInputField, Switch, Button, CaretRightIcon,
 
 import api from 'utils/api'
 import {USERNAME_LEN,INVITE_CODE_LEN, API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, 
-  API_CODE_ROOM_GEN_FAIL, API_CODE_NO_ROOM} from 'configs/variables'
+  API_CODE_ROOM_GEN_FAIL, API_CODE_NO_ROOM, API_CODE_ROOM_TAKEN} from 'configs/variables'
 
 export default function Join() {
   const router = useRouter()
@@ -17,7 +17,7 @@ export default function Join() {
   const [usernameClicked, setUsernameClicked] = useState(false)
   const [isPrivate, setIsPrivate] = useState(false)
   const [inviteCode, setInviteCode] = useState('')
-  const [initState, setInitState] = useState(true)
+  const [initState, setInitState] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -97,6 +97,11 @@ export default function Join() {
           'Seems no room left, try to create one yourself!'
         )
         setSelectedIndex(0)
+        break
+      case API_CODE_ROOM_TAKEN:
+        toaster.warning(
+          'Sorry, this room is taken.'
+        )
         break
       case API_CODE_FAIL:
       default:
@@ -208,7 +213,7 @@ export default function Join() {
                         label={`${INVITE_CODE_LEN}-digit Room Code`}
                         id="inviteCode"
                         placeholder="e.g. 0000"
-                        description="For private room only."
+                        description="Optional"
                         width="100%"
                         maxLength={INVITE_CODE_LEN}
                         value={inviteCode}

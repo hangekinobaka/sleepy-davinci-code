@@ -14,7 +14,7 @@ let socket
 export default function Game() {
   const router = useRouter()
 
-  const [initState, setInitState] = useState(true)
+  const [initState, setInitState] = useState(false)
 
   useEffect(() => {
     sendInit()

@@ -3,11 +3,24 @@ const client = new PromiseClient();
 const { roomCodeGenerator } = require("../utils/user");
 const {redis_keys, ROOM_DATA_EXPIRE_TIME} = require("../variables/config");
 
-const init = (req, res)=>{
+const init = async (req, res)=>{
   try {
     if(req.session.room_num){
-      res.status(200).json({code: 1, msg:"resume game"});
+      // Get the room data
+      let room_data = await client.get(`${redis_keys.ROOM_DATA}${req.session.room_num}`);
+      if(room_data === null) {
+        req.session.destroy();
+        res.status(200).json({code: 6, msg:"room is not exist"}); 
+        return;
+      }
+      // If there is room data, send the needed information
+      room_data = JSON.parse(room_data);
+      res.status(200).json({code: 1, data:{
+        ...room_data,
+        user_num: req.sessionID === room_data.user_1.session_id ? 1 : 2
+      }, msg:"resume game"});
     }else{
+      req.session.destroy();
       res.status(200).json({code: 2, msg:"no previous data"});
     }
   } catch (error) {
@@ -32,6 +45,7 @@ const login = async (req, res)=>{
       `${redis_keys.ROOM_DATA}${room.room_num}`, 
       ROOM_DATA_EXPIRE_TIME,
       JSON.stringify({
+        room_num: room.room_num,
         room_code: room.room_code,
         is_public: isPrivate,
         user_1:{

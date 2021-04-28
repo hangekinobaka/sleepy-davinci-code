@@ -3,9 +3,10 @@ import { useRouter } from 'next/router'
 import { Pane, Spinner, Overlay,toaster} from 'evergreen-ui'
 
 import api from 'utils/api'
+import styles from 'styles/game.module.scss'
 import { API_CODE_SUCCESS, API_CODE_FAIL } from 'configs/variables'
 
-export default function GameUI(initState) {
+export default function GameUI() {
   const [loading, setLoading] = useState(false)
 
   const router = useRouter()
@@ -31,22 +32,10 @@ export default function GameUI(initState) {
   
 
   return (
-    <>
-      {
-        initState ? 
-          <>
-            <h1 className="heading">Game</h1>
-            <button onClick={sendExit}>
+    <div className={styles['game-ui']}>
+      <button onClick={sendExit}>
             exit
-            </button>
-          </>
-          : 
-
-          <Pane display="flex" alignItems="center" justifyContent="center" height={600}>
-            <Spinner />
-          </Pane>
-      }
-
+      </button>
       {/* Loading overlay */}
       <Overlay 
         isShown={loading} 
@@ -60,6 +49,6 @@ export default function GameUI(initState) {
           </Pane>
         </div>
       </Overlay>
-    </>
+    </div>
   )
 }

@@ -5,8 +5,8 @@ const REDIS_HOST = process.env.REDIS_HOST || "127.0.0.1";
 
 const SESSION_SECRET = "sleepy cat";
 const SESSION_EXPIRE_TIME = 1000 * 60 * 60 * 3; // in ms, 3 hours here
-const SESSION_LEAVE_COUNT_DOWN = 1000 * 60 * 1; // in ms, 5 miutes here
-const ROOM_DATA_EXPIRE_TIME =  60 * 60 * 6; // in s, 6 hours here
+const SESSION_LEAVE_COUNT_DOWN = 1000 * 60 * 3; // in ms, 3 miutes here
+const ROOM_DATA_EXPIRE_TIME =  60 * 60 * 3; // in s, 3 hours here
 
 const corsOption = {
   origin: CLIENT_ENDPOINT,

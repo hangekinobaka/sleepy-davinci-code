@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@inlet/react-pixi": "^6.5.1",
     "@reach/component-component": "^0.15.0",
     "axios": "^0.21.1",
     "evergreen-ui": "^5.1.2",

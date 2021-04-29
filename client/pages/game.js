@@ -4,11 +4,10 @@ import dynamic from 'next/dynamic'
 import { io } from 'socket.io-client'
 import { Pane, Spinner } from 'evergreen-ui'
 
-
 import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, API_CODE_ROOM_DESTROYED} from 'configs/variables'
 import api from 'utils/api'
 import SocketClient from 'utils/io'
-import styles from 'styles/game.module.scss'
+import GameLayout from 'layouts/game-layout'
 
 import GameUI from 'components/game/game-ui'
 const GameCanvas = dynamic(() => import('components/game/game-canvas'), {
@@ -62,20 +61,19 @@ export default function Game() {
     return Promise.resolve()
   }
 
-
   return (
-    <div className={styles['game-container']}>
+    <GameLayout>
       {
         initState ? 
-          <>
+          <Pane display="flex" alignItems="center" justifyContent="center" height={window.innerHeight}>
             <GameUI initState/>
             <GameCanvas />
-          </>
+          </Pane>
           : 
           <Pane display="flex" alignItems="center" justifyContent="center" height={600}>
             <Spinner />
           </Pane>
       }
-    </div>
+    </GameLayout>
   )
 }

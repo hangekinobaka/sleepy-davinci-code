@@ -12,7 +12,9 @@ export default function GameCanvas({w,h}) {
   const [app, setApp] = useState()
 
   // textures
+  const [textureLoaded, setTextureLoaded] = useState(false)
   const [cardTexture, setCardTexture] = useState('')
+  const [bgTexture, setBgTexture] = useState('')
 
   
   useEffect(()=>{
@@ -37,35 +39,47 @@ export default function GameCanvas({w,h}) {
 
     PIXI.Loader.shared
       .add([
+        { name: 'bg', url: 'img/bg.jpg'},
         { name: 'card', url: 'img/card-w.png'}
       ])
       .load(setup)
   
     function setup(loader, resources){
       setCardTexture(resources.card.texture)
+      setBgTexture(resources.bg.texture)
+      setTextureLoaded(true)
     }
   }
 
   return (
-    <Stage 
-      width={w}
-      height={canvasHeight}
-      options={{ 
-        autoDensity: true,
-        antialias: true, 
-      }}
-      onMount={setApp}
-    >
-      <Sprite
-        image="img/bg.jpg"
-        width={w}
-        height={canvasHeight}
-        anchor={0.5}
-        x={w/2}
-        y={canvasHeight/2}
-      />
+    <>
+      {
+        textureLoaded ? 
+          <Stage 
+            width={w}
+            height={canvasHeight}
+            options={{ 
+              autoDensity: true,
+              antialias: true, 
+            }}
+            onMount={setApp}
+          >
+            <Sprite
+              texture={bgTexture}
+              width={w}
+              height={canvasHeight}
+              anchor={0.5}
+              x={w/2}
+              y={canvasHeight/2}
+            />
 
-      <Card cardTexture={cardTexture}/>
-    </Stage>
+            <Card cardTexture={cardTexture}/>
+          </Stage>
+
+          :
+
+          <></>
+      }
+    </>
   )
 }

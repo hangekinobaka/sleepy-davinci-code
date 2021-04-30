@@ -10,21 +10,14 @@ export default function Card({cardTexture}){
      
   return (
     <>
-      {
-        cardTexture === '' ?
-          <></>
-          :
-
-          <Sprite
-            texture={cardTexture}
-            width={100}
-            height={150}
-            anchor={0.5}
-            x={300}
-            y={300}
-          />
-      }
-    
+      <Sprite
+        texture={cardTexture}
+        width={100}
+        height={150}
+        anchor={0.5}
+        x={300}
+        y={300}
+      />
     </>
   )
 }

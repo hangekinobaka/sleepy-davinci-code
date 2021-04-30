@@ -3,10 +3,6 @@ import * as PIXI from 'pixi.js'
 import { Sprite } from '@inlet/react-pixi'
 
 export default function Card({cardTexture}){
-
-  useEffect(()=>{
-  },[])
-    
      
   return (
     <>

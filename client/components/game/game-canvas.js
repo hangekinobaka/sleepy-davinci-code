@@ -4,6 +4,8 @@ import * as PIXI from 'pixi.js'
 
 import {DESIGN_WIDTH,DESIGN_HEIGHT} from 'configs/variables'
 import Card from 'components/game/card'
+import CardPile from 'components/game/card-pile'
+
 
 const ratio = DESIGN_HEIGHT / DESIGN_WIDTH
 
@@ -15,6 +17,7 @@ export default function GameCanvas({w,h}) {
   const [textureLoaded, setTextureLoaded] = useState(false)
   const [cardTexture, setCardTexture] = useState('')
   const [bgTexture, setBgTexture] = useState('')
+  const [layCardTextures, setLayCardTextures] = useState({})
 
   
   useEffect(()=>{
@@ -23,11 +26,14 @@ export default function GameCanvas({w,h}) {
 
   useEffect(()=>{
     if(!app) return
-    
   },[app])
 
   useEffect(()=>{
     textureLoader()
+
+    return () => {
+      PIXI.Loader.shared.reset()
+    }
   },[])
 
   // Methods
@@ -40,13 +46,20 @@ export default function GameCanvas({w,h}) {
     PIXI.Loader.shared
       .add([
         { name: 'bg', url: 'img/bg.jpg'},
-        { name: 'card', url: 'img/card-w.png'}
+        { name: 'card_w_stand', url: 'img/card-w.png'},
+        { name: 'card_b_stand', url: 'img/card-b.png'},
+        { name: 'card_w_lay', url: 'img/card-w-lay.png'},
+        { name: 'card_b_lay', url: 'img/card-b-lay.png'}
       ])
       .load(setup)
   
     function setup(loader, resources){
-      setCardTexture(resources.card.texture)
+      setCardTexture(resources.card_w_stand.texture)
       setBgTexture(resources.bg.texture)
+      setLayCardTextures({
+        w: resources.card_w_lay.texture,
+        b: resources.card_b_lay.texture
+      })
       setTextureLoaded(true)
     }
   }
@@ -73,7 +86,7 @@ export default function GameCanvas({w,h}) {
               y={canvasHeight/2}
             />
 
-            <Card cardTexture={cardTexture}/>
+            <CardPile cardTextures={layCardTextures} w={w} h={h} />
           </Stage>
 
           :

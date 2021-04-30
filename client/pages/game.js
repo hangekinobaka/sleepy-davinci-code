@@ -8,6 +8,7 @@ import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, API_CODE_ROOM_DESTROY
 import api from 'utils/api'
 import SocketClient from 'utils/io'
 import GameLayout from 'layouts/game-layout'
+import {DESIGN_WIDTH,DESIGN_HEIGHT} from 'configs/variables'
 
 import GameUI from 'components/game/game-ui'
 const GameCanvas = dynamic(() => import('components/game/game-canvas'), {
@@ -23,6 +24,18 @@ export default function Game() {
 
   const [gameData, setGameData] = useState(undefined)
   const [initState, setInitState] = useState(false)
+  const [w, setW] = useState(DESIGN_WIDTH)
+  const [h, setH] = useState(DESIGN_HEIGHT)
+
+
+  useEffect(()=>{
+    setW(window.innerWidth)
+    setH(window.innerHeight)
+    window.addEventListener('resize', ()=>{
+      setW(window.innerWidth)
+      setH(window.innerHeight)
+    })
+  },[])
 
   useEffect(async () => {
     const data = await sendInit()
@@ -65,9 +78,9 @@ export default function Game() {
     <GameLayout>
       {
         initState ? 
-          <Pane display="flex" alignItems="center" justifyContent="center" height={window.innerHeight}>
+          <Pane display="flex" alignItems="center" justifyContent="center" height={h} background="#2a2d38">
             <GameUI initState/>
-            <GameCanvas />
+            <GameCanvas w={w} h={h}/>
           </Pane>
           : 
           <Pane display="flex" alignItems="center" justifyContent="center" height={600}>

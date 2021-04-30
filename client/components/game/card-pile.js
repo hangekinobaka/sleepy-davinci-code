@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Sprite, Container } from '@inlet/react-pixi'
 import {DESIGN_WIDTH,DESIGN_HEIGHT} from 'configs/variables'
 
@@ -17,15 +17,43 @@ export default function Card({cardTextures, w, h}){
   const [wNum, setWNum] = useState(WHITE_CARD_NUM)
   const [bNum, setBNum] = useState(BLACK_CARD_NUM)
 
+  /**
+   * Generate the card pile's random factors
+   */
+  const genRand = () => {
+    const randArr = []
+    for(let i = 0; i < WHITE_CARD_NUM; i++){
+      const rand = CARD_X[Math.floor((Math.random()*3))]
+      randArr.push(rand)
+    }
+    return randArr
+  }
+
+  const wRandomFactor = useMemo(genRand,[])
+  const bRandomFactor = useMemo(genRand,[])
+
   useEffect(()=>{
     setRatio((w / DESIGN_WIDTH).toFixed(2))
   },[w,h])
+
+  // methods
+  const pileClickHandler = (e)=>{
+    const color = e.target['data-color']
+    if(color === 'w'){
+      setWNum(wNum - 1)
+    }else if(color === 'b'){
+      setBNum(bNum - 1)
+    }
+  }
 
   return (
     <Container position={[CONTAINER_X*ratio,CONTAINER_Y*ratio]} scale={ratio}>
 
       {/* white card pile */}
-      <Container>
+      <Container 
+        interactive={true}
+        pointerdown={pileClickHandler}
+        data-color="w">
         {
           [...new Array(WHITE_CARD_NUM)].map((item, index) => (
             <Sprite
@@ -34,8 +62,9 @@ export default function Card({cardTextures, w, h}){
               width={CARD_WIDTH}
               height={CARD_HEIGHT}
               anchor={0.5}
-              x={CARD_X[Math.floor((Math.random()*3))]}
+              x={wRandomFactor[index]}
               y={0-index*CARD_DELTA_Y}
+              visible={index <= wNum - 1}
             />
           ))
         }
@@ -43,20 +72,25 @@ export default function Card({cardTextures, w, h}){
 
 
       {/* black card pile */}
-      {
-        [...new Array(BLACK_CARD_NUM)].map((item, index) => (
-          <Sprite
-            key={`card-pile-b-${index}`}
-            texture={cardTextures.b}
-            width={CARD_WIDTH}
-            height={CARD_HEIGHT}
-            anchor={0.5}
-            x={CARD_MARGIN_BETWWEN + CARD_X[Math.floor((Math.random()*3))]}
-            y={0-index*CARD_DELTA_Y}
-          />
-        ))
-      }
-      
+      <Container 
+        interactive={true}
+        pointerdown={pileClickHandler}
+        data-color="b">
+        {
+          [...new Array(BLACK_CARD_NUM)].map((item, index) => (
+            <Sprite
+              key={`card-pile-b-${index}`}
+              texture={cardTextures.b}
+              width={CARD_WIDTH}
+              height={CARD_HEIGHT}
+              anchor={0.5}
+              x={CARD_MARGIN_BETWWEN + bRandomFactor[index]}
+              y={0-index*CARD_DELTA_Y}
+              visible={index <= bNum - 1}
+            />
+          ))
+        }
+      </Container>
     </Container >
   )
 }

@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
-import * as PIXI from 'pixi.js'
 import { Sprite } from '@inlet/react-pixi'
 
-export default function Card({cardTexture}){
-     
+export default function Card({cardTextures, w, h, cardStatus}){
+  
+  useEffect(() => {
+    console.log(`Change status ${cardStatus}`)
+  },[cardStatus])
+
   return (
     <>
       <Sprite
-        texture={cardTexture}
+        texture={cardTextures.stand}
         width={100}
         height={150}
         anchor={0.5}

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { Sprite } from '@inlet/react-pixi'
 
-const CARD_WIDTH = 100 
-const CARD_HEIGHT = 140
-const CARD_DELTA_Y = 15
-const CARD_X = [-4,0,4]
-const CARD_MARGIN_BETWWEN = 1000
+const CARD_WIDTH = 150
+const CARD_HEIGHT = 210
 
-export default function Card({cardTextures, w, h, cardStatus}){
-  
+export default function Card({cardTextures, cardStatus}){
+  // Stores
+  const ratio = useSelector(state => state.win.ratio)
+
   useEffect(() => {
     console.log(`Change status ${cardStatus}`)
   },[cardStatus])
@@ -20,8 +20,7 @@ export default function Card({cardTextures, w, h, cardStatus}){
         width={CARD_WIDTH}
         height={CARD_HEIGHT}
         anchor={0.5}
-        x={300}
-        y={300}
+        position={[0*ratio, 0*ratio]}
       />
     </>
   )

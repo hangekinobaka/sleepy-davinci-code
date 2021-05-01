@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Stage, Sprite } from '@inlet/react-pixi'
+import { Stage, Sprite, Container } from '@inlet/react-pixi'
 import { useSelector, useDispatch } from 'react-redux'
 import * as PIXI from 'pixi.js'
 import { Provider } from 'react-redux'
@@ -7,12 +7,10 @@ import store from 'redux/store'
 import { setCardNumW, setCardNumB } from 'redux/card/actions'
 import { WHITE_CARD_NUM, BLACK_CARD_NUM } from 'configs/game'
 
-import {DESIGN_WIDTH,DESIGN_HEIGHT} from 'configs/variables'
 import {CARD_STATUS} from 'configs/game'
 import Card from 'components/game/card'
 import CardPile from 'components/game/card-pile'
 
-const canvasRatio = DESIGN_HEIGHT / DESIGN_WIDTH
 
 export default function GameCanvas() {
   // stores
@@ -20,10 +18,9 @@ export default function GameCanvas() {
   const cardNumB = useSelector(state => state.card.cardNumB)
   const dispatch = useDispatch()
   const w = useSelector(state => state.win.w)
-  const h = useSelector(state => state.win.h)
+  const ratio = useSelector(state => state.win.ratio)
+  const canvasHeight = useSelector(state => state.win.canvasHeight)
 
-  const [ratio, setRatio] = useState((w / DESIGN_WIDTH).toFixed(2))
-  const [canvasHeight, setCanvasHeight] = useState(w * canvasRatio)
   const [app, setApp] = useState()
   const [drawCard, setDrawCard] = useState({
     lay: '', 
@@ -36,10 +33,6 @@ export default function GameCanvas() {
   const [bgTexture, setBgTexture] = useState('')
   const [layCardTextures, setLayCardTextures] = useState({})
   const [standCardTextures, setStandCardTextures] = useState({})
-  
-  useEffect(()=>{
-    setCanvasHeight(w * canvasRatio)
-  },[w,h])
 
   // Handle the store changes
   useEffect(() => {
@@ -133,13 +126,14 @@ export default function GameCanvas() {
                 y={canvasHeight/2}
               />
 
-              <CardPile cardTextures={layCardTextures} w={w} h={h} />
+              <CardPile cardTextures={layCardTextures} />
               
               {/* draw card instance: change with draw status */}
-              <Card 
-                cardTextures={{lay: drawCard.lay, stand: drawCard.stand}} 
-                w={w} h={h}
-                cardStatus={drawCard.status} />
+              <Container position={[w/2, canvasHeight/2]} scale={ratio} anchor={0.5}> 
+                <Card 
+                  cardTextures={{lay: drawCard.lay, stand: drawCard.stand}} 
+                  cardStatus={drawCard.status} />
+              </Container>
             
             </Provider>
           </Stage>

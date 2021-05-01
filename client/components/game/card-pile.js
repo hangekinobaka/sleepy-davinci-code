@@ -13,10 +13,10 @@ const CARD_DELTA_Y = 15
 const CARD_X = [-4,0,4]
 const CARD_MARGIN_BETWWEN = 1000
 
-export default function CardPile({cardTextures, w, h}){
-  const [ratio, setRatio] = useState((w / DESIGN_WIDTH).toFixed(2))
-
+export default function CardPile({cardTextures}){
   // stores
+  const ratio = useSelector(state => state.win.ratio)
+
   const cardNumW = useSelector(state => state.card.cardNumW)
   const cardNumB = useSelector(state => state.card.cardNumB)
   const dispatch = useDispatch()
@@ -36,10 +36,6 @@ export default function CardPile({cardTextures, w, h}){
   // generate the x differences
   const wRandomFactor = useMemo(genRand,[])
   const bRandomFactor = useMemo(genRand,[])
-
-  useEffect(()=>{
-    setRatio((w / DESIGN_WIDTH).toFixed(2))
-  },[w,h])
 
   // methods
   const pileClickHandler = (e)=>{

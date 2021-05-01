@@ -12,10 +12,18 @@ import {CARD_STATUS} from 'configs/game'
 import Card from 'components/game/card'
 import CardPile from 'components/game/card-pile'
 
-const ratio = DESIGN_HEIGHT / DESIGN_WIDTH
+const canvasRatio = DESIGN_HEIGHT / DESIGN_WIDTH
 
-export default function GameCanvas({w,h}) {
-  const [canvasHeight, setCanvasHeight] = useState(w * ratio)
+export default function GameCanvas() {
+  // stores
+  const cardNumW = useSelector(state => state.card.cardNumW)
+  const cardNumB = useSelector(state => state.card.cardNumB)
+  const dispatch = useDispatch()
+  const w = useSelector(state => state.win.w)
+  const h = useSelector(state => state.win.h)
+
+  const [ratio, setRatio] = useState((w / DESIGN_WIDTH).toFixed(2))
+  const [canvasHeight, setCanvasHeight] = useState(w * canvasRatio)
   const [app, setApp] = useState()
   const [drawCard, setDrawCard] = useState({
     lay: '', 
@@ -28,13 +36,9 @@ export default function GameCanvas({w,h}) {
   const [bgTexture, setBgTexture] = useState('')
   const [layCardTextures, setLayCardTextures] = useState({})
   const [standCardTextures, setStandCardTextures] = useState({})
-  // states
-  const cardNumW = useSelector(state => state.card.cardNumW)
-  const cardNumB = useSelector(state => state.card.cardNumB)
-  const dispatch = useDispatch()
   
   useEffect(()=>{
-    setCanvasHeight(w * ratio)
+    setCanvasHeight(w * canvasRatio)
   },[w,h])
 
   // Handle the store changes
@@ -130,11 +134,13 @@ export default function GameCanvas({w,h}) {
               />
 
               <CardPile cardTextures={layCardTextures} w={w} h={h} />
-
+              
+              {/* draw card instance: change with draw status */}
               <Card 
                 cardTextures={{lay: drawCard.lay, stand: drawCard.stand}} 
                 w={w} h={h}
                 cardStatus={drawCard.status} />
+            
             </Provider>
           </Stage>
 

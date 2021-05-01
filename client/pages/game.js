@@ -3,12 +3,13 @@ import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import { io } from 'socket.io-client'
 import { Pane, Spinner } from 'evergreen-ui'
+import { setWinW, setWinH } from 'redux/win/actions'
+import { useSelector, useDispatch } from 'react-redux'
 
 import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, API_CODE_ROOM_DESTROYED} from 'configs/variables'
 import api from 'utils/api'
 import SocketClient from 'utils/io'
 import GameLayout from 'layouts/game-layout'
-import {DESIGN_WIDTH,DESIGN_HEIGHT} from 'configs/variables'
 
 import GameUI from 'components/game/game-ui'
 const GameCanvas = dynamic(() => import('components/game/game-canvas'), {
@@ -20,20 +21,23 @@ const ENDPOINT = process.env.NEXT_PUBLIC_API_URL|| 'localhost:5000'
 let socketClient
 
 export default function Game() {
+  // Stores
+  const w = useSelector(state => state.win.w)
+  const h = useSelector(state => state.win.h)
+  const dispatch = useDispatch()
+
   const router = useRouter()
 
   const [gameData, setGameData] = useState(undefined)
   const [initState, setInitState] = useState(false)
-  const [w, setW] = useState(DESIGN_WIDTH)
-  const [h, setH] = useState(DESIGN_HEIGHT)
 
 
   useEffect(()=>{
-    setW(window.innerWidth)
-    setH(window.innerHeight)
+    dispatch(setWinW(window.innerWidth))
+    dispatch(setWinH(window.innerHeight))
     window.addEventListener('resize', ()=>{
-      setW(window.innerWidth)
-      setH(window.innerHeight)
+      dispatch(setWinW(window.innerWidth))
+      dispatch(setWinH(window.innerHeight))
     })
   },[])
 

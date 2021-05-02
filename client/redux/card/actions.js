@@ -5,7 +5,8 @@ export const CARD_NUM_B_ALTER = 'CARD_NUM_B_ALTER'
 
 export const initialState = {
   cardNumW: WHITE_CARD_NUM,
-  cardNumB: BLACK_CARD_NUM
+  cardNumB: BLACK_CARD_NUM,
+  drawingCard: 'w'
 }
 
 export const setCardNumW = num => ({
@@ -26,12 +27,14 @@ export const reducer = (state = initialState, action) => {
   case CARD_NUM_W_ALTER:
     return {
       ...state,
-      cardNumW: action.payload.num
+      cardNumW: action.payload.num,
+      drawingCard: 'w'
     }
   case CARD_NUM_B_ALTER:
     return {
       ...state,
-      cardNumB: action.payload.num
+      cardNumB: action.payload.num,
+      drawingCard: 'b'
     }
   default:
     return state

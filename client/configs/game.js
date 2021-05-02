@@ -9,3 +9,7 @@ export const CARD_STATUS = {
 
 export const WHITE_CARD_NUM = 12
 export const BLACK_CARD_NUM = 12
+
+export const CARD_PILE = {
+  CARD_MARGIN_BETWWEN: 1000
+}

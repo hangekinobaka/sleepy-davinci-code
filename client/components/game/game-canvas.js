@@ -1,13 +1,17 @@
+// libs
 import { useEffect, useState } from 'react'
-import { Stage, Sprite, Container } from '@inlet/react-pixi'
+import { Stage, Sprite, Container, Text } from '@inlet/react-pixi'
 import { useSelector, useDispatch } from 'react-redux'
 import * as PIXI from 'pixi.js'
 import { Provider } from 'react-redux'
 import store from 'redux/store'
+// redux
 import { setCardNumW, setCardNumB } from 'redux/card/actions'
-import { WHITE_CARD_NUM, BLACK_CARD_NUM } from 'configs/game'
-
-import {CARD_STATUS} from 'configs/game'
+// configs
+import { WHITE_CARD_NUM, BLACK_CARD_NUM,CARD_STATUS } from 'configs/game'
+// utils
+import { setFps } from 'utils/pixi'
+// Components
 import Card from 'components/game/card'
 import CardPile from 'components/game/card-pile'
 
@@ -27,12 +31,24 @@ export default function GameCanvas() {
     stand: '',
     status: ''
   })
+  const [textField, setTextField] = useState('')
 
   // textures
   const [textureLoaded, setTextureLoaded] = useState(false)
   const [bgTexture, setBgTexture] = useState('')
   const [layCardTextures, setLayCardTextures] = useState({})
   const [standCardTextures, setStandCardTextures] = useState({})
+
+  // Setup app initialization
+  useEffect(()=>{
+    if(!app) return
+    
+    if(process.env.NODE_ENV === 'development'){
+      setFps(app, fps => {
+        setTextField(fps)
+      })
+    }
+  }, [app])
 
   // Handle the store changes
   useEffect(() => {
@@ -116,6 +132,7 @@ export default function GameCanvas() {
             }}
             onMount={setApp}
           >
+              
             <Provider store={store}>
               <Sprite
                 texture={bgTexture}
@@ -125,6 +142,17 @@ export default function GameCanvas() {
                 x={w/2}
                 y={canvasHeight/2}
               />
+
+              {/* fps mini tool */}
+              { process.env.NODE_ENV === 'development' ? 
+              
+                <Text
+                  text={textField}
+                  x={0}
+                  y={0}></Text>
+                :
+                <></>
+              }
 
               <CardPile cardTextures={layCardTextures} />
               

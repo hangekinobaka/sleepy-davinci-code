@@ -6,7 +6,7 @@ import { CARD_STATUS, CARD_PILE } from 'configs/game'
 const CARD_WIDTH = 150
 const CARD_HEIGHT = 210
 
-export default function Card({cardTextures, cardStatus}){
+export default function Card({cardTextures, cardStatus = CARD_STATUS.none}){
   // Stores
   const ratio = useSelector(state => state.win.ratio)
   const w = useSelector(state => state.win.w)

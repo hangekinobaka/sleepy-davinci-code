@@ -8,7 +8,7 @@ import store from 'redux/store'
 // redux
 import { setCardNumW, setCardNumB } from 'redux/card/actions'
 // configs
-import { WHITE_CARD_NUM, BLACK_CARD_NUM,CARD_STATUS } from 'configs/game'
+import { WHITE_CARD_NUM, BLACK_CARD_NUM,CARD_STATUS, NUM_SHEET_MAP } from 'configs/game'
 // utils
 import { setFps } from 'utils/pixi'
 // Components
@@ -38,6 +38,7 @@ export default function GameCanvas() {
   const [bgTexture, setBgTexture] = useState('')
   const [layCardTextures, setLayCardTextures] = useState({})
   const [standCardTextures, setStandCardTextures] = useState({})
+  const [numSheetTextures, setNumSheetTextures] = useState()
 
   // Setup app initialization
   useEffect(()=>{
@@ -90,7 +91,8 @@ export default function GameCanvas() {
         { name: 'card_w_stand', url: 'img/card-w.png'},
         { name: 'card_b_stand', url: 'img/card-b.png'},
         { name: 'card_w_lay', url: 'img/card-w-lay.png'},
-        { name: 'card_b_lay', url: 'img/card-b-lay.png'}
+        { name: 'card_b_lay', url: 'img/card-b-lay.png'},
+        { name: 'num_sheet', url: 'img/number-sheet.json'}
       ])
       .load(setup)
   
@@ -104,7 +106,10 @@ export default function GameCanvas() {
         w: resources.card_w_stand.texture,
         b: resources.card_b_stand.texture
       })
+      setNumSheetTextures(resources.num_sheet)
+
       initTextures(resources)
+
       setTextureLoaded(true)
     }
   }
@@ -162,6 +167,16 @@ export default function GameCanvas() {
                   cardTextures={{lay: drawCard.lay, stand: drawCard.stand}} 
                   cardStatus={drawCard.status} />
               </Container>
+
+              
+              <Sprite
+                texture={numSheetTextures.textures[NUM_SHEET_MAP.b2_l]}
+                width={300}
+                height={300}
+                anchor={0.5}
+                x={w/2}
+                y={canvasHeight/2}
+              />
             
             </Provider>
           </Stage>

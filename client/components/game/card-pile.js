@@ -3,17 +3,18 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Sprite, Container } from '@inlet/react-pixi'
 import { WHITE_CARD_NUM, BLACK_CARD_NUM, CARD_PILE } from 'configs/game'
 import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
-import { setCardNumW, setCardNumB } from 'redux/card/actions'
+import { setCardNumW, setCardNumB, setIsInteractive } from 'redux/card/actions'
 
-const CARD_WIDTH = 170
-const CARD_HEIGHT = 102
-const CARD_DELTA_Y = 18
-const CARD_X = [-4,0,4]
+const CARD_WIDTH = 200
+const CARD_HEIGHT = 120
+const CARD_DELTA_Y = 22
+const CARD_X = [-5,0,5]
 
 export default function CardPile({cardTextures}){
   // stores
   const cardNumW = useSelector(state => state.card.cardNumW)
   const cardNumB = useSelector(state => state.card.cardNumB)
+  const isInteractive = useSelector(state => state.card.isInteractive)
   const dispatch = useDispatch()
 
   /**
@@ -34,6 +35,7 @@ export default function CardPile({cardTextures}){
 
   // methods
   const pileClickHandler = (e)=>{
+    dispatch(setIsInteractive(false))
     const color = e.target['data-color']
     if(color === 'w'){
       dispatch(setCardNumW(cardNumW - 1))
@@ -48,7 +50,7 @@ export default function CardPile({cardTextures}){
 
         {/* white card pile */}
         <Container 
-          interactive={true}
+          interactive={isInteractive}
           pointerdown={pileClickHandler}
           data-color="w">
           {
@@ -70,7 +72,7 @@ export default function CardPile({cardTextures}){
 
         {/* black card pile */}
         <Container 
-          interactive={true}
+          interactive={isInteractive}
           pointerdown={pileClickHandler}
           data-color="b">
           {

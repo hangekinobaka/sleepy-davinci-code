@@ -6,9 +6,9 @@ import * as PIXI from 'pixi.js'
 import { Provider } from 'react-redux'
 import store from 'redux/store'
 // redux
-import { resetAll } from 'redux/card/actions'
+import { resetAll, setNumSheetTextures } from 'redux/card/actions'
 // configs
-import { NUM_SHEET_MAP, CARD_TYPE } from 'configs/game'
+import { CARD_TYPE } from 'configs/game'
 import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
 // utils
 import { setFps } from 'utils/pixi'
@@ -16,31 +16,30 @@ import { setFps } from 'utils/pixi'
 import Card from 'components/game/card'
 import CardPile from 'components/game/card-pile'
 // gsap plugin register
-import { PixiPlugin, MotionPathPlugin } from 'gsap/all'
+import { PixiPlugin } from 'gsap/all'
 import { gsap } from 'gsap'
 PixiPlugin.registerPIXI(PIXI)
 gsap.registerPlugin(PixiPlugin)
-gsap.registerPlugin(MotionPathPlugin)
-
 
 export default function GameCanvas() {
   // stores
   const ratio = useSelector(state => state.win.ratio)
   const w = useSelector(state => state.win.w)
   const canvasHeight = useSelector(state => state.win.canvasHeight)
+  const isDrawing = useSelector(state => state.card.isDrawing)
   const dispatch = useDispatch()
 
   // states
   const [app, setApp] = useState()
   const [ftpTextField, setFtpTextField] = useState('')
   const [loadingTextField, setLoadingTextField] = useState('')
+  const [myCardNum, setMyCardNum] = useState(0)
 
   // textures
   const [textureLoaded, setTextureLoaded] = useState(false)
   const [bgTexture, setBgTexture] = useState('')
   const [layCardTextures, setLayCardTextures] = useState({})
   const [standCardTextures, setStandCardTextures] = useState({})
-  const [numSheetTextures, setNumSheetTextures] = useState()
 
   // Setup app initialization
   useEffect(()=>{
@@ -67,7 +66,15 @@ export default function GameCanvas() {
       PIXI.utils.clearTextureCache()
       dispatch(resetAll())
     }
+
   },[])
+
+  /**
+   * Everytime draw the card
+   */
+  useEffect(()=>{
+    if(isDrawing) setMyCardNum(myCardNum+1)
+  },[isDrawing])
 
   // Methods
   const textureLoader = ()=>{
@@ -100,7 +107,7 @@ export default function GameCanvas() {
         w: resources.card_w_stand.texture,
         b: resources.card_b_stand.texture
       })
-      setNumSheetTextures(resources.num_sheet)
+      dispatch(setNumSheetTextures(resources.num_sheet.textures))
 
       initTextures(resources)
 
@@ -145,9 +152,14 @@ export default function GameCanvas() {
                 <CardPile cardTextures={layCardTextures} />
               
                 {/* draw card instance: change with draw status */}
-                <Card 
-                  cardTextures={{lay: layCardTextures, stand: standCardTextures}} 
-                  cardType={CARD_TYPE.draw} />
+                {
+                  [...new Array(myCardNum)].map((item, index) => (
+                    <Card 
+                      key={`card-${index}`}
+                      cardTextures={{lay: layCardTextures, stand: standCardTextures}} 
+                    />
+                  ))
+                }
               </Container>
               
               {/* fps widget */}

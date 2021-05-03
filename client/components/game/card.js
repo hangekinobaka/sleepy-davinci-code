@@ -1,77 +1,59 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Sprite, Container, useApp } from '@inlet/react-pixi'
-import { CARD_STATUS, CARD_PILE, CARD_TYPE } from 'configs/game'
+import { Sprite, useApp } from '@inlet/react-pixi'
+import { CARD_STATUS, CARD_PILE, CARD_TYPE, NUM_SHEET_MAP } from 'configs/game'
 import { closeDrawing } from 'redux/card/actions'
 import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
-import {gsap} from 'gsap'
+import { gsap } from 'gsap'
+import { setIsInteractive } from 'redux/card/actions'
+import * as PIXI from 'pixi.js'
 
-const CARD_WIDTH = 100
-const CARD_HEIGHT = 140
+const CARD_WIDTH = 180
+const CARD_HEIGHT = 252
 
-const tl = gsap.timeline()
-export default function Card({cardTextures, cardType = CARD_TYPE.draw}){
+export default function Card({cardTextures}){
   const app = useApp()
   // Stores
-  const canvasHeight = useSelector(state => state.win.canvasHeight)
-  const w = useSelector(state => state.win.w)
-  const ratio = useSelector(state => state.win.ratio)
   const drawingCard = useSelector(state => state.card.drawingCard)
-  const isDrawing = useSelector(state => state.card.isDrawing)
+  const numSheetTextures = useSelector(state => state.card.numSheetTextures)
   const dispatch = useDispatch()
   // States
   const [cardPosition, setCardPosition] = useState({x: 0, y: 0})
   const [cardTexture, setCardTexture] = useState(cardTextures.stand.w)
-  const [cardStatus, setCardStatus] = useState(CARD_STATUS.none)  
+  const [cardStatus, setCardStatus] = useState(CARD_STATUS.draw)  
   const [displayMe, setDisplayMe] = useState(false)
   const me = useRef()
 
-  // useEffect(()=>{
-  //   switch (cardType){
-  //   case CARD_TYPE.draw:
-  //     break
-  //   default: break
-  //   }
-  // },[cardType, app])
-
   useEffect(() => {
-    switch (cardType){
-    case CARD_TYPE.draw:
-      drawStatusHandler()
-      break
-    default: break
-    }
+    statusHandler()
   },[cardStatus])
 
-  useEffect(() => {
-    if(isDrawing) setCardStatus(CARD_STATUS.draw)
-  }, [isDrawing])
-
   // Methods
-  const drawStatusHandler = () => {
+  const statusHandler = () => {
     let pos = { x: 0, y: 0 }
-
     switch (cardStatus){
     case CARD_STATUS.drawOver:
       dispatch(closeDrawing())
-
+      dispatch(setIsInteractive(true))
       break
     case CARD_STATUS.draw:
       if(drawingCard === 'w'){
         pos = {
-          x: 0, y: 0
+          x: (DESIGN_WIDTH-CARD_PILE.CARD_MARGIN_BETWWEN)/2 + 100, y: DESIGN_HEIGHT/2 - 60
         }
         setCardTexture(cardTextures.stand.w)
       }
       else if(drawingCard === 'b'){
         pos = {
-          x: 0, y: 0
+          x: (DESIGN_WIDTH+CARD_PILE.CARD_MARGIN_BETWWEN)/2 - 100, y: DESIGN_HEIGHT/2 - 60
         }
         setCardTexture(cardTextures.stand.b)
       }
+      // Set init position
+      addNumber()
       setCardPosition(pos)
+      drawAnimation()
       setDisplayMe(true)
-      setTimeout(() => setCardStatus(CARD_STATUS.drawOver), 0)
       break
     case CARD_STATUS.none:
     default: 
@@ -79,22 +61,34 @@ export default function Card({cardTextures, cardType = CARD_TYPE.draw}){
     }
   }
 
-  // custom ticker
-  // useTick(delta => {
+  const drawAnimation = () => {
+    const tl = gsap.timeline()
 
-  // i += 0.05 * delta
+    tl
+      .to(me.current, {
+        pixi: {x:DESIGN_WIDTH-1000, y:DESIGN_HEIGHT-350, scaleX: 3, scaleY: 3},
+        ease: 'power1.inOut',
+        duration: 1.5
+      })
+      .to(me.current, {
+        pixi: {x:DESIGN_WIDTH-170, y:DESIGN_HEIGHT-350, scaleX: 2, scaleY: 2},
+        ease: 'power1.out',
+        duration: .8,
+        onComplete: () => setCardStatus(CARD_STATUS.drawOver)
+      })
+  }
 
-  // setCardPosition({
-  //   x: Math.sin(i) * 1000,
-  //   y: Math.sin(i/1.5) * 1000
-  // })
-  // })
+  // Add the number sprite
+  const addNumber = () => {
+    const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP['b10_s']])
+    sprite.width = CARD_WIDTH / 2
+    sprite.height = CARD_HEIGHT / 2
+    sprite.anchor.set(0.5)
+    me.current.addChild(sprite)
+  }
 
   return (
-    <Container 
-      // scale={ratio}
-      x={0}
-      y={0}>
+    <>
       <Sprite
         ref={me}
         texture={cardTexture}
@@ -104,6 +98,6 @@ export default function Card({cardTextures, cardType = CARD_TYPE.draw}){
         position={cardPosition}
         visible={displayMe}
       />
-    </Container>
+    </>
   )
 }

@@ -18,7 +18,7 @@ export const CARD_PILE = {
   CARD_MARGIN_BETWWEN: 1000
 }
 
-// Usage example: numSheetTextures.textures[NUM_SHEET_MAP.b2_l]
+// Usage example: numSheetTextures[NUM_SHEET_MAP.b2_l]
 export const NUM_SHEET_MAP = {
   b1_l: '1b-l.png',
   b1_s: '1b-s.png',

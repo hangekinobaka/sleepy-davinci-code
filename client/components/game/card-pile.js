@@ -2,18 +2,16 @@ import { useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Sprite, Container } from '@inlet/react-pixi'
 import { WHITE_CARD_NUM, BLACK_CARD_NUM, CARD_PILE } from 'configs/game'
+import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
 import { setCardNumW, setCardNumB } from 'redux/card/actions'
 
-const CARD_WIDTH = 150 
-const CARD_HEIGHT = 90
-const CARD_DELTA_Y = 15
+const CARD_WIDTH = 170
+const CARD_HEIGHT = 102
+const CARD_DELTA_Y = 18
 const CARD_X = [-4,0,4]
 
 export default function CardPile({cardTextures}){
   // stores
-  const ratio = useSelector(state => state.win.ratio)
-  const w = useSelector(state => state.win.w)
-  const canvasHeight = useSelector(state => state.win.canvasHeight)
   const cardNumW = useSelector(state => state.card.cardNumW)
   const cardNumB = useSelector(state => state.card.cardNumB)
   const dispatch = useDispatch()
@@ -46,7 +44,7 @@ export default function CardPile({cardTextures}){
 
   return (
     <>
-      <Container position={[w/2 - CARD_PILE.CARD_MARGIN_BETWWEN*ratio/2,canvasHeight/2]} scale={ratio}>
+      <Container position={[DESIGN_WIDTH/2 - CARD_PILE.CARD_MARGIN_BETWWEN/2,DESIGN_HEIGHT/2 + 100]}>
 
         {/* white card pile */}
         <Container 

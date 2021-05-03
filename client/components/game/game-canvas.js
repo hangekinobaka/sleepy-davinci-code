@@ -9,26 +9,27 @@ import store from 'redux/store'
 import { resetAll } from 'redux/card/actions'
 // configs
 import { NUM_SHEET_MAP, CARD_TYPE } from 'configs/game'
+import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
 // utils
 import { setFps } from 'utils/pixi'
 // Components
 import Card from 'components/game/card'
 import CardPile from 'components/game/card-pile'
 // gsap plugin register
-import { PixiPlugin } from 'gsap/all'
+import { PixiPlugin, MotionPathPlugin } from 'gsap/all'
 import { gsap } from 'gsap'
 PixiPlugin.registerPIXI(PIXI)
 gsap.registerPlugin(PixiPlugin)
+gsap.registerPlugin(MotionPathPlugin)
 
 
 export default function GameCanvas() {
   // stores
-  const cardNumW = useSelector(state => state.card.cardNumW)
-  const cardNumB = useSelector(state => state.card.cardNumB)
-  const dispatch = useDispatch()
-  const w = useSelector(state => state.win.w)
   const ratio = useSelector(state => state.win.ratio)
+  const w = useSelector(state => state.win.w)
   const canvasHeight = useSelector(state => state.win.canvasHeight)
+  const dispatch = useDispatch()
+
   // states
   const [app, setApp] = useState()
   const [ftpTextField, setFtpTextField] = useState('')
@@ -124,21 +125,34 @@ export default function GameCanvas() {
               antialias: true, 
             }}
             onMount={setApp}
+            x={0}
+            y={0}
           >
               
             <Provider store={store}>
-              <Sprite
-                texture={bgTexture}
-                width={w}
-                height={canvasHeight}
-                anchor={0.5}
-                x={w/2}
-                y={canvasHeight/2}
-              />
+              <Container 
+                scale={ratio}
+              >
+                <Sprite
+                  texture={bgTexture}
+                  width={DESIGN_WIDTH}
+                  height={DESIGN_HEIGHT}
+                  anchor={0.5}
+                  x={DESIGN_WIDTH/2}
+                  y={DESIGN_HEIGHT/2}
+                />
 
-              {/* fps mini tool */}
-              { process.env.NODE_ENV === 'development' ? 
+                <CardPile cardTextures={layCardTextures} />
               
+                {/* draw card instance: change with draw status */}
+                <Card 
+                  cardTextures={{lay: layCardTextures, stand: standCardTextures}} 
+                  cardType={CARD_TYPE.draw} />
+              </Container>
+              
+              {/* fps widget */}
+              { process.env.NODE_ENV === 'development' ? 
+
                 <Text
                   text={ftpTextField}
                   x={0}
@@ -146,16 +160,6 @@ export default function GameCanvas() {
                 :
                 <></>
               }
-
-              <CardPile cardTextures={layCardTextures} />
-              
-              {/* draw card instance: change with draw status */}
-              <Container position={[w/2, canvasHeight/2]} scale={ratio} anchor={0.5}> 
-                <Card 
-                  cardTextures={{lay: layCardTextures, stand: standCardTextures}} 
-                  cardType={CARD_TYPE.draw} />
-              </Container>
-            
             </Provider>
           </Stage>
 

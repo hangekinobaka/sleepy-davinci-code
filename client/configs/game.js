@@ -1,10 +1,14 @@
 export const CARD_STATUS = {
   none: 0,
   draw: 1,
-  stand_hide: 2,
-  stand_show:3,
+  standHide: 2,
+  standShow:3,
   lay:4,
-  dragable: 5
+  dragable: 5,
+  drawOver: 6
+}
+export const CARD_TYPE = {
+  draw: 1,
 }
 
 export const WHITE_CARD_NUM = 12
@@ -14,6 +18,7 @@ export const CARD_PILE = {
   CARD_MARGIN_BETWWEN: 1000
 }
 
+// Usage example: numSheetTextures.textures[NUM_SHEET_MAP.b2_l]
 export const NUM_SHEET_MAP = {
   b1_l: '1b-l.png',
   b1_s: '1b-s.png',

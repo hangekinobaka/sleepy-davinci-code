@@ -6,14 +6,19 @@ import * as PIXI from 'pixi.js'
 import { Provider } from 'react-redux'
 import store from 'redux/store'
 // redux
-import { setCardNumW, setCardNumB } from 'redux/card/actions'
+import { resetAll } from 'redux/card/actions'
 // configs
-import { WHITE_CARD_NUM, BLACK_CARD_NUM,CARD_STATUS, NUM_SHEET_MAP } from 'configs/game'
+import { NUM_SHEET_MAP, CARD_TYPE } from 'configs/game'
 // utils
 import { setFps } from 'utils/pixi'
 // Components
 import Card from 'components/game/card'
 import CardPile from 'components/game/card-pile'
+// gsap plugin register
+import { PixiPlugin } from 'gsap/all'
+import { gsap } from 'gsap'
+PixiPlugin.registerPIXI(PIXI)
+gsap.registerPlugin(PixiPlugin)
 
 
 export default function GameCanvas() {
@@ -24,14 +29,10 @@ export default function GameCanvas() {
   const w = useSelector(state => state.win.w)
   const ratio = useSelector(state => state.win.ratio)
   const canvasHeight = useSelector(state => state.win.canvasHeight)
-
+  // states
   const [app, setApp] = useState()
-  const [drawCard, setDrawCard] = useState({
-    lay: '', 
-    stand: '',
-    status: ''
-  })
-  const [textField, setTextField] = useState('')
+  const [ftpTextField, setFtpTextField] = useState('')
+  const [loadingTextField, setLoadingTextField] = useState('')
 
   // textures
   const [textureLoaded, setTextureLoaded] = useState(false)
@@ -44,29 +45,18 @@ export default function GameCanvas() {
   useEffect(()=>{
     if(!app) return
     
+    // add fps widget
     if(process.env.NODE_ENV === 'development'){
       setFps(app, fps => {
-        setTextField(fps)
+        setFtpTextField(fps)
       })
     }
   }, [app])
 
-  // Handle the store changes
-  useEffect(() => {
-    setDrawCard({
-      lay: layCardTextures.w, 
-      stand: standCardTextures.w,
-      status: CARD_STATUS.draw
-    })
-  },[cardNumW])
-  useEffect(() => {
-    setDrawCard({
-      lay: layCardTextures.b, 
-      stand: standCardTextures.b,
-      status: CARD_STATUS.draw
-    })
-  },[cardNumB])
 
+  /**
+   * Load all the textures needed 
+   */
   useEffect(()=>{
     textureLoader()
 
@@ -74,15 +64,11 @@ export default function GameCanvas() {
       // Reset all the resources
       PIXI.Loader.shared.reset()
       PIXI.utils.clearTextureCache()
-      dispatch(setCardNumW(WHITE_CARD_NUM))
-      dispatch(setCardNumB(BLACK_CARD_NUM))
+      dispatch(resetAll())
     }
   },[])
 
   // Methods
-  /**
-   * Load all the textures needed 
-   */
   const textureLoader = ()=>{
 
     PIXI.Loader.shared
@@ -95,6 +81,13 @@ export default function GameCanvas() {
         { name: 'num_sheet', url: 'img/number-sheet.json'}
       ])
       .load(setup)
+      .onProgress.add((e) => {
+        const str = Math.floor(e.progress)
+          .toString()
+          .padStart(2, '0') + '%'
+        
+        setLoadingTextField(str)
+      })
   
     function setup(loader, resources){
       setBgTexture(resources.bg.texture)
@@ -117,11 +110,6 @@ export default function GameCanvas() {
 
   // Handle when everthing is loaded
   const initTextures = (resources) => {
-    setDrawCard({
-      lay: resources.card_w_lay.texture, 
-      stand: resources.card_w_stand.texture,
-      status: CARD_STATUS.none
-    })
   }
 
   return (
@@ -152,9 +140,9 @@ export default function GameCanvas() {
               { process.env.NODE_ENV === 'development' ? 
               
                 <Text
-                  text={textField}
+                  text={ftpTextField}
                   x={0}
-                  y={0}></Text>
+                  y={0}/>
                 :
                 <></>
               }
@@ -164,26 +152,18 @@ export default function GameCanvas() {
               {/* draw card instance: change with draw status */}
               <Container position={[w/2, canvasHeight/2]} scale={ratio} anchor={0.5}> 
                 <Card 
-                  cardTextures={{lay: drawCard.lay, stand: drawCard.stand}} 
-                  cardStatus={drawCard.status} />
+                  cardTextures={{lay: layCardTextures, stand: standCardTextures}} 
+                  cardType={CARD_TYPE.draw} />
               </Container>
-
-              
-              <Sprite
-                texture={numSheetTextures.textures[NUM_SHEET_MAP.b2_l]}
-                width={300}
-                height={300}
-                anchor={0.5}
-                x={w/2}
-                y={canvasHeight/2}
-              />
             
             </Provider>
           </Stage>
 
           :
 
-          <></>
+          <h1>
+            {`Loading ... ${loadingTextField}`}
+          </h1>
       }
     </>
   )

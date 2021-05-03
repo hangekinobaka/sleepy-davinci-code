@@ -2,14 +2,17 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import styles from 'styles/login.module.scss'
 import Component from '@reach/component-component'
-import { Pane, Tablist, Tab, TextInputField, Switch, Button, CaretRightIcon, Text, Heading, Spinner, Overlay,toaster} from 'evergreen-ui'
+import { Pane, Tablist, Tab, TextInputField, Switch, Button, CaretRightIcon, 
+  Text, Heading, Spinner, Overlay,toaster} from 'evergreen-ui'
 
 import api from 'utils/api'
-import {USERNAME_LEN,INVITE_CODE_LEN, API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA} from 'configs/variables'
+import {USERNAME_LEN,INVITE_CODE_LEN, API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, 
+  API_CODE_ROOM_GEN_FAIL, API_CODE_NO_ROOM, API_CODE_ROOM_TAKEN} from 'configs/variables'
 
 export default function Join() {
   const router = useRouter()
-
+  
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const [username, setUsername] = useState('')
   const [usernameClicked, setUsernameClicked] = useState(false)
   const [isPrivate, setIsPrivate] = useState(false)
@@ -30,13 +33,10 @@ export default function Join() {
     
     switch(e.target.name){
     case 'start':
-      console.log(username)
-      console.log(isPrivate)
       sendLogin()
       break
     case 'join':
-      console.log(username)
-      console.log(inviteCode)
+      sendJoin()
       break
     default:
       break
@@ -52,6 +52,11 @@ export default function Join() {
       case API_CODE_SUCCESS:
         router.push('/game')
         return 
+      case API_CODE_ROOM_GEN_FAIL:  
+        toaster.danger(
+          'Oops! The room might be full. Please try it later...'
+        )
+        break
       case API_CODE_FAIL:
       default:
         toaster.danger(
@@ -79,6 +84,39 @@ export default function Join() {
     }
     setInitState(true)
   }
+  const sendJoin = async () => {
+    setLoading(true)
+    try {
+      const res = await api('post', '/join', { username, inviteCode })
+      switch (res.code) {
+      case API_CODE_SUCCESS:
+        router.push('/game')
+        return
+      case API_CODE_NO_ROOM:  
+        toaster.warning(
+          'Seems no room left, try to create one yourself!'
+        )
+        setSelectedIndex(0)
+        break
+      case API_CODE_ROOM_TAKEN:
+        toaster.warning(
+          'Sorry, this room is taken.'
+        )
+        break
+      case API_CODE_FAIL:
+      default:
+        toaster.danger(
+          'Oops! login error. Please try it later...'
+        )
+        break
+      }
+    } catch (error) {
+      toaster.danger(
+        'Oops! Network error. Please try it later...'
+      )
+    }
+    setLoading(false)
+  }
 
   return (
     <Pane className={styles['login-container']}
@@ -87,7 +125,6 @@ export default function Join() {
         initState ? 
           <Component
             initialState={{
-              selectedIndex: 0,
               tabs: [['start', 'Start A Game'], ['join', 'Join A Game']]
             }}
           >
@@ -99,8 +136,8 @@ export default function Join() {
                       fontSize={20}
                       key={tab[0]}
                       id={tab[0]}
-                      onSelect={() => setState({ selectedIndex: index })}
-                      isSelected={index === state.selectedIndex}
+                      onSelect={() => setSelectedIndex(index)}
+                      isSelected={index === selectedIndex}
                       aria-controls={`panel-${tab[0]}`}
                     >
                       {tab[1]}
@@ -114,8 +151,8 @@ export default function Join() {
                     id={`panel-${state.tabs[0][0]}`}
                     role="tabpanel"
                     aria-labelledby={state.tabs[0][0]}
-                    aria-hidden={state.selectedIndex !== 0}
-                    display={state.selectedIndex  === 0 ? 'block' : 'none'}
+                    aria-hidden={selectedIndex !== 0}
+                    display={selectedIndex  === 0 ? 'block' : 'none'}
                   >
                     <Heading size={700} marginBottom={20}>Start A Game</Heading>
                     <form method="POST" action="#" onSubmit={formSubmit} name="start">
@@ -153,8 +190,8 @@ export default function Join() {
                     id={`panel-${state.tabs[1][0]}`}
                     role="tabpanel"
                     aria-labelledby={state.tabs[1][0]}
-                    aria-hidden={state.selectedIndex !== 1}
-                    display={state.selectedIndex === 1 ? 'block' : 'none'}
+                    aria-hidden={selectedIndex !== 1}
+                    display={selectedIndex === 1 ? 'block' : 'none'}
                   >
                     <Heading size={700} marginBottom={20}>Join A Game</Heading>
                     <form method="POST" action="#" onSubmit={formSubmit} name="join">
@@ -173,9 +210,10 @@ export default function Join() {
                       />
                       <TextInputField
                         name="inviteCode"
-                        label="Invite Code"
+                        label={`${INVITE_CODE_LEN}-digit Room Code`}
                         id="inviteCode"
-                        placeholder="Enter invite code..."
+                        placeholder="e.g. 0000"
+                        description="Optional"
                         width="100%"
                         maxLength={INVITE_CODE_LEN}
                         value={inviteCode}
@@ -200,6 +238,7 @@ export default function Join() {
           </Pane>
       }
 
+      {/* Loading overlay */}
       <Overlay 
         isShown={loading} 
         preventBodyScrolling={true}

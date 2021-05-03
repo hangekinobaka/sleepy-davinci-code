@@ -1,0 +1,34 @@
+$vertical-break-width: 480;
+
+@mixin horizontal-layout {
+  @media (min-width: #{$vertical-break-width + 1}px) {
+    @content;
+  }
+}
+
+@mixin vertical-layout {
+  @media (max-width: #{$vertical-break-width}px) {
+    @content;
+  }
+}
+
+.main{
+  &-layout{
+    @include horizontal-layout {
+      display: block;
+    }
+    @include vertical-layout {
+      display: none;
+    }
+
+    &-hor{
+      @include horizontal-layout {
+        display: none;
+      }
+      @include vertical-layout {
+        display: block;
+      }
+    }
+  }
+  
+}

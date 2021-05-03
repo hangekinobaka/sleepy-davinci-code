@@ -18,4 +18,8 @@ export default function SocketClient(socket){
       console.log(message)
     })
   }
+
+  this.drawCard = ()=>{
+    return Math.floor((Math.random()*11))
+  }
 }

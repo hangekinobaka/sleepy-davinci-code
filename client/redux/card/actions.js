@@ -6,6 +6,7 @@ export const CLOSE_DRAWING = 'CLOSE_DRAWING'
 export const RESET_ALL = 'RESET_ALL'
 export const IS_INTERAVTIVE_ALTER = 'IS_INTERAVTIVE_ALTER'
 export const NUM_TEXTURES_ALTER = 'NUM_TEXTURES_ALTER'
+export const DRAWING_NUM_ALTER = 'DRAWING_NUM_ALTER'
 
 export const initialState = {
   cardNumW: WHITE_CARD_NUM,
@@ -13,7 +14,8 @@ export const initialState = {
   drawingCard: 'w',
   isDrawing: false,
   isInteractive: true,
-  numSheetTextures: null
+  numSheetTextures: null,
+  drawingNum: null
 }
 
 export const setCardNumW = num => ({
@@ -44,6 +46,12 @@ export const setNumSheetTextures = textures => ({
   type: NUM_TEXTURES_ALTER,
   payload:{
     textures
+  }
+})
+export const setDrawingNum = num => ({
+  type: DRAWING_NUM_ALTER,
+  payload:{
+    num
   }
 })
 
@@ -79,6 +87,11 @@ export const reducer = (state = initialState, action) => {
     return {
       ...state,
       numSheetTextures: action.payload.textures
+    }
+  case DRAWING_NUM_ALTER:
+    return {
+      ...state,
+      drawingNum: action.payload.num
     }
   default:
     return state

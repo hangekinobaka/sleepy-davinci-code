@@ -16,12 +16,14 @@ export default function Card({cardTextures}){
   // Stores
   const drawingCard = useSelector(state => state.card.drawingCard)
   const numSheetTextures = useSelector(state => state.card.numSheetTextures)
+  const drawingNum = useSelector(state => state.card.drawingNum)
   const dispatch = useDispatch()
   // States
   const [cardPosition, setCardPosition] = useState({x: 0, y: 0})
   const [cardTexture, setCardTexture] = useState(cardTextures.stand.w)
   const [cardStatus, setCardStatus] = useState(CARD_STATUS.draw)  
   const [displayMe, setDisplayMe] = useState(false)
+  const [numSprite, setNumSprite] = useState()
   const me = useRef()
 
   useEffect(() => {
@@ -80,10 +82,12 @@ export default function Card({cardTextures}){
 
   // Add the number sprite
   const addNumber = () => {
-    const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP['b10_s']])
+    if(!numSheetTextures || !drawingNum || !drawingCard) return
+    const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${drawingCard}${drawingNum}_s`]])
     sprite.width = CARD_WIDTH / 2
     sprite.height = CARD_HEIGHT / 2
     sprite.anchor.set(0.5)
+    setNumSprite(sprite)
     me.current.addChild(sprite)
   }
 

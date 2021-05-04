@@ -20,6 +20,6 @@ export default function SocketClient(socket){
   }
 
   this.drawCard = ()=>{
-    return Math.floor((Math.random()*11))
+    return Math.floor((Math.random()*11+1))
   }
 }

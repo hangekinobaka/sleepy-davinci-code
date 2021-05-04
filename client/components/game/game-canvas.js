@@ -8,13 +8,13 @@ import store from 'redux/store'
 // redux
 import { resetAll, setNumSheetTextures } from 'redux/card/actions'
 // configs
-import { CARD_TYPE } from 'configs/game'
 import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
 // utils
 import { setFps } from 'utils/pixi'
 // Components
 import Card from 'components/game/card'
 import CardPile from 'components/game/card-pile'
+import CardLine from 'components/game/card-line'
 // gsap plugin register
 import { PixiPlugin } from 'gsap/all'
 import { gsap } from 'gsap'
@@ -140,6 +140,7 @@ export default function GameCanvas() {
               <Container 
                 scale={ratio}
               >
+                {/* bg */}
                 <Sprite
                   texture={bgTexture}
                   width={DESIGN_WIDTH}
@@ -149,9 +150,13 @@ export default function GameCanvas() {
                   y={DESIGN_HEIGHT/2}
                 />
 
+                {/* draw card pile */}
                 <CardPile cardTextures={layCardTextures} />
+
+                {/* my card line */}
+                <CardLine />
               
-                {/* draw card instance: change with draw status */}
+                {/* card instances */}
                 {
                   [...new Array(myCardNum)].map((item, index) => (
                     <Card 
@@ -160,6 +165,7 @@ export default function GameCanvas() {
                     />
                   ))
                 }
+
               </Container>
               
               {/* fps widget */}

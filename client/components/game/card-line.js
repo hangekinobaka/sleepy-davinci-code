@@ -1,8 +1,11 @@
 import { useEffect, useState, useRef } from 'react'
-import { Graphics, Container } from '@inlet/react-pixi'
+import { Graphics, Container, useTick } from '@inlet/react-pixi'
 import { CARD_WIDTH, LINE_X, LINE_Y, LINE_WIDTH, LINE_HEIGHT, WHITE_CARD_NUM } from 'configs/game'
 import { useSelector, useDispatch } from 'react-redux'
 import { setMyLine, setDragRes, setInsertPlace } from 'redux/card/actions'
+import * as PIXI from 'pixi.js'
+
+const ticker = PIXI.Ticker.shared
 
 let collideInterval = null
 let collideArea = null
@@ -16,6 +19,7 @@ export default function CardLine(){
   const insertPlace = useSelector(state => state.card.insertPlace)
   const dispatch = useDispatch()
   // Refs 
+  const me = useRef()
   const placeholders = []
   for ( let i = 0; i < WHITE_CARD_NUM; i++){
     placeholders.push(useRef())
@@ -27,12 +31,11 @@ export default function CardLine(){
       clearInterval(collideInterval)
     }
   }, [])
-
+  
   useEffect(() => {
     if(isDragging === null) return
 
     if(isDragging){
-      dispatch(setInsertPlace(null))
       collideInterval = setInterval(collisionHandler, 200)
       dispatch(setDragRes(null))
 
@@ -69,8 +72,8 @@ export default function CardLine(){
   const drawPlaceHolder= (i) => (g) => { 
     const x = i * CARD_WIDTH + 2
     g.clear()
-    g.lineStyle(2, 0xff00ff, 1)
-    g.beginFill(0xff00bb, 0.25)
+    g.lineStyle(5, 0x613708, 1)
+    g.beginFill(0x381e02, 1)
     g.moveTo(x, 0)
     g.lineTo(x + CARD_WIDTH, 0)
     g.lineTo(x + CARD_WIDTH, LINE_HEIGHT)
@@ -145,8 +148,22 @@ export default function CardLine(){
     }
   }
 
+  const insertingAnimation = delta => {
+    if(me.current.alpha > 0) me.current.alpha -= (0.03 * delta)
+    else {
+      me.current.alpha = 1
+    }
+  }
+
+  useTick(delta => {
+    if(insertPlace !== null) insertingAnimation(delta)
+    else me.current.alpha = 1
+  })
+  
+
   return (
     <Container
+      ref={me}
       position={[ LINE_X, LINE_Y] }
       width={LINE_WIDTH}
       height={LINE_HEIGHT}

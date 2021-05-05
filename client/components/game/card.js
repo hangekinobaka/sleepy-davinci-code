@@ -5,7 +5,7 @@ import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY,
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
   LINE_X, LINE_Y } from 'configs/game'
 import { closeDrawing, setIsDragging, setDraggingCard, setIsInteractive,
-  setCardIdCounter } from 'redux/card/actions'
+  setCardIdCounter, setInsertPlace } from 'redux/card/actions'
 import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
 
@@ -51,6 +51,7 @@ export default function Card({cardTextures}){
       setCardStatus(CARD_STATUS.stand)
       positionByIndex(dragResult.index)
       setMyIdex(dragResult.index)
+      dispatch(setInsertPlace(null))
     }else{
       setDrag()
     }
@@ -78,6 +79,7 @@ export default function Card({cardTextures}){
     }
 
   }, [insertPlace])
+
   // Methods
   const statusHandler = () => {
     let pos = { x: 0, y: 0 }

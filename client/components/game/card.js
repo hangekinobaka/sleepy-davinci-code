@@ -3,10 +3,9 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Sprite, useApp } from '@inlet/react-pixi'
 import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, 
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP } from 'configs/game'
-import { closeDrawing, setIsDragging, setDraggingCard } from 'redux/card/actions'
+import { closeDrawing, setIsDragging, setDraggingCard, setIsInteractive } from 'redux/card/actions'
 import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
 import { gsap } from 'gsap'
-import { setIsInteractive } from 'redux/card/actions'
 import * as PIXI from 'pixi.js'
 
 let isDraggingLocal = false
@@ -18,6 +17,7 @@ export default function Card({cardTextures}){
   const drawingNum = useSelector(state => state.card.drawingNum)
   const isInteractive = useSelector(state => state.card.isInteractive)
   const isDragging = useSelector(state => state.card.isDragging)
+  const dragResult = useSelector(state => state.card.dragResult)
   const dispatch = useDispatch()
   // States
   const [cardPosition, setCardPosition] = useState({x: 0, y: 0})
@@ -34,6 +34,18 @@ export default function Card({cardTextures}){
   useEffect(() => {
     statusHandler()
   },[cardStatus])
+
+  useEffect(() => {
+    if(dragResult === null || cardStatus !== CARD_STATUS.dragable) return
+    
+    if(dragResult.success){
+      setCardStatus(CARD_STATUS.standShow)
+      setCardPosition(dragResult.pos)
+    }else{
+      setDrag()
+    }
+
+  }, [dragResult])
 
   // Methods
   const statusHandler = () => {
@@ -72,7 +84,6 @@ export default function Card({cardTextures}){
 
   const drawAnimation = () => {
     const tl = gsap.timeline()
-
     const scale = me.current.scale.x
     tl
       .to(me.current, {
@@ -136,7 +147,6 @@ export default function Card({cardTextures}){
   }
   const onDragEnd = () => {
     isDraggingLocal = false
-    setCardStatus(CARD_STATUS.standShow)
     dispatch(setIsDragging(false))
     me.current.off()
   }

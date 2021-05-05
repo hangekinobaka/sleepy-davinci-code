@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Sprite, Container } from '@inlet/react-pixi'
-import { WHITE_CARD_NUM, BLACK_CARD_NUM, CARD_PILE } from 'configs/game'
-import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
+import { WHITE_CARD_NUM, BLACK_CARD_NUM, CARD_PILE, DESIGN_WIDTH, DESIGN_HEIGHT } from 'configs/game'
 import { setCardNumW, setCardNumB, setIsInteractive } from 'redux/card/actions'
 
 const CARD_WIDTH = 200

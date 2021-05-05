@@ -2,9 +2,10 @@ import { useEffect, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Sprite, useApp } from '@inlet/react-pixi'
 import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, 
-  CARD_STATUS, CARD_PILE, NUM_SHEET_MAP } from 'configs/game'
-import { closeDrawing, setIsDragging, setDraggingCard, setIsInteractive } from 'redux/card/actions'
-import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
+  CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
+  LINE_X, LINE_Y } from 'configs/game'
+import { closeDrawing, setIsDragging, setDraggingCard, setIsInteractive,
+  setCardIdCounter } from 'redux/card/actions'
 import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
 
@@ -16,8 +17,10 @@ export default function Card({cardTextures}){
   const numSheetTextures = useSelector(state => state.card.numSheetTextures)
   const drawingNum = useSelector(state => state.card.drawingNum)
   const isInteractive = useSelector(state => state.card.isInteractive)
-  const isDragging = useSelector(state => state.card.isDragging)
   const dragResult = useSelector(state => state.card.dragResult)
+  const myLine = useSelector(state => state.card.myLine)
+  const cardIdCounter = useSelector(state => state.card.cardIdCounter)
+  const insertPlace = useSelector(state => state.card.insertPlace)
   const dispatch = useDispatch()
   // States
   const [cardPosition, setCardPosition] = useState({x: 0, y: 0})
@@ -29,7 +32,13 @@ export default function Card({cardTextures}){
   const [numSprite, setNumSprite] = useState()
   const [myColor, setMyColor] = useState()
   const [myNumber, setMyNumber] = useState()
+  const [myId, setMyId] = useState(cardIdCounter)
+  const [myIdex, setMyIdex] = useState(null)
   const me = useRef()
+
+  useEffect(() => {
+    dispatch(setCardIdCounter(cardIdCounter+1))
+  }, [])
 
   useEffect(() => {
     statusHandler()
@@ -39,14 +48,36 @@ export default function Card({cardTextures}){
     if(dragResult === null || cardStatus !== CARD_STATUS.dragable) return
     
     if(dragResult.success){
-      setCardStatus(CARD_STATUS.standShow)
-      setCardPosition(dragResult.pos)
+      setCardStatus(CARD_STATUS.stand)
+      positionByIndex(dragResult.index)
+      setMyIdex(dragResult.index)
     }else{
       setDrag()
     }
-
   }, [dragResult])
 
+  useEffect(() => {
+    if(myLine === null || myIdex === null) return
+    if(cardStatus === CARD_STATUS.stand &&
+      myLine[myIdex].id !== myId){
+      positionByIndex(myIdex+1)
+      setMyIdex(myIdex+1)
+    }
+  }, [myLine])
+
+  useEffect(() => {
+    if(myIdex === null) return
+    
+    if(insertPlace === null){
+      positionByIndex(myIdex)
+      return
+    }
+
+    if(insertPlace <= myIdex){
+      positionByIndex(myIdex+1)
+    }
+
+  }, [insertPlace])
   // Methods
   const statusHandler = () => {
     let pos = { x: 0, y: 0 }
@@ -56,6 +87,11 @@ export default function Card({cardTextures}){
       dispatch(setIsInteractive(true))
       break
     case CARD_STATUS.draw:
+      dispatch(setDraggingCard({
+        id: myId,
+        sprite: me.current
+      }))
+
       if(drawingCard === 'w'){
         pos = {
           x: (DESIGN_WIDTH-CARD_PILE.CARD_MARGIN_BETWWEN)/2 + 100, y: DESIGN_HEIGHT/2 - 60
@@ -74,7 +110,7 @@ export default function Card({cardTextures}){
       drawAnimation()
       setDisplayMe(true)
       break
-    case CARD_STATUS.standShow:
+    case CARD_STATUS.stand:
       break
     case CARD_STATUS.none:
     default: 
@@ -141,7 +177,6 @@ export default function Card({cardTextures}){
 
   // Card drag handlers
   const onDragStart = () => {
-    dispatch(setDraggingCard(me.current))
     isDraggingLocal = true
     dispatch(setIsDragging(true))
   }
@@ -158,6 +193,14 @@ export default function Card({cardTextures}){
         y:newPosition.y
       })
     }
+  }
+
+  // Positioning by index
+  const positionByIndex = index => {
+    setCardPosition({
+      x: LINE_X + CARD_WIDTH/2 + index * CARD_WIDTH + 2, 
+      y: LINE_Y
+    })
   }
 
   return (

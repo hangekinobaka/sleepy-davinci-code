@@ -8,7 +8,7 @@ import store from 'redux/store'
 // redux
 import { resetAll, setNumSheetTextures } from 'redux/card/actions'
 // configs
-import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
+import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/game'
 // utils
 import { setFps } from 'utils/pixi'
 // Components

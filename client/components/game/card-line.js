@@ -1,14 +1,8 @@
 import { useEffect, useState, useRef } from 'react'
 import { Graphics, Container } from '@inlet/react-pixi'
-import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, WHITE_CARD_NUM } from 'configs/game'
+import { CARD_WIDTH, LINE_X, LINE_Y, LINE_WIDTH, LINE_HEIGHT, WHITE_CARD_NUM } from 'configs/game'
 import { useSelector, useDispatch } from 'react-redux'
-import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
-import { setMyLine,setDragRes } from 'redux/card/actions'
-
-const LINE_X = 120
-const LINE_Y = DESIGN_HEIGHT - 150
-const LINE_WIDTH = CARD_WIDTH * 12 + 20
-const LINE_HEIGHT = 100
+import { setMyLine, setDragRes, setInsertPlace } from 'redux/card/actions'
 
 let collideInterval = null
 let collideArea = null
@@ -19,9 +13,8 @@ export default function CardLine(){
   const draggingCard = useSelector(state => state.card.draggingCard)
   const drawingNum = useSelector(state => state.card.drawingNum)
   const drawingCard = useSelector(state => state.card.drawingCard)
+  const insertPlace = useSelector(state => state.card.insertPlace)
   const dispatch = useDispatch()
-  // States
-  const [insertPlace, setInsertPlace] = useState(null)
   // Refs 
   const placeholders = []
   for ( let i = 0; i < WHITE_CARD_NUM; i++){
@@ -39,6 +32,7 @@ export default function CardLine(){
     if(isDragging === null) return
 
     if(isDragging){
+      dispatch(setInsertPlace(null))
       collideInterval = setInterval(collisionHandler, 200)
       dispatch(setDragRes(null))
 
@@ -52,15 +46,12 @@ export default function CardLine(){
           // update the line
           let newLine = [...myLine]
           newLine.splice(insertPlace, 0, {
-            num:drawingNum , color: drawingCard
+            num:drawingNum , color: drawingCard, id: draggingCard.id
           })
           dispatch(setMyLine(newLine))
           dispatch(setDragRes({
             success: true,
-            pos: {
-              x: LINE_X + CARD_WIDTH/2 + insertPlace * CARD_WIDTH + 2, 
-              y: LINE_Y
-            }
+            index: insertPlace
           }))
 
           return
@@ -69,7 +60,7 @@ export default function CardLine(){
 
       dispatch(setDragRes({
         success: false,
-        pos: {}
+        index: null
       }))
     }
   },[isDragging])
@@ -103,54 +94,53 @@ export default function CardLine(){
     if(placeholders.length === 0 || !draggingCard) return
     
     placeholders.forEach((ph, i) => {
-      const collide = testCollision(draggingCard, ph.current) 
+      const collide = testCollision(draggingCard.sprite, ph.current) 
       if(collide) {
         if(collideArea === i) return
         collideArea = i
-        console.log(i)
         testInsert(i)
       }else{
         if(collideArea === null || collideArea !== i) return 
         collideArea = null
+        dispatch(setInsertPlace(null))
       }
     })
   }
 
   // Handle the card insertion
   const testInsert = i => {
-    if(myLine.length === 0) {setInsertPlace(0); return}
+    if(myLine.length === 0) {dispatch(setInsertPlace(0)); return}
 
     if(myLine[i]){
       // If there is card in the current position 
-      // you can put the card in this place if it smaller than the last card
+      // you can put the card in this place if it smaller than the current card and larger than the previous card
       if(drawingNum < myLine[i].num){
-        setInsertPlace(i)
-      }else if(myLine[i].num === drawingNum){
+        if(i === 0 || drawingNum > myLine[i-1].num) dispatch(setInsertPlace(i))
+        else if(drawingNum === myLine[i-1].num && drawingCard === 'b') dispatch(setInsertPlace(i))
+        else dispatch(setInsertPlace(null))
+
+      }else if(myLine[i].num === drawingNum && drawingCard === 'w'){
         // If the number is the same
         // you can put it here if the color is white
-        if(drawingCard === 'w'){
-          setInsertPlace(i)
-        }else{
-          setInsertPlace(null)
-        }
+        dispatch(setInsertPlace(i))
       }else{
-        setInsertPlace(null)
+        dispatch(setInsertPlace(null))
       }
     }else{
       // If there is no card in the current position 
       // you can put the card in the end of line if it is larger than the last card
       if(drawingNum > myLine[myLine.length - 1].num){
-        setInsertPlace(myLine.length)
+        dispatch(setInsertPlace(myLine.length))
       }else if(drawingNum === myLine[myLine.length - 1].num){
         // If the number is the same as the last one
         // you can put it if the color is black
         if(drawingCard === 'b'){
-          setInsertPlace(myLine.length)
+          dispatch(setInsertPlace(myLine.length))
         }else{
-          setInsertPlace(null)
+          dispatch(setInsertPlace(null))
         }
       }else{
-        setInsertPlace(null)
+        dispatch(setInsertPlace(null))
       }
     }
   }

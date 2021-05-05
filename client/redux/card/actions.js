@@ -11,6 +11,8 @@ export const MY_LINE_ALTER = 'MY_LINE_ALTER'
 export const IS_DRAGGING_ALTER = 'IS_DRAGGING_ALTER'
 export const DRAGGING_CARD_ALTER = 'DRAGGING_CARD_ALTER'
 export const DRAG_RESULT_ALTER = 'DRAG_RESULT_ALTER'
+export const CARD_ID_COUNTER_ALTER = 'CARD_ID_COUNTER_ALTER'
+export const INSERT_PLACE_ALTER = 'INSERT_PLACE_ALTER'
 
 export const initialState = {
   cardNumW: WHITE_CARD_NUM,
@@ -23,23 +25,25 @@ export const initialState = {
   /**
    * myLine example:  
    * [
-   *   {num: 1, color: 'b'},
-   *   {num: 5, color: 'b'},
-   *   {num: 6, color: 'w'},
-   *   {num: 6, color: 'b'}
+   *   {num: 1, color: 'b', id: 1},
+   *   {num: 5, color: 'b', id: 3},
+   *   {num: 6, color: 'w', id: 4},
+   *   {num: 6, color: 'b', id: 2}
    * ]
    */
   myLine:[],
   isDragging: null,
-  draggingCard: {},
+  draggingCard: null,
   /**
    * dragResult example:  
    * {
    *    success: true,
-   *    pos: {x: 10, y: 20}
+   *    index: 1
    * }
    */
-  dragResult: null
+  dragResult: null,
+  cardIdCounter:1,
+  insertPlace: null
 }
 
 
@@ -103,7 +107,18 @@ export const setDragRes = res => ({
     res
   }
 })
-
+export const setCardIdCounter = id => ({
+  type: CARD_ID_COUNTER_ALTER,
+  payload:{
+    id
+  }
+})
+export const setInsertPlace = index => ({
+  type: INSERT_PLACE_ALTER,
+  payload:{
+    index
+  }
+})
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -163,7 +178,17 @@ export const reducer = (state = initialState, action) => {
       ...state,
       dragResult: {...action.payload.res}
     }
-    
+  case CARD_ID_COUNTER_ALTER:
+    return{
+      ...state,
+      cardIdCounter: action.payload.id
+    }
+  case INSERT_PLACE_ALTER:
+    return{
+      ...state,
+      insertPlace: action.payload.index
+    }
+
   default:
     return state
   }

@@ -1,11 +1,13 @@
+export const DESIGN_WIDTH = 2436
+export const DESIGN_HEIGHT = 1125
+
 export const CARD_STATUS = {
   none: 0,
   draw: 1,
-  standHide: 2,
-  standShow:3,
+  dragable: 2,
+  stand:3,
   lay:4,
-  dragable: 5,
-  disabled: 6
+  disabled: 5
 }
 
 export const WHITE_CARD_NUM = 12
@@ -15,6 +17,11 @@ export const CARD_WIDTH = 180
 export const CARD_HEIGHT = 252
 export const CARD_WIDTH_LAY = 250
 export const CARD_HEIGHT_LAY = 200
+
+export const LINE_X = 120
+export const LINE_Y = DESIGN_HEIGHT - 150
+export const LINE_WIDTH = CARD_WIDTH * 12 + 20
+export const LINE_HEIGHT = 100
 
 export const CARD_PILE = {
   CARD_MARGIN_BETWWEN: 1000

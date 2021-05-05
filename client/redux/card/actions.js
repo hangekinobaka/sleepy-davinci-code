@@ -7,6 +7,9 @@ export const RESET_ALL = 'RESET_ALL'
 export const IS_INTERAVTIVE_ALTER = 'IS_INTERAVTIVE_ALTER'
 export const NUM_TEXTURES_ALTER = 'NUM_TEXTURES_ALTER'
 export const DRAWING_NUM_ALTER = 'DRAWING_NUM_ALTER'
+export const MY_LINE_ALTER = 'MY_LINE_ALTER'
+export const IS_DRAGGING_ALTER = 'IS_DRAGGING_ALTER'
+export const DRAGGING_CARD_ALTER = 'DRAGGING_CARD_ALTER'
 
 export const initialState = {
   cardNumW: WHITE_CARD_NUM,
@@ -15,8 +18,21 @@ export const initialState = {
   isDrawing: false,
   isInteractive: true,
   numSheetTextures: null,
-  drawingNum: null
+  drawingNum: null,
+  /**
+   * myLine example:  
+   * [
+   *   {num: 1, color: 'b'},
+   *   {num: 5, color: 'b'},
+   *   {num: 6, color: 'w'},
+   *   {num: 6, color: 'b'}
+   * ]
+   */
+  myLine:[],
+  isDragging: false,
+  draggingCard: {}
 }
+
 
 export const setCardNumW = num => ({
   type: CARD_NUM_W_ALTER,
@@ -54,6 +70,25 @@ export const setDrawingNum = num => ({
     num
   }
 })
+export const setMyLine = newLine => ({
+  type: MY_LINE_ALTER,
+  payload:{
+    newLine
+  }
+})
+export const setIsDragging = isDragging => ({
+  type: IS_DRAGGING_ALTER,
+  payload:{
+    isDragging
+  }
+})
+export const setDraggingCard = card => ({
+  type: DRAGGING_CARD_ALTER,
+  payload:{
+    card
+  }
+})
+
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -92,6 +127,21 @@ export const reducer = (state = initialState, action) => {
     return {
       ...state,
       drawingNum: action.payload.num
+    }
+  case MY_LINE_ALTER:
+    return {
+      ...state,
+      myLine: [...action.payload.newLine]
+    }
+  case IS_DRAGGING_ALTER:
+    return {
+      ...state,
+      isDragging: action.payload.isDragging
+    }
+  case DRAGGING_CARD_ALTER:
+    return {
+      ...state,
+      draggingCard: action.payload.card
     }
   default:
     return state

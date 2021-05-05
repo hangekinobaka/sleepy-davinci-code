@@ -6,7 +6,7 @@ import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
 import { setCardNumW, setCardNumB, setIsInteractive } from 'redux/card/actions'
 
 const CARD_WIDTH = 200
-const CARD_HEIGHT = 160
+const CARD_HEIGHT = 154
 const CARD_DELTA_Y = 22
 const CARD_X = [-5,0,5]
 

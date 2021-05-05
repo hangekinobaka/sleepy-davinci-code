@@ -1,20 +1,15 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Sprite, useApp } from '@inlet/react-pixi'
-import { CARD_STATUS, CARD_PILE, NUM_SHEET_MAP } from 'configs/game'
-import { closeDrawing } from 'redux/card/actions'
+import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, 
+  CARD_STATUS, CARD_PILE, NUM_SHEET_MAP } from 'configs/game'
+import { closeDrawing, setIsDragging, setDraggingCard } from 'redux/card/actions'
 import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/variables'
 import { gsap } from 'gsap'
 import { setIsInteractive } from 'redux/card/actions'
 import * as PIXI from 'pixi.js'
 
-const CARD_WIDTH = 180
-const CARD_HEIGHT = 252
-const CARD_WIDTH_LAY = 250
-const CARD_HEIGHT_LAY = 200
-
-let isDragging = false
-
+let isDraggingLocal = false
 export default function Card({cardTextures}){
   const app = useApp()
   // Stores
@@ -22,6 +17,7 @@ export default function Card({cardTextures}){
   const numSheetTextures = useSelector(state => state.card.numSheetTextures)
   const drawingNum = useSelector(state => state.card.drawingNum)
   const isInteractive = useSelector(state => state.card.isInteractive)
+  const isDragging = useSelector(state => state.card.isDragging)
   const dispatch = useDispatch()
   // States
   const [cardPosition, setCardPosition] = useState({x: 0, y: 0})
@@ -65,6 +61,8 @@ export default function Card({cardTextures}){
       setCardPosition(pos)
       drawAnimation()
       setDisplayMe(true)
+      break
+    case CARD_STATUS.standShow:
       break
     case CARD_STATUS.none:
     default: 
@@ -131,25 +129,25 @@ export default function Card({cardTextures}){
   }
 
   // Card drag handlers
-  const onDragStart = (event) => {
-    isDragging = true
+  const onDragStart = () => {
+    dispatch(setDraggingCard(me.current))
+    isDraggingLocal = true
+    dispatch(setIsDragging(true))
   }
   const onDragEnd = () => {
-    isDragging = false
+    isDraggingLocal = false
     setCardStatus(CARD_STATUS.standShow)
+    dispatch(setIsDragging(false))
     me.current.off()
   }
   const onDragMove = event => {
-    if (isDragging) {
+    if (isDraggingLocal) {
       const newPosition = event.data.getLocalPosition(me.current.parent)
       setCardPosition({
         x:newPosition.x,
         y:newPosition.y
       })
     }
-  }
-  const removeDragEvent = () => {
-   
   }
 
   return (

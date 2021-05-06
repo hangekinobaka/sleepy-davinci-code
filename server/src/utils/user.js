@@ -1,6 +1,13 @@
 const { paddingNumber } = require("./utils");
 const {redis_keys} = require("../variables/config");
 
+// Generate card array
+const cardsArr = [];
+for(let i = 0; i < 11; i++){
+  cardsArr.push(i + 1 + "");
+}
+cardsArr.push("J");
+
 /**
  * Generate a 4-digit room code
  * @param client An open redis client
@@ -24,4 +31,26 @@ const roomCodeGenerator = async function(client){
   }
 };
 
-module.exports = {roomCodeGenerator};
+// Fisher-Yates shuffle O(n2)
+function shuffle(oldArr){
+  const arr = [...oldArr];
+  var result = [],
+    random;
+  while(arr.length>0){
+    random = Math.floor(Math.random() * arr.length);
+    result.push(arr[random]);
+    arr.splice(random, 1);
+  }
+  return result;
+}
+
+const initData = () => {
+  const wArr = [...shuffle(cardsArr)];
+  const bArr = [...shuffle(cardsArr)];
+  return {
+    wArr,
+    bArr
+  };
+};
+
+module.exports = {roomCodeGenerator, initData};

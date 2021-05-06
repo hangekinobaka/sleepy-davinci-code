@@ -1,6 +1,6 @@
 const PromiseClient = require("../utils/redis");
 const client = new PromiseClient();
-const { roomCodeGenerator } = require("../utils/user");
+const { roomCodeGenerator, initData } = require("../utils/user");
 const {redis_keys, ROOM_DATA_EXPIRE_TIME} = require("../variables/config");
 
 const init = async (req, res)=>{
@@ -40,6 +40,9 @@ const login = async (req, res)=>{
     const room = await roomCodeGenerator(client);
     if(room === null) { res.status(200).json({code: 3, msg:"room generate failed"}); return;}
 
+    // Generate game data
+    const data = initData();
+
     // Store room number in `room_data` and `session`
     await client.setex(
       `${redis_keys.ROOM_DATA}${room.room_num}`, 
@@ -48,6 +51,7 @@ const login = async (req, res)=>{
         room_num: room.room_num,
         room_code: room.room_code,
         is_public: isPrivate,
+        game:data,
         user_1:{
           session_id: req.sessionID,
           username

@@ -1,5 +1,5 @@
 // libs
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Stage, Sprite, Container, Text } from '@inlet/react-pixi'
 import { useSelector, useDispatch } from 'react-redux'
 import * as PIXI from 'pixi.js'
@@ -41,6 +41,9 @@ export default function GameCanvas() {
   const [layCardTextures, setLayCardTextures] = useState({})
   const [standCardTextures, setStandCardTextures] = useState({})
 
+  // Refs
+  const isMounted = useRef(false)
+
   // Setup app initialization
   useEffect(()=>{
     if(!app) return
@@ -53,18 +56,19 @@ export default function GameCanvas() {
     }
   }, [app])
 
-
   /**
    * Load all the textures needed 
    */
   useEffect(()=>{
     textureLoader()
+    isMounted.current = true
 
     return () => {
       // Reset all the resources
       PIXI.Loader.shared.reset()
       PIXI.utils.clearTextureCache()
       dispatch(resetAll())
+      isMounted.current = false
     }
 
   },[])
@@ -93,8 +97,7 @@ export default function GameCanvas() {
         const str = Math.floor(e.progress)
           .toString()
           .padStart(2, '0') + '%'
-        
-        setLoadingTextField(str)
+        if(isMounted.current) setLoadingTextField(str)
       })
   
     function setup(loader, resources){
@@ -114,7 +117,6 @@ export default function GameCanvas() {
       setTextureLoaded(true)
     }
   }
-
 
   // Handle when everthing is loaded
   const initTextures = (resources) => {

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { Pane, Spinner, Overlay,toaster} from 'evergreen-ui'
+import { Pane, Spinner, Overlay, toaster} from 'evergreen-ui'
 
 import api from 'utils/api'
 import styles from 'styles/game.module.scss'

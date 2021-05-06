@@ -24,13 +24,14 @@ export default function Game() {
   const w = useSelector(state => state.win.w)
   const h = useSelector(state => state.win.h)
   const isDrawing = useSelector(state => state.card.isDrawing)
+  const drawingCard = useSelector(state => state.card.drawingCard)
   const dispatch = useDispatch()
 
   const router = useRouter()
-
-  const [gameData, setGameData] = useState(undefined)
+  // States 
+  const [gameData, setGameData] = useState(null)
   const [initState, setInitState] = useState(false)
-  const [socketClient, setSocketClient] = useState()
+  const [socketClient, setSocketClient] = useState(null)
 
 
   useEffect(()=>{
@@ -56,6 +57,7 @@ export default function Game() {
     const username = data.user_num === 1 ? data.user_1.username : data.user_2.username
     sc.join(username, data.room_num)
     sc.message()
+    // sc.receiveCard()
 
     setSocketClient(sc)
   },[ENDPOINT])
@@ -63,6 +65,7 @@ export default function Game() {
   useEffect(() => {
     if(isDrawing) {
       const num = socketClient.drawCard()
+      // socketClient.draw(drawingCard)
       dispatch(setDrawingNum(num))
     }
   },[isDrawing])

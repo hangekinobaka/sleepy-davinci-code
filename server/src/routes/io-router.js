@@ -16,9 +16,17 @@ module.exports = function(io){
     socket.on("join", ({ username, room }, callback) => {
       // Handle room logic
       socket.join(room);
-      socket.emit("message", { user: "admin", text: `${username}, welcome to room ${room}.`});
+      socket.emit("message", {msg:"join success"});
       callback();
     });
+
+
+    // socket.on("join", ({ username, room }, callback) => {
+    //   // Handle room logic
+    //   socket.join(room);
+    //   socket.emit("message", { user: "admin", text: `${username}, welcome to room ${room}.`});
+    //   callback();
+    // });
 
     socket.on("disconnect", async () => {
       // IF the user leave, give it a count down  

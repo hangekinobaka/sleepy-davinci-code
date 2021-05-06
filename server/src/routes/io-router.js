@@ -30,10 +30,12 @@ module.exports = function(io){
         // See which user it is
         const user = data.user_1.session_id === _sessionId ? 1 : 2;
         
-        io.to(_room).emit("init", {
+        socket.emit("init", {
           wNum: data.game.wArr.length,
           bNum: data.game.bArr.length,
-          line: data.game.lines[user],
+          line: data.game.lines[user]
+        });
+        io.to(_room).emit("status", {
           status: data.game.status
         });
         if (callback) callback();

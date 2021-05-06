@@ -11,7 +11,6 @@ import * as PIXI from 'pixi.js'
 
 let isDraggingLocal = false
 export default function Card({cardTextures}){
-  const app = useApp()
   // Stores
   const drawingCard = useSelector(state => state.card.drawingCard)
   const numSheetTextures = useSelector(state => state.card.numSheetTextures)
@@ -42,7 +41,7 @@ export default function Card({cardTextures}){
 
   useEffect(() => {
     statusHandler()
-  },[cardStatus])
+  },[cardStatus, drawingNum])
 
   useEffect(() => {
     if(dragResult === null || cardStatus !== CARD_STATUS.dragable) return
@@ -89,6 +88,7 @@ export default function Card({cardTextures}){
       dispatch(setIsInteractive(true))
       break
     case CARD_STATUS.draw:
+      if(!drawingNum) return
       dispatch(setDraggingCard({
         id: myId,
         sprite: me.current

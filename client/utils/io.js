@@ -5,8 +5,8 @@
 export default function SocketClient(socket){
   this.socket = socket
   
-  this.join = (username,room) => {
-    socket.emit('join', {username, room}, (error) => {
+  this.join = () => {
+    socket.emit('join', (error) => {
       if(error) {
         console.error(error)
       }
@@ -31,9 +31,9 @@ export default function SocketClient(socket){
     })
   }
 
-  this.receiveCard = ()=>{
-    socket.on('receiveCard', number => {
-      console.log(number)
+  this.receiveCard = ({dispatch, setDrawingNum}) => {
+    socket.on('receiveCard', ({number}) => {
+      dispatch(setDrawingNum(number))
     })
   }
 }

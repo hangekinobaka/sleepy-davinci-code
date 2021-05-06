@@ -49,7 +49,7 @@ export default function CardLine(){
           // update the line
           let newLine = [...myLine]
           newLine.splice(insertPlace, 0, {
-            num:drawingNum , color: drawingCard, id: draggingCard.id
+            num: drawingNum, color: drawingCard, id: draggingCard.id
           })
           dispatch(setMyLine(newLine))
           dispatch(setDragRes({
@@ -114,15 +114,71 @@ export default function CardLine(){
   const testInsert = i => {
     if(myLine.length === 0) {dispatch(setInsertPlace(0)); return}
 
+    // If we are inserting the 'J' card, we can put it any where.
+    if(drawingNum === 'J') {
+      if(!myLine[i]) dispatch(setInsertPlace(myLine.length))
+      else dispatch(setInsertPlace(i))
+      return
+    }
+
+    // Test if this i number is smaller than num
+    const testPrevSmaller = (i) => {
+      /**
+       * Possible true condition:
+       * 1. the i is negative
+       * 2. it is number and smaller
+       * 3. it is number and the number is the same and the drawingCard color is black
+       * 4. it is 'J', then repeat this function with the -1 index
+       */
+      if(i < 0) return true
+      if(myLine[i].num === 'J'){
+        return testPrevSmaller(i-1)
+      }
+      return (
+        (parseInt(myLine[i].num) < num) || 
+        (parseInt(myLine[i].num) === num && drawingCard === 'b')
+      )
+    }
+
+    // Test if this i number is larger than num
+    const testNextLarger = (i) => {
+      /**
+       * Possible true condition:
+       * 1. the i is over the length
+       * 2. it is number and larger
+       * 3. it is number and the number is the same and the drawingCard color is white
+       * 4. it is 'J', then repeat this function with the +1 index
+       */
+      if(i >= myLine.length) return true
+      if(myLine[i].num === 'J'){
+        return testNextLarger(i+1)
+      }
+      return (
+        (parseInt(myLine[i].num) > num) || 
+        (parseInt(myLine[i].num) === num && drawingCard === 'w')
+      )
+    }
+
+    const num = parseInt(drawingNum)
+    const cur = myLine[i] ? 
+      myLine[i].num === 'J' ? 
+        'J'
+        : parseInt(myLine[i].num) 
+      : null
+
     if(myLine[i]){
       // If there is card in the current position 
-      // you can put the card in this place if it smaller than the current card and larger than the previous card
-      if(drawingNum < myLine[i].num){
-        if(i === 0 || drawingNum > myLine[i-1].num) dispatch(setInsertPlace(i))
-        else if(drawingNum === myLine[i-1].num && drawingCard === 'b') dispatch(setInsertPlace(i))
+      if(cur === 'J'){
+        // if the current number is "J"
+        // You can put it in if next number is bigger and previous number is smaller
+        if(testNextLarger(i+1) && testPrevSmaller(i-1)) dispatch(setInsertPlace(i))
         else dispatch(setInsertPlace(null))
-
-      }else if(myLine[i].num === drawingNum && drawingCard === 'w'){
+      }else if(num < cur){
+        // if the current number is bigger
+        // you can put the card in this place if the prev number is smaller
+        if(testPrevSmaller(i-1)) dispatch(setInsertPlace(i))
+        else dispatch(setInsertPlace(null))
+      }else if(cur === num && drawingCard === 'w'){
         // If the number is the same
         // you can put it here if the color is white
         dispatch(setInsertPlace(i))
@@ -131,17 +187,9 @@ export default function CardLine(){
       }
     }else{
       // If there is no card in the current position 
-      // you can put the card in the end of line if it is larger than the last card
-      if(drawingNum > myLine[myLine.length - 1].num){
+      if(testPrevSmaller(myLine.length-1)){
+        // you can put the card in the end of line if it is larger than the last card
         dispatch(setInsertPlace(myLine.length))
-      }else if(drawingNum === myLine[myLine.length - 1].num){
-        // If the number is the same as the last one
-        // you can put it if the color is black
-        if(drawingCard === 'b'){
-          dispatch(setInsertPlace(myLine.length))
-        }else{
-          dispatch(setInsertPlace(null))
-        }
       }else{
         dispatch(setInsertPlace(null))
       }

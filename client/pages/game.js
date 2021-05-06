@@ -5,6 +5,7 @@ import { io } from 'socket.io-client'
 import { Pane, Spinner } from 'evergreen-ui'
 import { setWinW, setWinH } from 'redux/win/actions'
 import { setDrawingNum } from 'redux/card/actions'
+import { setUsername , setRoom} from 'redux/user/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, API_CODE_ROOM_DESTROYED} from 'configs/variables'
@@ -25,6 +26,7 @@ export default function Game() {
   const h = useSelector(state => state.win.h)
   const isDrawing = useSelector(state => state.card.isDrawing)
   const drawingCard = useSelector(state => state.card.drawingCard)
+  const drawingNum = useSelector(state => state.card.drawingNum)
   const dispatch = useDispatch()
 
   const router = useRouter()
@@ -46,27 +48,32 @@ export default function Game() {
   useEffect(async () => {
     const data = await sendInit()
     if(!data) return
+    const {room_code, room_num } = data
+    const username = data.user_num === 1 ? data.user_1.username : data.user_2.username
+    dispatch(setUsername(username))
+    dispatch(setRoom({room_num, room_code}))
+
     // Connect the web socket
     const socket = io(ENDPOINT,{
       path: process.env.NODE_ENV === 'production' ? '/api/socket.io' : '/socket.io',
       withCredentials: true
     })
-
     const sc = new SocketClient(socket)
 
-    const username = data.user_num === 1 ? data.user_1.username : data.user_2.username
-    sc.join(username, data.room_num)
+    sc.join()
     sc.message()
-    // sc.receiveCard()
+
+    // Receive draw card number
+    sc.receiveCard({dispatch, setDrawingNum})
 
     setSocketClient(sc)
   },[ENDPOINT])
 
   useEffect(() => {
     if(isDrawing) {
-      const num = socketClient.drawCard()
-      // socketClient.draw(drawingCard)
-      dispatch(setDrawingNum(num))
+      // Sewnd draw card signal
+      socketClient.draw(drawingCard)
+      dispatch(setDrawingNum(null))
     }
   },[isDrawing])
 

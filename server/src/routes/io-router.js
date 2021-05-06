@@ -13,20 +13,37 @@ module.exports = function(io){
       ROOM_DATA_EXPIRE_TIME * 1000
     );
 
-    socket.on("join", ({ username, room }, callback) => {
-      // Handle room logic
-      socket.join(room);
-      socket.emit("message", {msg:"join success"});
-      callback();
+    socket.on("join", (callback=null) => {
+      try {
+        // Handle room logic
+        socket.join(socket.handshake.session.room_num);
+        socket.emit("message", {msg:`join room ${socket.handshake.session.room_num} success`});
+        if (callback) callback();
+        
+      } catch (error) {
+        console.error(error);
+      } 
     });
 
 
-    // socket.on("join", ({ username, room }, callback) => {
-    //   // Handle room logic
-    //   socket.join(room);
-    //   socket.emit("message", { user: "admin", text: `${username}, welcome to room ${room}.`});
-    //   callback();
-    // });
+    socket.on("draw", async ({ color }, callback) => {
+      // Handle room logic
+      let data = await client.get(`${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`);
+      data = JSON.parse(data);
+      let number = null;
+      if(color === "w") {
+        number = data.game.wArr.pop();
+      }else{
+        number = data.game.bArr.pop();
+      }
+      await client.set(
+        `${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`, 
+        JSON.stringify(data)
+      );
+
+      socket.emit("receiveCard", {number});
+      callback();
+    });
 
     socket.on("disconnect", async () => {
       // IF the user leave, give it a count down  

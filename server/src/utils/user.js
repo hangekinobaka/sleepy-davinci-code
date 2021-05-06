@@ -49,7 +49,11 @@ const initData = () => {
   const bArr = [...shuffle(cardsArr)];
   return {
     wArr,
-    bArr
+    bArr,
+    lines:{
+      1: [],
+      2: []
+    }
   };
 };
 

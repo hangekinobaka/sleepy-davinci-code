@@ -2,7 +2,7 @@ import { WHITE_CARD_NUM, BLACK_CARD_NUM } from 'configs/game'
 
 export const CARD_NUM_W_ALTER = 'CARD_NUM_W_ALTER'
 export const CARD_NUM_B_ALTER = 'CARD_NUM_B_ALTER'
-export const CLOSE_DRAWING = 'CLOSE_DRAWING'
+export const IS_DRAWING_ALTER = 'IS_DRAWING_ALTER'
 export const RESET_ALL = 'RESET_ALL'
 export const IS_INTERAVTIVE_ALTER = 'IS_INTERAVTIVE_ALTER'
 export const NUM_TEXTURES_ALTER = 'NUM_TEXTURES_ALTER'
@@ -11,15 +11,15 @@ export const MY_LINE_ALTER = 'MY_LINE_ALTER'
 export const IS_DRAGGING_ALTER = 'IS_DRAGGING_ALTER'
 export const DRAGGING_CARD_ALTER = 'DRAGGING_CARD_ALTER'
 export const DRAG_RESULT_ALTER = 'DRAG_RESULT_ALTER'
-export const CARD_ID_COUNTER_ALTER = 'CARD_ID_COUNTER_ALTER'
 export const INSERT_PLACE_ALTER = 'INSERT_PLACE_ALTER'
+export const CAN_DRAW_CARD_ALTER = 'CAN_DRAW_CARD_ALTER'
 
 export const initialState = {
   cardNumW: WHITE_CARD_NUM,
   cardNumB: BLACK_CARD_NUM,
   drawingCard: 'w',
   isDrawing: false,
-  isInteractive: true,
+  isInteractive: false,
   numSheetTextures: null,
   drawingNum: null,
   /**
@@ -42,8 +42,8 @@ export const initialState = {
    * }
    */
   dragResult: null,
-  cardIdCounter:1,
-  insertPlace: null
+  insertPlace: null,
+  canDrawCard: false
 }
 
 
@@ -59,8 +59,11 @@ export const setCardNumB = num => ({
     num
   }
 })
-export const closeDrawing = () => ({
-  type: CLOSE_DRAWING
+export const setIsDrawing = isDrawing => ({
+  type: IS_DRAWING_ALTER,
+  payload:{
+    isDrawing
+  }
 })
 export const resetAll = () => ({
   type: RESET_ALL
@@ -107,16 +110,16 @@ export const setDragRes = res => ({
     res
   }
 })
-export const setCardIdCounter = id => ({
-  type: CARD_ID_COUNTER_ALTER,
-  payload:{
-    id
-  }
-})
 export const setInsertPlace = index => ({
   type: INSERT_PLACE_ALTER,
   payload:{
     index
+  }
+})
+export const setCanDrawCard = can => ({
+  type: CAN_DRAW_CARD_ALTER,
+  payload:{
+    can
   }
 })
 
@@ -126,20 +129,18 @@ export const reducer = (state = initialState, action) => {
     return {
       ...state,
       cardNumW: action.payload.num,
-      drawingCard: 'w',
-      isDrawing: true
+      drawingCard: 'w'
     }
   case CARD_NUM_B_ALTER:
     return {
       ...state,
       cardNumB: action.payload.num,
-      drawingCard: 'b',
-      isDrawing: true
+      drawingCard: 'b'
     }
-  case CLOSE_DRAWING:
+  case IS_DRAWING_ALTER:
     return {
       ...state,
-      isDrawing: false
+      isDrawing: action.payload.isDrawing
     }
   case RESET_ALL:
     return initialState
@@ -178,17 +179,16 @@ export const reducer = (state = initialState, action) => {
       ...state,
       dragResult: {...action.payload.res}
     }
-  case CARD_ID_COUNTER_ALTER:
-    return{
-      ...state,
-      cardIdCounter: action.payload.id
-    }
   case INSERT_PLACE_ALTER:
     return{
       ...state,
       insertPlace: action.payload.index
     }
-
+  case CAN_DRAW_CARD_ALTER:
+    return{
+      ...state,
+      canDrawCard: action.payload.can
+    }
   default:
     return state
   }

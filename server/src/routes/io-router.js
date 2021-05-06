@@ -13,11 +13,23 @@ module.exports = function(io){
       ROOM_DATA_EXPIRE_TIME * 1000
     );
 
-    socket.on("join", (callback=null) => {
+    socket.on("join", async (callback=null) => {
       try {
         // Handle room logic
         socket.join(socket.handshake.session.room_num);
-        socket.emit("message", {msg:`join room ${socket.handshake.session.room_num} success`});
+
+        // Fetch data
+        let data = await client.get(`${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`);
+        data = JSON.parse(data);
+
+        // See which user it is
+        const user = data.user_1.session_id === socket.handshake.sessionID ? 1 : 2;
+        
+        socket.emit("init", {
+          wNum: data.game.wArr.length,
+          bNum: data.game.bArr.length,
+          line: data.game.lines[user]
+        });
         if (callback) callback();
         
       } catch (error) {
@@ -27,22 +39,46 @@ module.exports = function(io){
 
 
     socket.on("draw", async ({ color }, callback) => {
-      // Handle room logic
-      let data = await client.get(`${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`);
-      data = JSON.parse(data);
-      let number = null;
-      if(color === "w") {
-        number = data.game.wArr.pop();
-      }else{
-        number = data.game.bArr.pop();
-      }
-      await client.set(
-        `${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`, 
-        JSON.stringify(data)
-      );
+      try {
+        // Handle room logic
+        let data = await client.get(`${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`);
+        data = JSON.parse(data);
+        let number = null;
+        if(color === "w") {
+          number = data.game.wArr.pop();
+        }else{
+          number = data.game.bArr.pop();
+        }
+        await client.set(
+          `${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`, 
+          JSON.stringify(data)
+        );
 
-      socket.emit("receiveCard", {number});
-      callback();
+        socket.emit("receiveCard", {number});
+        callback();
+      }
+      catch (error) {
+        callback(error);
+      }
+    });
+
+    socket.on("updateLine", async ({ newLine }, callback) => {
+      try {
+        let data = await client.get(`${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`);
+        data = JSON.parse(data);
+        // See which user it is
+        const user = data.user_1.session_id === socket.handshake.sessionID ? 1 : 2;
+        if(data.game.lines[user].length === newLine.length) return;
+        // Update user line
+        data.game.lines[user] = newLine;
+        await client.set(
+          `${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`, 
+          JSON.stringify(data)
+        );
+      }
+      catch (error) {
+        callback(error);
+      }
     });
 
     socket.on("disconnect", async () => {

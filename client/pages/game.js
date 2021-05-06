@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { io } from 'socket.io-client'
 import { Pane, Spinner } from 'evergreen-ui'
 import { setWinW, setWinH } from 'redux/win/actions'
-import { setDrawingNum } from 'redux/card/actions'
+import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive, setCanDrawCard, setMyLine } from 'redux/card/actions'
 import { setUsername , setRoom} from 'redux/user/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -26,12 +26,11 @@ export default function Game() {
   const h = useSelector(state => state.win.h)
   const isDrawing = useSelector(state => state.card.isDrawing)
   const drawingCard = useSelector(state => state.card.drawingCard)
-  const drawingNum = useSelector(state => state.card.drawingNum)
+  const myLine = useSelector(state => state.card.myLine)
   const dispatch = useDispatch()
 
   const router = useRouter()
   // States 
-  const [gameData, setGameData] = useState(null)
   const [initState, setInitState] = useState(false)
   const [socketClient, setSocketClient] = useState(null)
 
@@ -61,7 +60,9 @@ export default function Game() {
     const sc = new SocketClient(socket)
 
     sc.join()
-    sc.message()
+
+    // Receive the game init data
+    sc.init({dispatch, setCardNumW, setCardNumB, setIsInteractive, setCanDrawCard, setMyLine})
 
     // Receive draw card number
     sc.receiveCard({dispatch, setDrawingNum})
@@ -77,6 +78,12 @@ export default function Game() {
     }
   },[isDrawing])
 
+  useEffect(() => {
+    if(myLine.length === 0) return
+
+    socketClient.updateLine(myLine)
+  },[myLine])
+
   // methods
   const sendInit = async () => {
     const res = await api('post', '/init')
@@ -87,7 +94,6 @@ export default function Game() {
       router.push('/')
       return Promise.resolve()
     case API_CODE_SUCCESS:
-      setGameData(res.data)
       setInitState(true)
       return Promise.resolve(res.data)
     default:

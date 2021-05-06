@@ -27,6 +27,7 @@ export default function GameCanvas() {
   const w = useSelector(state => state.win.w)
   const canvasHeight = useSelector(state => state.win.canvasHeight)
   const isDrawing = useSelector(state => state.card.isDrawing)
+  const myLine = useSelector(state => state.card.myLine)
   const dispatch = useDispatch()
 
   // states
@@ -73,12 +74,16 @@ export default function GameCanvas() {
 
   },[])
 
-  /**
-   * Everytime draw the card
-   */
   useEffect(()=>{
     if(isDrawing) setMyCardNum(myCardNum+1)
   },[isDrawing])
+
+  useEffect(() => {
+    // if my line number not fit the local card count, meaning that it is an init state
+    if(myCardNum !== myLine.length){
+      setMyCardNum(myLine.length)
+    }
+  }, [myLine])
 
   // Methods
   const textureLoader = ()=>{
@@ -163,6 +168,7 @@ export default function GameCanvas() {
                   [...new Array(myCardNum)].map((item, index) => (
                     <Card 
                       key={`card-${index}`}
+                      id={index+1}
                       cardTextures={{lay: layCardTextures, stand: standCardTextures}} 
                     />
                   ))

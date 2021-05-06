@@ -4,13 +4,12 @@ import { Sprite, useApp } from '@inlet/react-pixi'
 import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, 
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
   LINE_X, LINE_Y } from 'configs/game'
-import { closeDrawing, setIsDragging, setDraggingCard, setIsInteractive,
-  setCardIdCounter, setInsertPlace } from 'redux/card/actions'
+import { setIsDrawing, setIsDragging, setDraggingCard, setIsInteractive, setInsertPlace, setCanDrawCard } from 'redux/card/actions'
 import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
 
 let isDraggingLocal = false
-export default function Card({cardTextures}){
+export default function Card({cardTextures, id}){
   // Stores
   const drawingCard = useSelector(state => state.card.drawingCard)
   const numSheetTextures = useSelector(state => state.card.numSheetTextures)
@@ -18,7 +17,6 @@ export default function Card({cardTextures}){
   const isInteractive = useSelector(state => state.card.isInteractive)
   const dragResult = useSelector(state => state.card.dragResult)
   const myLine = useSelector(state => state.card.myLine)
-  const cardIdCounter = useSelector(state => state.card.cardIdCounter)
   const insertPlace = useSelector(state => state.card.insertPlace)
   const dispatch = useDispatch()
   // States
@@ -31,12 +29,27 @@ export default function Card({cardTextures}){
   const [numSprite, setNumSprite] = useState()
   const [myColor, setMyColor] = useState()
   const [myNumber, setMyNumber] = useState()
-  const [myId, setMyId] = useState(cardIdCounter)
+  const [myId, setMyId] = useState(id)
   const [myIdex, setMyIdex] = useState(null)
   const me = useRef()
 
   useEffect(() => {
-    dispatch(setCardIdCounter(cardIdCounter+1))
+    // Check if this id already exist
+    // If yes, that means this card is an init state card, directly go to the line
+    for(let i = 0; i < myLine.length; i++ ){
+      if(myId === myLine[i].id){
+        const { num, color } = myLine[i]
+        positionByIndex(i)
+        setMyIdex(i)
+        setCardTexture(cardTextures.stand[color])
+        addNumber(color, num)
+        setMyColor(color)
+        setMyNumber(num) 
+        setDisplayMe(true)
+        setCardStatus(CARD_STATUS.stand)  
+      }
+    }    
+
   }, [])
 
   useEffect(() => {
@@ -51,6 +64,7 @@ export default function Card({cardTextures}){
       positionByIndex(dragResult.index)
       setMyIdex(dragResult.index)
       dispatch(setInsertPlace(null))
+      dispatch(setCanDrawCard(true))
     }else{
       setDrag()
     }
@@ -84,8 +98,7 @@ export default function Card({cardTextures}){
     let pos = { x: 0, y: 0 }
     switch (cardStatus){
     case CARD_STATUS.dragable:
-      dispatch(closeDrawing())
-      dispatch(setIsInteractive(true))
+      dispatch(setIsDrawing(false))
       break
     case CARD_STATUS.draw:
       if(!drawingNum) return
@@ -106,8 +119,9 @@ export default function Card({cardTextures}){
         }
         setCardTexture(cardTextures.stand.b)
       }
+      addNumber(drawingCard, drawingNum)
       setMyColor(drawingCard)
-      addNumber()
+      setMyNumber(drawingNum)
       setCardPosition(pos)
       drawAnimation()
       setDisplayMe(true)
@@ -135,6 +149,7 @@ export default function Card({cardTextures}){
         duration: .6,
         onComplete: () => {
           setDrag()
+          dispatch(setIsInteractive(true))
         }
       })
   }
@@ -152,16 +167,15 @@ export default function Card({cardTextures}){
   }
 
   // Add the number sprite
-  const addNumber = () => {
-    if(!numSheetTextures || !drawingNum || !drawingCard) return
+  const addNumber = (color, number) => {
+    if(!numSheetTextures) return
 
-    const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${drawingCard}${drawingNum}_s`]])
+    const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${color}${number}_s`]])
     sprite.width = CARD_WIDTH / 2
     sprite.height = CARD_HEIGHT / 2
     sprite.anchor.set(0.5)
     setNumSprite(sprite)
     me.current.addChild(sprite)
-    setMyNumber(drawingNum)
   }
 
   // Make the card lay down 

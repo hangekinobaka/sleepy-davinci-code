@@ -53,7 +53,8 @@ const initData = () => {
     lines:{
       1: [],
       2: []
-    }
+    },
+    status: null
   };
 };
 

@@ -6,7 +6,7 @@ import * as PIXI from 'pixi.js'
 import { Provider } from 'react-redux'
 import store from 'redux/store'
 // redux
-import { resetAll, setNumSheetTextures } from 'redux/card/actions'
+import { setNumSheetTextures } from 'redux/card/actions'
 // configs
 import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/game'
 // utils
@@ -68,10 +68,8 @@ export default function GameCanvas() {
       // Reset all the resources
       PIXI.Loader.shared.reset()
       PIXI.utils.clearTextureCache()
-      dispatch(resetAll())
       isMounted.current = false
     }
-
   },[])
 
   useEffect(()=>{

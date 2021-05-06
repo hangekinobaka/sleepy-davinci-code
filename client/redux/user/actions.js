@@ -1,13 +1,33 @@
+export const USER_ALTER = 'USER_ALTER'
 export const USERNAME_ALTER = 'USERNAME_ALTER'
 export const ROOM_ALTER = 'ROOM_ALTER'
+export const STATUS_ALTER = 'STATUS_ALTER'
+export const RESET = 'RESET'
+
+const GAME_STATUS = {
+  USER_1: 1,
+  USER_2: 2,
+}
 
 export const initialState = {
+  user: null,
   username: '',
   room_num: 0,
   room_code: '0000',
+  /**
+   * 1 for user1 draw, 
+   * 2 for user2 draw, 
+   * 
+   * null for not satrt yet
+   */
+  status: null
 }
-
-
+export const setUser = user => ({
+  type: USER_ALTER,
+  payload:{
+    user
+  }
+})
 export const setUsername = username => ({
   type: USERNAME_ALTER,
   payload:{
@@ -21,9 +41,23 @@ export const setRoom = ({room_num, room_code}) => ({
     room_code
   }
 })
+export const setGlobalStatus = status => ({
+  type: STATUS_ALTER,
+  payload:{
+    status
+  }
+})
+export const resetUser = () => ({
+  type: RESET
+})
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
+  case USER_ALTER:
+    return {
+      ...state,
+      user: action.payload.user
+    }
   case USERNAME_ALTER:
     return {
       ...state,
@@ -34,6 +68,15 @@ export const reducer = (state = initialState, action) => {
       ...state,
       room_num: action.payload.room_num,
       room_code: action.payload.room_code
+    }
+  case STATUS_ALTER:
+    return {
+      ...state,
+      status: action.payload.status
+    }
+  case RESET:
+    return {
+      ...initialState
     }
   default:
     return state

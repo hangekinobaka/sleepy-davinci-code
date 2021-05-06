@@ -4,8 +4,8 @@ import dynamic from 'next/dynamic'
 import { io } from 'socket.io-client'
 import { Pane, Spinner } from 'evergreen-ui'
 import { setWinW, setWinH } from 'redux/win/actions'
-import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive, setCanDrawCard, setMyLine } from 'redux/card/actions'
-import { setUsername , setRoom} from 'redux/user/actions'
+import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive, setCanDrawCard, setMyLine, resetAll } from 'redux/card/actions'
+import { setUser, setUsername , setRoom, setGlobalStatus, resetUser} from 'redux/user/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, API_CODE_ROOM_DESTROYED} from 'configs/variables'
@@ -27,6 +27,8 @@ export default function Game() {
   const isDrawing = useSelector(state => state.card.isDrawing)
   const drawingCard = useSelector(state => state.card.drawingCard)
   const myLine = useSelector(state => state.card.myLine)
+  const globalStatus = useSelector(state => state.user.status)
+  const user = useSelector(state => state.user.user)
   const dispatch = useDispatch()
 
   const router = useRouter()
@@ -34,6 +36,12 @@ export default function Game() {
   const [initState, setInitState] = useState(false)
   const [socketClient, setSocketClient] = useState(null)
 
+  // Set game status based on the game turn
+  useEffect(() => {
+    console.log(`status change ${globalStatus}`)
+    if(globalStatus === null) return
+    if(globalStatus === user) dispatch(setCanDrawCard(true))
+  }, [globalStatus])
 
   useEffect(()=>{
     dispatch(setWinW(window.innerWidth))
@@ -42,15 +50,21 @@ export default function Game() {
       dispatch(setWinW(window.innerWidth))
       dispatch(setWinH(window.innerHeight))
     })
+    return () => {
+      // Clean up
+      dispatch(resetAll())
+      dispatch(resetUser())
+    }
   },[])
 
   useEffect(async () => {
     const data = await sendInit()
     if(!data) return
-    const {room_code, room_num } = data
+    const {room_code, room_num, user_num } = data
     const username = data.user_num === 1 ? data.user_1.username : data.user_2.username
     dispatch(setUsername(username))
     dispatch(setRoom({room_num, room_code}))
+    dispatch(setUser(user_num))
 
     // Connect the web socket
     const socket = io(ENDPOINT,{
@@ -59,13 +73,29 @@ export default function Game() {
     })
     const sc = new SocketClient(socket)
 
+    // Join the socket room
     sc.join()
 
     // Receive the game init data
-    sc.init({dispatch, setCardNumW, setCardNumB, setIsInteractive, setCanDrawCard, setMyLine})
+    sc.init(initData => {
+      console.log('run init')
+      console.log(initData)
+      dispatch(setCardNumW(initData.wNum))
+      dispatch(setCardNumB(initData.bNum))
+      dispatch(setMyLine(initData.line))
+      dispatch(setIsInteractive(true))
+      dispatch(setGlobalStatus(initData.status))
+    })
 
     // Receive draw card number
-    sc.receiveCard({dispatch, setDrawingNum})
+    sc.receiveCard(number => {
+      dispatch(setDrawingNum(number))
+    })
+
+    // Receive the gaem status change
+    sc.status(status => {
+      dispatch(setGlobalStatus(status))
+    })
 
     setSocketClient(sc)
   },[ENDPOINT])

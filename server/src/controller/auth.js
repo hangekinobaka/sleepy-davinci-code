@@ -2,6 +2,7 @@ const PromiseClient = require("../utils/redis");
 const client = new PromiseClient();
 const { roomCodeGenerator, initData } = require("../utils/user");
 const {redis_keys, ROOM_DATA_EXPIRE_TIME} = require("../variables/config");
+const { GAME_STATUS } = require("../variables/consts");
 
 const init = async (req, res)=>{
   try {
@@ -117,6 +118,7 @@ const join = async (req, res)=>{
     }
     // save the user 2 to the room
     room_data = JSON.parse(room_data);
+    room_data.game.status = GAME_STATUS.USER_1;
     // If for some reason the room is already taken, return a msg
     if("user_2" in room_data) {res.status(200).json({code: 5, msg:"the room is taken"}); return;}
     await client.setex(
@@ -127,7 +129,7 @@ const join = async (req, res)=>{
         user_2:{
           session_id: req.sessionID,
           username
-        }
+        },
       })
     );
 

@@ -6,7 +6,7 @@ export default function SocketClient(socket){
   this.socket = socket
   
   this.join = () => {
-    socket.emit('join', (error) => {
+    this.socket.emit('join', (error) => {
       if(error) {
         console.error(error)
       }
@@ -18,35 +18,36 @@ export default function SocketClient(socket){
   }
 
   this.draw = color => {
-    socket.emit('draw', {color}, (error) => {
+    this.socket.emit('draw', {color}, (error) => {
       if(error) {
         console.error(error)
       }
     })
   }
 
-  this.init = ({dispatch, setCardNumW, setCardNumB, setIsInteractive, setCanDrawCard, setMyLine})=>{
-    socket.on('init', initData => {
-      console.log(initData)
-      dispatch(setCardNumW(initData.wNum))
-      dispatch(setCardNumB(initData.bNum))
-      dispatch(setMyLine(initData.line))
-      dispatch(setIsInteractive(true))
-      dispatch(setCanDrawCard(true))
+  this.init = (callback)=>{
+    this.socket.on('init', initData => {
+      callback(initData)
     })
   }
 
-  this.receiveCard = ({dispatch, setDrawingNum}) => {
-    socket.on('receiveCard', ({number}) => {
-      dispatch(setDrawingNum(number))
+  this.receiveCard = (callback) => {
+    this.socket.on('receiveCard', ({number}) => {
+      callback(number)
     })
   }
 
   this.updateLine = newLine => {
-    socket.emit('updateLine', {newLine}, (error) => {
+    this.socket.emit('updateLine', {newLine}, (error) => {
       if(error) {
         console.error(error)
       }
+    })
+  }
+
+  this.status = (callback)=>{
+    this.socket.on('status', ({status}) => {
+      callback(status)
     })
   }
 }

@@ -2,33 +2,39 @@ const {SESSION_LEAVE_COUNT_DOWN, ROOM_DATA_EXPIRE_TIME} = require("../variables/
 const PromiseClient = require("../utils/redis");
 const client = new PromiseClient();
 const {redis_keys} = require("../variables/config");
-
+const { GAME_STATUS } = require("../variables/consts");
 
 module.exports = function(io){
   // Run when client connects
   io.on("connection", async socket => {
     console.log(`Socket ${socket.id} connected.`);
+    
+    const _room = socket.handshake.session.room_num;
+    const _sessionId = socket.handshake.sessionID;
+
     await client.pexpire(
-      `${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`, 
+      `${redis_keys.ROOM_DATA}${_room}`, 
       ROOM_DATA_EXPIRE_TIME * 1000
     );
 
-    socket.on("join", async (callback=null) => {
+    socket.on("join", async (callback) => {
+      console.log("receive join");
       try {
         // Handle room logic
-        socket.join(socket.handshake.session.room_num);
+        socket.join(_room);
 
         // Fetch data
-        let data = await client.get(`${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`);
+        let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
         data = JSON.parse(data);
 
         // See which user it is
-        const user = data.user_1.session_id === socket.handshake.sessionID ? 1 : 2;
+        const user = data.user_1.session_id === _sessionId ? 1 : 2;
         
-        socket.emit("init", {
+        io.to(_room).emit("init", {
           wNum: data.game.wArr.length,
           bNum: data.game.bArr.length,
-          line: data.game.lines[user]
+          line: data.game.lines[user],
+          status: data.game.status
         });
         if (callback) callback();
         
@@ -41,7 +47,7 @@ module.exports = function(io){
     socket.on("draw", async ({ color }, callback) => {
       try {
         // Handle room logic
-        let data = await client.get(`${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`);
+        let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
         data = JSON.parse(data);
         let number = null;
         if(color === "w") {
@@ -50,7 +56,7 @@ module.exports = function(io){
           number = data.game.bArr.pop();
         }
         await client.set(
-          `${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`, 
+          `${redis_keys.ROOM_DATA}${_room}`, 
           JSON.stringify(data)
         );
 
@@ -64,15 +70,15 @@ module.exports = function(io){
 
     socket.on("updateLine", async ({ newLine }, callback) => {
       try {
-        let data = await client.get(`${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`);
+        let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
         data = JSON.parse(data);
         // See which user it is
-        const user = data.user_1.session_id === socket.handshake.sessionID ? 1 : 2;
+        const user = data.user_1.session_id === _sessionId ? 1 : 2;
         if(data.game.lines[user].length === newLine.length) return;
         // Update user line
         data.game.lines[user] = newLine;
         await client.set(
-          `${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`, 
+          `${redis_keys.ROOM_DATA}${_room}`, 
           JSON.stringify(data)
         );
       }
@@ -82,11 +88,14 @@ module.exports = function(io){
     });
 
     socket.on("disconnect", async () => {
+      // Tell the oponent I have left
+      io.to(_room).emit("status", {
+        status: GAME_STATUS.USER_LEFT
+      });
       // IF the user leave, give it a count down  
-      const session_id = socket.handshake.sessionID;
-      await client.pexpire(`sess:${session_id}`, SESSION_LEAVE_COUNT_DOWN);
+      await client.pexpire(`sess:${_sessionId}`, SESSION_LEAVE_COUNT_DOWN);
       await client.pexpire(
-        `${redis_keys.ROOM_DATA}${socket.handshake.session.room_num}`, 
+        `${redis_keys.ROOM_DATA}${_room}`, 
         SESSION_LEAVE_COUNT_DOWN
       );
       

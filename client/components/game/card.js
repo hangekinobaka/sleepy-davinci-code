@@ -64,7 +64,6 @@ export default function Card({cardTextures, id}){
       positionByIndex(dragResult.index)
       setMyIdex(dragResult.index)
       dispatch(setInsertPlace(null))
-      dispatch(setCanDrawCard(true))
     }else{
       setDrag()
     }

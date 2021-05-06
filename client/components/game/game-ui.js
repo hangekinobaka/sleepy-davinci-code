@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
 import { Pane, Spinner, Overlay, toaster} from 'evergreen-ui'
 
@@ -7,6 +8,11 @@ import styles from 'styles/game.module.scss'
 import { API_CODE_SUCCESS, API_CODE_FAIL } from 'configs/variables'
 
 export default function GameUI() {
+  // Stores
+  const username = useSelector(state => state.user.username)
+  const room_code = useSelector(state => state.user.room_code)
+
+  // States
   const [loading, setLoading] = useState(false)
 
   const router = useRouter()

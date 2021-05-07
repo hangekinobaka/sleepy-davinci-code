@@ -9,6 +9,7 @@ import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
 
 let isDraggingLocal = false
+let draggId = null
 export default function Card({cardTextures, id}){
   // Stores
   const drawingCard = useSelector(state => state.card.drawingCard)
@@ -198,6 +199,7 @@ export default function Card({cardTextures, id}){
   // Card drag handlers
   const onDragStart = () => {
     isDraggingLocal = true
+    draggId = myId
     dispatch(setIsDragging(true))
   }
   const onDragEnd = () => {

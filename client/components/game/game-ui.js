@@ -69,7 +69,7 @@ export default function GameUI() {
   
 
   return (
-    <Pane className={styles['game-ui']}>
+    <Pane className={[styles['game-ui'], 'events-none']} >
       {/* Menu board */}
       <Pane display="flex" alignItems="center"
         className={styles['game-menu']}
@@ -88,7 +88,9 @@ export default function GameUI() {
           }
         }>
         {/* Exit btn */}
-        <Button appearance="primary"
+        <Button 
+          className='events-all'
+          appearance="primary"
           onClick={sendExit}
           padding={5}
           display="flex" alignItems="center" justifyContent="center"

@@ -14,7 +14,10 @@ const GAME_STATUS = {
   USER_1_DRAG: 13,
   USER_2_DRAG: 14,
   USER_LEFT: 15,
-  USER_EXIT: 16
+  USER_EXIT: 16,
+  PUT_IN_LINE_INIT: 17,
+  USER_1_PUT_IN_LINE: 19,
+  USER_2_PUT_IN_LINE_INIT: 20
 };
 
 module.exports = {

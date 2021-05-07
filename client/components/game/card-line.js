@@ -15,7 +15,6 @@ export default function CardLine(){
   const isDragging = useSelector(state => state.card.isDragging)
   const draggingCard = useSelector(state => state.card.draggingCard)
   const drawingNum = useSelector(state => state.card.drawingNum)
-  const drawingCard = useSelector(state => state.card.drawingCard)
   const insertPlace = useSelector(state => state.card.insertPlace)
   const dispatch = useDispatch()
   // Refs 
@@ -49,7 +48,7 @@ export default function CardLine(){
           // update the line
           let newLine = [...myLine]
           newLine.splice(insertPlace, 0, {
-            num: drawingNum, color: drawingCard, id: draggingCard.id
+            num: draggingCard.num, color: draggingCard.color, id: draggingCard.id
           })
           dispatch(setMyLine(newLine))
           dispatch(setDragRes({
@@ -136,7 +135,7 @@ export default function CardLine(){
       }
       return (
         (parseInt(myLine[i].num) < num) || 
-        (parseInt(myLine[i].num) === num && drawingCard === 'b')
+        (parseInt(myLine[i].num) === num && draggingCard.color === 'b')
       )
     }
 
@@ -155,11 +154,11 @@ export default function CardLine(){
       }
       return (
         (parseInt(myLine[i].num) > num) || 
-        (parseInt(myLine[i].num) === num && drawingCard === 'w')
+        (parseInt(myLine[i].num) === num && draggingCard.color === 'w')
       )
     }
 
-    const num = parseInt(drawingNum)
+    const num = parseInt(draggingCard.num)
     const cur = myLine[i] ? 
       myLine[i].num === 'J' ? 
         'J'
@@ -178,7 +177,7 @@ export default function CardLine(){
         // you can put the card in this place if the prev number is smaller
         if(testPrevSmaller(i-1)) dispatch(setInsertPlace(i))
         else dispatch(setInsertPlace(null))
-      }else if(cur === num && drawingCard === 'w'){
+      }else if(cur === num && draggingCard.color === 'w'){
         // If the number is the same
         // you can put it here if the color is white
         dispatch(setInsertPlace(i))

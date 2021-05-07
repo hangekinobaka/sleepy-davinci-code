@@ -54,7 +54,7 @@ const initData = () => {
       1: [],
       2: []
     },
-    darggingLines:{
+    draggingLines:{
       1: [],
       2: []
     },

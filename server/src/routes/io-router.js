@@ -30,7 +30,8 @@ module.exports = function(io){
         socket.emit("init", {
           wNum: data.game.wArr.length,
           bNum: data.game.bArr.length,
-          line: data.game.lines[user]
+          line: data.game.lines[user],
+          drawingLine: data.game.draggingLines[user]
         });
 
         io.to(_room).emit("status", {
@@ -60,9 +61,8 @@ module.exports = function(io){
         }else{
           number = data.game.bArr.pop();
         }
-
         // Push to the dragging line
-        data.game.darggingLines[user].push({num: number, color});
+        data.game.draggingLines[user].push({num: number, color});
 
         // Save data
         await client.set(
@@ -70,7 +70,10 @@ module.exports = function(io){
           JSON.stringify(data)
         );
 
-        socket.emit("receiveCard", {number});
+        socket.emit("receiveCard", {
+          num:number,
+          draggingLine: data.game.draggingLines[user]
+        });
         callback();
       }
       catch (error) {
@@ -86,12 +89,12 @@ module.exports = function(io){
 
         switch(data.game.status){
         case GAME_STATUS.USER_1_DRAW_INIT:
-          if(data.game.darggingLines[2].length < 4) data.game.status = GAME_STATUS.USER_2_DRAW_INIT;
-          else data.game.status = GAME_STATUS.USER_1_GUESS_MUST;
+          if(data.game.draggingLines[2].length < 4) data.game.status = GAME_STATUS.USER_2_DRAW_INIT;
+          else data.game.status = GAME_STATUS.PUT_IN_LINE_INIT;
           break;
         case GAME_STATUS.USER_2_DRAW_INIT:
-          if(data.game.darggingLines[1].length < 4) data.game.status = GAME_STATUS.USER_1_DRAW_INIT;
-          else data.game.status = GAME_STATUS.USER_2_GUESS_MUST;
+          if(data.game.draggingLines[1].length < 4) data.game.status = GAME_STATUS.USER_1_DRAW_INIT;
+          else data.game.status = GAME_STATUS.PUT_IN_LINE_INIT;
           break;
         default:
           break;

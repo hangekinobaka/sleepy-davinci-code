@@ -78,7 +78,7 @@ export default function GameCanvas() {
 
   useEffect(() => {
     // if my line number not fit the local card count, meaning that it is an init state
-    if(myCardNum !== myLine.length){
+    if(myCardNum < myLine.length){
       setMyCardNum(myLine.length)
     }
   }, [myLine])

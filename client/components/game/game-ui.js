@@ -23,6 +23,7 @@ export default function GameUI() {
   const [gameInfo, setGameInfo] = useState('')
   const [fullScreenInfo, setFullScreenInfo] = useState('')
   const [fullScreenInfoTitle, setFullScreenInfoTitle] = useState('')
+  const [fullScreenRoomInfo, setFullScreenRoomInfo] = useState('')
 
   const router = useRouter()
 
@@ -31,6 +32,7 @@ export default function GameUI() {
     case null:
       setFullScreenInfoTitle('Waiting')
       setFullScreenInfo('Waiting for your opponent...')
+      setFullScreenRoomInfo(`Your room code is: ${room_code}`)
       break
     case GAME_STATUS.USER_LEFT:
       setFullScreenInfoTitle('Your Opponent has left')
@@ -167,7 +169,8 @@ export default function GameUI() {
         >
             exit <Icon icon={LogOutIcon} marginLeft={4} size={10} />
         </Button>
-        {fullScreenInfo}
+        {fullScreenInfo}<br />
+        {fullScreenRoomInfo}
       </Dialog>
 
       {/* remove `X` icon on the side bar */}

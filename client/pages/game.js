@@ -4,7 +4,8 @@ import dynamic from 'next/dynamic'
 import { io } from 'socket.io-client'
 import { Pane, Spinner } from 'evergreen-ui'
 import { setWinW, setWinH } from 'redux/win/actions'
-import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive, setCanDrawCard, setMyLine, resetAll } from 'redux/card/actions'
+import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive, 
+  setCanDrawCard, setMyLine, resetAll, setMyDarggingLine } from 'redux/card/actions'
 import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient} from 'redux/user/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -28,6 +29,7 @@ export default function Game() {
   const isDrawing = useSelector(state => state.card.isDrawing)
   const drawingCard = useSelector(state => state.card.drawingCard)
   const myLine = useSelector(state => state.card.myLine)
+  const myDraggingLine = useSelector(state => state.card.myDraggingLines)
   const globalStatus = useSelector(state => state.user.status)
   const user = useSelector(state => state.user.user)
   const socketClient = useSelector(state => state.user.socketClient)
@@ -98,13 +100,15 @@ export default function Game() {
       dispatch(setCardNumW(initData.wNum))
       dispatch(setCardNumB(initData.bNum))
       dispatch(setMyLine(initData.line))
+      dispatch(setMyDarggingLine(initData.drawingLine))
       dispatch(setIsInteractive(true))
       dispatch(setGlobalStatus(initData.status))
     })
 
     // Receive draw card number
-    sc.receiveCard(number => {
-      dispatch(setDrawingNum(number))
+    sc.receiveCard(({num, draggingLine}) => {
+      dispatch(setMyDarggingLine(draggingLine))
+      dispatch(setDrawingNum(num))
     })
 
     // Receive the gaem status change

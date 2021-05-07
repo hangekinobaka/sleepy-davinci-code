@@ -5,7 +5,7 @@ import { io } from 'socket.io-client'
 import { Pane, Spinner } from 'evergreen-ui'
 import { setWinW, setWinH } from 'redux/win/actions'
 import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive, setCanDrawCard, setMyLine, resetAll } from 'redux/card/actions'
-import { setUser, setUsername , setRoom, setGlobalStatus, resetUser} from 'redux/user/actions'
+import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient} from 'redux/user/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, API_CODE_ROOM_DESTROYED} from 'configs/variables'
@@ -29,12 +29,12 @@ export default function Game() {
   const myLine = useSelector(state => state.card.myLine)
   const globalStatus = useSelector(state => state.user.status)
   const user = useSelector(state => state.user.user)
+  const socketClient = useSelector(state => state.user.socketClient)
   const dispatch = useDispatch()
 
   const router = useRouter()
   // States 
   const [initState, setInitState] = useState(false)
-  const [socketClient, setSocketClient] = useState(null)
 
   // Set game status based on the game turn
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function Game() {
       dispatch(setGlobalStatus(status))
     })
 
-    setSocketClient(sc)
+    dispatch(setSocketClient(sc))
   },[ENDPOINT])
 
   useEffect(() => {

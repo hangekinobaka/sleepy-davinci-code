@@ -50,4 +50,12 @@ export default function SocketClient(socket){
       callback(status)
     })
   }
+
+  this.exit = (callback)=>{
+    this.socket.emit('exit', (error) => {
+      if(error) {
+        console.error(error)
+      }
+    })
+  }
 }

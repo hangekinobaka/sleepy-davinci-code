@@ -7,8 +7,6 @@ const { GAME_STATUS } = require("../variables/consts");
 module.exports = function(io){
   // Run when client connects
   io.on("connection", async socket => {
-    console.log(`Socket ${socket.id} connected.`);
-    
     const _room = socket.handshake.session.room_num;
     const _sessionId = socket.handshake.sessionID;
 
@@ -18,7 +16,6 @@ module.exports = function(io){
     );
 
     socket.on("join", async (callback) => {
-      console.log("receive join");
       try {
         // Handle room logic
         socket.join(_room);
@@ -35,9 +32,11 @@ module.exports = function(io){
           bNum: data.game.bArr.length,
           line: data.game.lines[user]
         });
+
         io.to(_room).emit("status", {
           status: data.game.status
         });
+        
         if (callback) callback();
         
       } catch (error) {
@@ -100,8 +99,13 @@ module.exports = function(io){
         `${redis_keys.ROOM_DATA}${_room}`, 
         SESSION_LEAVE_COUNT_DOWN
       );
-      
-      console.log(`Socket ${socket.id} disconnected.`);
+    });
+
+    socket.on("exit", async () => {
+      // Tell the oponent I have exited
+      io.to(_room).emit("status", {
+        status: GAME_STATUS.USER_EXIT
+      });
     });
   });
 };

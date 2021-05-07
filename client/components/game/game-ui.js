@@ -37,10 +37,22 @@ export default function GameUI() {
     case GAME_STATUS.USER_LEFT:
       setFullScreenInfoTitle('Your Opponent has left')
       setFullScreenInfo('If he or she comes back in 3 mins, the game will be resumed')
+      setFullScreenRoomInfo('')
       break
     case GAME_STATUS.USER_EXIT:
       setFullScreenInfoTitle('Your Opponent has exited')
       setFullScreenInfo('Please click exit and restart a game')
+      setFullScreenRoomInfo('')
+      break
+    case GAME_STATUS.USER_1_DRAW_INIT:
+    case GAME_STATUS.USER_1_DRAW:
+      if(user == 1) setGameInfo('Please draw a card...')
+      else setGameInfo('Opponent is drawing card.')
+      break
+    case GAME_STATUS.USER_2_DRAW_INIT:
+    case GAME_STATUS.USER_2_DRAW:
+      if(user == 2) setGameInfo('Please draw a card...')
+      else setGameInfo('Opponent is drawing card.')
       break
     default:
       break

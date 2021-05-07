@@ -40,7 +40,6 @@ export default function Card({cardTextures, id}){
   useEffect(() => {
     // Check if this id already exist in myLine
     // If yes means this card is an init stand card, directly go to the line
-    // In draggingLines means this card is an init dragging card, directly go to the waiting line
     for(let i = 0; i < myLine.length; i++ ){
       if(myId === myLine[i].id){
         const { num, color } = myLine[i]
@@ -54,6 +53,22 @@ export default function Card({cardTextures, id}){
         setCardStatus(CARD_STATUS.stand)  
       }
     }    
+
+    // Check if draggingLines is not 0 and this card id is over myLine's
+    // If yes means that this card go direct to the wait line
+    if(myDraggingLine.length > 0 && myId > myLine.length){
+      for(let i = 0; i < myDraggingLine.length; i++ ){
+        if(myId - myLine.length === i + 1){
+          const { num, color } = myDraggingLine[i]
+          setCardTexture(cardTextures.stand[color])
+          addNumber(color, num)
+          setMyColor(color)
+          setMyNumber(num) 
+          setDrag()
+          setDisplayMe(true)
+        }
+      }  
+    }  
 
   }, [])
 

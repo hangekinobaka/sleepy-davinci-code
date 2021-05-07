@@ -28,6 +28,7 @@ export default function GameCanvas() {
   const canvasHeight = useSelector(state => state.win.canvasHeight)
   const isDrawing = useSelector(state => state.card.isDrawing)
   const myLine = useSelector(state => state.card.myLine)
+  const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const dispatch = useDispatch()
 
   // states
@@ -78,10 +79,10 @@ export default function GameCanvas() {
 
   useEffect(() => {
     // if my line number not fit the local card count, meaning that it is an init state
-    if(myCardNum < myLine.length){
-      setMyCardNum(myLine.length)
+    if(myCardNum < myLine.length + myDraggingLine.length){
+      setMyCardNum(myLine.length + myDraggingLine.length)
     }
-  }, [myLine])
+  }, [myLine, myDraggingLine])
 
   // Methods
   const textureLoader = ()=>{

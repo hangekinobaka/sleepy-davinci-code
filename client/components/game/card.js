@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Sprite, useApp } from '@inlet/react-pixi'
 import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, 
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
-  LINE_X, LINE_Y } from 'configs/game'
+  LINE_X, LINE_Y, GAME_STATUS } from 'configs/game'
 import { setIsDrawing, setIsDragging, setDraggingCard, setIsInteractive, setInsertPlace, setCanDrawCard } from 'redux/card/actions'
 import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
@@ -18,6 +18,9 @@ export default function Card({cardTextures, id}){
   const dragResult = useSelector(state => state.card.dragResult)
   const myLine = useSelector(state => state.card.myLine)
   const insertPlace = useSelector(state => state.card.insertPlace)
+  const globalStatus = useSelector(state => state.user.status)
+  const user = useSelector(state => state.user.user)
+  const socketClient = useSelector(state => state.user.socketClient)
   const dispatch = useDispatch()
   // States
   const [cardPosition, setCardPosition] = useState({x: 0, y: 0})
@@ -118,6 +121,7 @@ export default function Card({cardTextures, id}){
         }
         setCardTexture(cardTextures.stand.b)
       }
+
       addNumber(drawingCard, drawingNum)
       setMyColor(drawingCard)
       setMyNumber(drawingNum)
@@ -149,6 +153,7 @@ export default function Card({cardTextures, id}){
         onComplete: () => {
           setDrag()
           dispatch(setIsInteractive(true))
+          socketClient.drawFinish()
         }
       })
   }

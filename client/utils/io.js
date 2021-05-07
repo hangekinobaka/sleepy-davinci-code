@@ -13,12 +13,22 @@ export default function SocketClient(socket){
     })
   }
 
-  this.drawCard = ()=>{
-    return Math.floor((Math.random()*11+1))
-  }
-
   this.draw = color => {
     this.socket.emit('draw', {color}, (error) => {
+      if(error) {
+        console.error(error)
+      }
+    })
+  }
+
+  this.receiveCard = (callback) => {
+    this.socket.on('receiveCard', ({number}) => {
+      callback(number)
+    })
+  }
+
+  this.drawFinish = (callback)=>{
+    this.socket.emit('drawFinish', (error) => {
       if(error) {
         console.error(error)
       }
@@ -28,12 +38,6 @@ export default function SocketClient(socket){
   this.init = (callback)=>{
     this.socket.on('init', initData => {
       callback(initData)
-    })
-  }
-
-  this.receiveCard = (callback) => {
-    this.socket.on('receiveCard', ({number}) => {
-      callback(number)
     })
   }
 

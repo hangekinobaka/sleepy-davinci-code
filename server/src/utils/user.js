@@ -54,6 +54,10 @@ const initData = () => {
       1: [],
       2: []
     },
+    darggingLines:{
+      1: [],
+      2: []
+    },
     status: null
   };
 };

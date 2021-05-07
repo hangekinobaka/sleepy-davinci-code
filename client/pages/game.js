@@ -9,6 +9,7 @@ import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketCl
 import { useSelector, useDispatch } from 'react-redux'
 
 import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, API_CODE_ROOM_DESTROYED} from 'configs/variables'
+import { GAME_STATUS } from 'configs/game'
 import api from 'utils/api'
 import SocketClient from 'utils/io'
 import GameLayout from 'layouts/game-layout'
@@ -39,8 +40,22 @@ export default function Game() {
   // Set game status based on the game turn
   useEffect(() => {
     console.log(`status change ${globalStatus}`)
-    if(globalStatus === null) return
-    if(globalStatus === user) dispatch(setCanDrawCard(true))
+    switch(globalStatus){
+    case null:
+      break
+    case GAME_STATUS.USER_1_DRAW:
+    case GAME_STATUS.USER_1_DRAW_INIT:
+      console.log(`user ${user}`)
+      if(user == 1) dispatch(setCanDrawCard(true))
+      break
+    case GAME_STATUS.USER_2_DRAW:
+    case GAME_STATUS.USER_2_DRAW_INIT:
+      console.log(`user ${user}`)
+      if(user == 2) dispatch(setCanDrawCard(true))
+      break
+    default:
+      break
+    }
   }, [globalStatus])
 
   useEffect(()=>{

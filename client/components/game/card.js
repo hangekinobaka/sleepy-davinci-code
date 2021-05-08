@@ -34,8 +34,9 @@ export default function Card({cardTextures, id}){
   const [myColor, setMyColor] = useState()
   const [myNumber, setMyNumber] = useState()
   const [myId, setMyId] = useState(id)
-  const [myIdex, setMyIdex] = useState(null)
+  const [myIndex, setMyIndex] = useState(null)
   const [cardInit, setCardInit] = useState(false)
+  const [dragIndex, setDragIndex] = useState(null)
 
   const me = useRef()
 
@@ -48,7 +49,7 @@ export default function Card({cardTextures, id}){
       if(myId === myLine[i].id){
         const { num, color } = myLine[i]
         positionByIndex(i)
-        setMyIdex(i)
+        setMyIndex(i)
         setCardTexture(cardTextures.stand[color])
         addNumber(color, num)
         setMyColor(color)
@@ -68,6 +69,7 @@ export default function Card({cardTextures, id}){
           addNumber(color, num)
           setMyColor(color)
           setMyNumber(num) 
+          setDragIndex(i)
           return setCardInit(true)      
         }
       }  
@@ -90,7 +92,7 @@ export default function Card({cardTextures, id}){
       // Put card in place
       setCardStatus(CARD_STATUS.stand)
       positionByIndex(dragResult.index)
-      setMyIdex(dragResult.index)
+      setMyIndex(dragResult.index)
       
       // Remove the card from the waiting line
       const index = myId - myLine.length - 1
@@ -105,24 +107,24 @@ export default function Card({cardTextures, id}){
   }, [dragResult])
 
   useEffect(() => {
-    if(myLine === null || myIdex === null) return
+    if(myLine === null || myIndex === null) return
     if(cardStatus === CARD_STATUS.stand &&
-      myLine[myIdex].id !== myId){
-      positionByIndex(myIdex+1)
-      setMyIdex(myIdex+1)
+      myLine[myIndex].id !== myId){
+      positionByIndex(myIndex+1)
+      setMyIndex(myIndex+1)
     }
   }, [myLine])
   
   useEffect(() => {
-    if(cardStatus !== CARD_STATUS.stand && cardStatus !== CARD_STATUS.lay && myIdex === null) return
+    if(cardStatus !== CARD_STATUS.stand && cardStatus !== CARD_STATUS.lay && myIndex === null) return
     
     if(insertPlace === null){
-      positionByIndex(myIdex)
+      positionByIndex(myIndex)
       return
     }
 
-    if(insertPlace <= myIdex){
-      positionByIndex(myIdex+1)
+    if(insertPlace <= myIndex){
+      positionByIndex(myIndex+1)
     }
 
   }, [insertPlace])
@@ -173,7 +175,7 @@ export default function Card({cardTextures, id}){
     const tl = gsap.timeline()
     const scale = me.current.scale.x
     const prevNum = myId - myLine.length - 1
-
+    setDragIndex(prevNum)
     tl
       .to(me.current, {
         pixi: {x:DESIGN_WIDTH-1000, y:DESIGN_HEIGHT-350, scale:scale+1},
@@ -198,7 +200,7 @@ export default function Card({cardTextures, id}){
 
   // Set drag status
   const setDrag = () => {
-    const prevNum = myId - myLine.length - 1
+    const prevNum = dragIndex === null ? myId - myLine.length - 1 : dragIndex
     setCardPosition({x:DESIGN_WIDTH - 170 - CARD_WIDTH * prevNum, y:DESIGN_HEIGHT-350})
     setCardStatus(CARD_STATUS.dragable)
 

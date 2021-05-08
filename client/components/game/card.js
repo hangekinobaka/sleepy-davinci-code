@@ -168,6 +168,7 @@ export default function Card({cardTextures, id}){
     case CARD_STATUS.none:
     default: 
       setCardPosition(pos)
+      break
     }
   }
 
@@ -180,12 +181,12 @@ export default function Card({cardTextures, id}){
       .to(me.current, {
         pixi: {x:DESIGN_WIDTH-1000, y:DESIGN_HEIGHT-350, scale:scale+1},
         ease: 'power1.inOut',
-        duration: 1.3
+        duration: 1.1
       })
       .to(me.current, {
         pixi: {x:DESIGN_WIDTH - 170 - CARD_WIDTH * prevNum, y:DESIGN_HEIGHT-350, scale:scale},
         ease: 'power1.out',
-        duration: .6,
+        duration: .5,
         onComplete: () => {
           drawSuccessHandler()
         }

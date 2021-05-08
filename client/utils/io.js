@@ -41,6 +41,12 @@ export default function SocketClient(socket){
     })
   }
 
+  this.opReceiveCard = (callback)=>{
+    this.socket.on('opReceiveCard', ({ color}) => {
+      callback({ color})
+    })
+  }
+
   this.init = (callback)=>{
     this.socket.on('init', initData => {
       callback(initData)

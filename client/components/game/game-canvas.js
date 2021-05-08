@@ -87,7 +87,7 @@ export default function GameCanvas() {
 
   useEffect(() => {
     if(cardNumW + cardNumB === WHITE_CARD_NUM + BLACK_CARD_NUM) return
-    
+
     const cardOnUse = WHITE_CARD_NUM + BLACK_CARD_NUM - (cardNumW + cardNumB)
     if(cardOnUse === myCardNum + opCardNum) return
 
@@ -207,7 +207,7 @@ export default function GameCanvas() {
 
                 {/* opponent card instances */}
                 {
-                  [...new Array(myCardNum)].map((item, index) => (
+                  [...new Array(opCardNum)].map((item, index) => (
                     <OpCard 
                       key={`card-${index}`}
                       id={index+1}

@@ -8,7 +8,7 @@ import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive,
   setCanDrawCard, setMyLine, resetAll, setMyDarggingLine, setDisableDrag } from 'redux/card/actions'
 import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient} from 'redux/user/actions'
 import { setShowConfirmBtn, resetUi } from 'redux/ui/actions'
-import { resetOp } from 'redux/opponent/actions'
+import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine } from 'redux/opponent/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { API_STATUS } from 'configs/variables'
@@ -108,11 +108,16 @@ export default function Game() {
     sc.init(initData => {
       console.log('run init')
       console.log(initData)
-      dispatch(setCardNumW(initData.wNum))
-      dispatch(setCardNumB(initData.bNum))
       dispatch(setMyLine(initData.line))
       dispatch(setMyDarggingLine(initData.drawingLine))
       dispatch(setIsInteractive(true))
+
+      // Opponent data
+      dispatch(setOpLine(initData.opLine))
+      dispatch(setOpDarggingLine(initData.opDrawingLine))
+
+      dispatch(setCardNumW(initData.wNum))
+      dispatch(setCardNumB(initData.bNum))
       dispatch(setGlobalStatus(initData.status))
     })
 
@@ -130,6 +135,11 @@ export default function Game() {
     // Receive the gaem status change
     sc.status(status => {
       dispatch(setGlobalStatus(status))
+    })
+
+    // Receive opponent card
+    sc.opReceiveCard(({color}) => {
+      dispatch(setOpDrawingCardColor(color))
     })
 
     dispatch(setSocketClient(sc))

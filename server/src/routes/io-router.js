@@ -25,13 +25,22 @@ module.exports = function(io){
         data = JSON.parse(data);
 
         // See which user it is
-        const user = data.user_1.session_id === _sessionId ? 1 : 2;
+        let user, opponent;
+        if(data.user_1.session_id === _sessionId){
+          user = 1;
+          opponent = 2;
+        }else{
+          user = 2;
+          opponent = 1;
+        }
         
         socket.emit("init", {
           wNum: data.game.wArr.length,
           bNum: data.game.bArr.length,
           line: data.game.lines[user],
-          drawingLine: data.game.draggingLines[user]
+          drawingLine: data.game.draggingLines[user],
+          opLine: (data.game.lines[opponent]).map(card => ({color: card.color, id: card.color})),
+          opDrawingLine: (data.game.draggingLines[opponent]).map(card => ({color: card.color})),
         });
 
         io.to(_room).emit("status", {
@@ -66,6 +75,9 @@ module.exports = function(io){
           bNum: data.game.bArr.length,
         });
        
+        socket.broadcast.to(_room).emit("opReceiveCard", { 
+          color
+        });
         callback();
       }
       catch (error) {

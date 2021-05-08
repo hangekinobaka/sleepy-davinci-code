@@ -58,7 +58,8 @@ const initData = () => {
       1: [],
       2: []
     },
-    status: null
+    status: null,
+    senTe: 1
   };
 };
 

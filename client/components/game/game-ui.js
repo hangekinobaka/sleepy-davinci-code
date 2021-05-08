@@ -4,10 +4,11 @@ import { useRouter } from 'next/router'
 import { Pane, Spinner, Overlay, toaster, Dialog, Button, SideSheet, 
   Paragraph, Position, DoubleChevronRightIcon, LogOutIcon, IconButton, Icon } from 'evergreen-ui'
 import Component from '@reach/component-component'
+import { setShowConfirmBtn } from 'redux/ui/actions'
 
 import api from 'utils/api'
 import styles from 'styles/game.module.scss'
-import { API_CODE_SUCCESS, API_CODE_FAIL } from 'configs/variables'
+import { API_STATUS } from 'configs/variables'
 import { GAME_STATUS } from 'configs/game'
 
 export default function GameUI() {
@@ -18,6 +19,9 @@ export default function GameUI() {
   const status = useSelector(state => state.user.status)
   const socketClient = useSelector(state => state.user.socketClient)
   const showConfirmBtn = useSelector(state => state.ui.showConfirmBtn)
+  const myLine = useSelector(state => state.card.myLine)
+  const myDraggingLine = useSelector(state => state.card.myDraggingLine)
+  const dispatch = useDispatch()
   
   // States
   const [loading, setLoading] = useState(false)
@@ -55,9 +59,9 @@ export default function GameUI() {
       if(user == 2) setGameInfo('Please draw a card...')
       else setGameInfo('Opponent is drawing card.')
       break
-
     case GAME_STATUS.PUT_IN_LINE_INIT:
-      setGameInfo('Please put the cards in your line')
+      if(myDraggingLine !== null && myDraggingLine.length !== 0) setGameInfo('Please put the cards in your line')
+      else if(myDraggingLine !== null && myDraggingLine.length === 0) setGameInfo('Your opponent didn\'t finish yet, please wait.')
       break
     default:
       break
@@ -69,13 +73,12 @@ export default function GameUI() {
     setLoading(true)
     const res = await api('post', '/exit')
     switch (res.code) {
-    case API_CODE_SUCCESS:
+    case API_STATUS.API_CODE_SUCCESS:
       // Send exit signal
       socketClient.exit()
-
       router.push('/')
       return
-    case API_CODE_FAIL:
+    case API_STATUS.API_CODE_FAIL:
       toaster.danger(
         'Exit failed. Please try it later...'
       )
@@ -86,6 +89,17 @@ export default function GameUI() {
     setLoading(false)
   }
   
+  // Handlers
+  const confirmHandler = () => {
+    if(myLine.length === 0) return
+    socketClient.updateLine(myLine)
+    socketClient.updateLineRes(res => {
+      if(res === API_STATUS.API_CODE_SUCCESS){
+        dispatch(setShowConfirmBtn(false))
+        setGameInfo('Your opponent didn\'t finish yet, please wait.')
+      }
+    })
+  }
 
   return (
     <Pane className={[styles['game-ui'], 'events-none']} >
@@ -152,9 +166,10 @@ export default function GameUI() {
       <Button
         className={`events-all ${styles['game-btn-confirm']}`}
         appearance="primary"
-        // onClick={}
+        onClick={confirmHandler}
         padding={5}
         display="flex" alignItems="center" justifyContent="center"
+        data-show={showConfirmBtn}
       >
         Confirm
       </Button>

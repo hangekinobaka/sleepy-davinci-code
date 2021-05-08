@@ -2,13 +2,16 @@ const {SESSION_LEAVE_COUNT_DOWN, ROOM_DATA_EXPIRE_TIME} = require("../variables/
 const PromiseClient = require("../utils/redis");
 const client = new PromiseClient();
 const {redis_keys} = require("../variables/config");
-const { GAME_STATUS } = require("../variables/consts");
+const { GAME_STATUS, API_STATUS } = require("../variables/consts");
 
 module.exports = function(io){
   // Run when client connects
   io.on("connection", async socket => {
     const _room = socket.handshake.session.room_num;
     const _sessionId = socket.handshake.sessionID;
+
+    // Handle room logic
+    socket.join(_room);
 
     await client.pexpire(
       `${redis_keys.ROOM_DATA}${_room}`, 
@@ -17,9 +20,6 @@ module.exports = function(io){
 
     socket.on("join", async (callback) => {
       try {
-        // Handle room logic
-        socket.join(_room);
-
         // Fetch data
         let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
         data = JSON.parse(data);
@@ -123,20 +123,60 @@ module.exports = function(io){
 
     socket.on("updateLine", async ({ newLine }, callback) => {
       try {
+        // Fetch data
         let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
         data = JSON.parse(data);
+        
         // See which user it is
-        const user = data.user_1.session_id === _sessionId ? 1 : 2;
+        let user, opponent;
+        if(data.user_1.session_id === _sessionId){
+          user = 1;
+          opponent = 2;
+        }else{
+          user = 2;
+          opponent = 1;
+        }
+        
+        // Exit if there is no change
         if(data.game.lines[user].length === newLine.length) return;
+        
         // Update user line
         data.game.lines[user] = newLine;
+        data.game.draggingLines[user] = [];
+
+        let status = data.game.status;
+        switch(data.game.status){
+        case GAME_STATUS.PUT_IN_LINE_INIT:
+          if(data.game.draggingLines[opponent].length !== 0) break;
+          else if(data.game.senTe === 1) status = GAME_STATUS.USER_1_GUESS_MUST;
+          else if(data.game.senTe === 2) status = GAME_STATUS.USER_2_GUESS_MUST;
+          break;
+        default:
+          break;
+        }
+
+        data.game.status = status;
+
+        // Save data
         await client.set(
           `${redis_keys.ROOM_DATA}${_room}`, 
           JSON.stringify(data)
         );
+
+        socket.emit("updateLineRes", {
+          res: API_STATUS.API_CODE_SUCCESS
+        });
+
+        io.to(_room).emit("status", {
+          status
+        });
       }
       catch (error) {
         callback(error);
+
+        socket.emit("updateLineRes", {
+          res: API_STATUS.API_CODE_FAIL
+        });
       }
     });
 

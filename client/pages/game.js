@@ -10,7 +10,7 @@ import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketCl
 import { setShowConfirmBtn, resetUi } from 'redux/ui/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
-import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, API_CODE_ROOM_DESTROYED} from 'configs/variables'
+import { API_STATUS } from 'configs/variables'
 import { GAME_STATUS } from 'configs/game'
 import api from 'utils/api'
 import SocketClient from 'utils/io'
@@ -164,12 +164,12 @@ export default function Game() {
   const sendInit = async () => {
     const res = await api('post', '/init')
     switch (res.code) {
-    case API_CODE_ROOM_DESTROYED:
-    case API_CODE_FAIL:
-    case API_CODE_NO_DATA:
+    case API_STATUS.API_CODE_ROOM_DESTROYED:
+    case API_STATUS.API_CODE_FAIL:
+    case API_STATUS.API_CODE_NO_DATA:
       router.push('/')
       return Promise.resolve()
-    case API_CODE_SUCCESS:
+    case API_STATUS.API_CODE_SUCCESS:
       setInitState(true)
       return Promise.resolve(res.data)
     default:

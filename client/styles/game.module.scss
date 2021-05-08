@@ -1,4 +1,13 @@
 .game{
+  @mixin data-show {
+    &[data-show='true']{
+      opacity: 1;
+    }
+    &[data-show='false']{
+      opacity: 0;
+    }
+  }
+
   &-ui{
     left: 0;
     top: 0;
@@ -15,12 +24,7 @@
   }
 
   &-menu{
-    &[data-show='true']{
-      opacity: 1;
-    }
-    &[data-show='false']{
-      opacity: 0;
-    }
+    @include data-show;
   }
 
   &-info-bar{
@@ -34,10 +38,11 @@
 
   &-btn{
     &-confirm{
+      @include data-show; 
       position: absolute;
-      top: 60%;
-      left: 70%;
-      transform: translate(-50%, 0);
+      top: 42%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 

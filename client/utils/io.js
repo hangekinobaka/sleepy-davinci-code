@@ -55,6 +55,12 @@ export default function SocketClient(socket){
     })
   }
 
+  this.updateLineRes = (callback) => {
+    this.socket.on('updateLineRes', ({res}) => {
+      callback(res)
+    })
+  }
+
   this.status = (callback)=>{
     this.socket.on('status', ({status}) => {
       callback(status)

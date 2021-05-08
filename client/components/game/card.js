@@ -78,7 +78,7 @@ export default function Card({cardTextures, id}){
     setCardStatus(CARD_STATUS.draw)  
     return setCardInit(true)  
 
-  }, [])
+  }, [myLine, myDraggingLine])
 
   useEffect(() => {
     statusHandler()

@@ -34,6 +34,8 @@ export default function GameCanvas() {
   const cardNumB = useSelector(state => state.card.cardNumB)
   const globalStatus = useSelector(state => state.user.status)
   const user = useSelector(state => state.user.user)
+  const opLine = useSelector(state => state.opponent.opLine)
+  const opDraggingLine = useSelector(state => state.opponent.opDraggingLine)
   const dispatch = useDispatch()
 
   // states
@@ -81,10 +83,6 @@ export default function GameCanvas() {
     }
   },[])
 
-  // useEffect(()=>{
-  //   if(isDrawing) setMyCardNum(myCardNum+1)
-  // },[isDrawing])
-
   useEffect(() => {
     if(cardNumW + cardNumB === WHITE_CARD_NUM + BLACK_CARD_NUM) return
 
@@ -108,13 +106,16 @@ export default function GameCanvas() {
   }, [cardNumW, cardNumB])
 
   useEffect(() => {
-    if(cardInit || myLine === null || myDraggingLine === null) return
+    if(cardInit || myLine === null || myDraggingLine === null || opLine === null || opDraggingLine === null) return
     // if my line number not fit the local card count, meaning that it is an init state
     if(myCardNum < myLine.length + myDraggingLine.length){
       setMyCardNum(myLine.length + myDraggingLine.length)
     }
+    if(opCardNum < opLine.length + opDraggingLine.length){
+      setOpCardNum(opLine.length + opDraggingLine.length)
+    }
     setCardInit(true)
-  }, [myLine, myDraggingLine])
+  }, [myLine, myDraggingLine, opLine, opDraggingLine])
 
   // Methods
   const textureLoader = ()=>{

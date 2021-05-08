@@ -98,3 +98,6 @@ export const GAME_STATUS = {
   USER_EXIT: 16,
   PUT_IN_LINE_INIT: 17,
 }
+
+export const OP_LINE_X = 120
+export const OP_LINE_Y = 300

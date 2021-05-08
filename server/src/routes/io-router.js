@@ -59,12 +59,6 @@ module.exports = function(io){
           number = data.game.bArr.pop();
         }
 
-        // Save data
-        await client.set(
-          `${redis_keys.ROOM_DATA}${_room}`, 
-          JSON.stringify(data)
-        );
-
         socket.emit("receiveCard", { num:number });
 
         io.to(_room).emit("cardNumChange", {
@@ -102,6 +96,13 @@ module.exports = function(io){
           break;
         default:
           break;
+        }
+
+        // Remove the corresponding element
+        if(color === "w") {
+          data.game.wArr.pop();
+        }else{
+          data.game.bArr.pop();
         }
 
         // Save data

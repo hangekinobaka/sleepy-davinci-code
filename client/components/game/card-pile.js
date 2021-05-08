@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Sprite, Container } from '@inlet/react-pixi'
 import { WHITE_CARD_NUM, BLACK_CARD_NUM, CARD_PILE, DESIGN_WIDTH, DESIGN_HEIGHT } from 'configs/game'
-import { setCardNumW, setCardNumB, setIsInteractive, setIsDrawing, setCanDrawCard } from 'redux/card/actions'
+import { setDrawingCardColor, setIsInteractive, setIsDrawing, setCanDrawCard } from 'redux/card/actions'
 
 const CARD_WIDTH = 200
 const CARD_HEIGHT = 154
@@ -38,11 +38,7 @@ export default function CardPile({cardTextures}){
     dispatch(setIsInteractive(false))
     dispatch(setCanDrawCard(false))
     const color = e.target['data-color']
-    if(color === 'w'){
-      dispatch(setCardNumW(cardNumW - 1))
-    }else if(color === 'b'){
-      dispatch(setCardNumB(cardNumB - 1))
-    }
+    dispatch(setDrawingCardColor(color))
     dispatch(setIsDrawing(true))
   }
 

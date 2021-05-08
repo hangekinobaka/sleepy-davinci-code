@@ -46,7 +46,7 @@ export default function CardLine(){
         if(insertPlace !== null){
           // if the card insertion isa valid,
           // update the line
-          let newLine = [...myLine]
+          let newLine = myLine === null ? [] : [...myLine]
           newLine.splice(insertPlace, 0, {
             num: draggingCard.num, color: draggingCard.color, id: draggingCard.id
           })

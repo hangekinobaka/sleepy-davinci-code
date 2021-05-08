@@ -2,6 +2,7 @@ import { WHITE_CARD_NUM, BLACK_CARD_NUM } from 'configs/game'
 
 export const CARD_NUM_W_ALTER = 'CARD_NUM_W_ALTER'
 export const CARD_NUM_B_ALTER = 'CARD_NUM_B_ALTER'
+export const DRAWING_CARD_COLOR_ALTER = 'DRAWING_CARD_COLOR_ALTER'
 export const IS_DRAWING_ALTER = 'IS_DRAWING_ALTER'
 export const RESET_ALL = 'RESET_ALL'
 export const IS_INTERAVTIVE_ALTER = 'IS_INTERAVTIVE_ALTER'
@@ -14,11 +15,13 @@ export const DRAGGING_CARD_ALTER = 'DRAGGING_CARD_ALTER'
 export const DRAG_RESULT_ALTER = 'DRAG_RESULT_ALTER'
 export const INSERT_PLACE_ALTER = 'INSERT_PLACE_ALTER'
 export const CAN_DRAW_CARD_ALTER = 'CAN_DRAW_CARD_ALTER'
+export const CONFIRM_UPDATE_LINE_ALTER = 'CONFIRM_UPDATE_LINE_ALTER'
+export const DISABLE_DRAG_ALTER = 'DISABLE_DRAG_ALTER'
 
 export const initialState = {
   cardNumW: WHITE_CARD_NUM,
   cardNumB: BLACK_CARD_NUM,
-  drawingCard: 'w',
+  drawingCardColor: 'w',
   isDrawing: false,
   isInteractive: false,
   numSheetTextures: null,
@@ -32,7 +35,7 @@ export const initialState = {
    *   {num: 6, color: 'b', id: 2}
    * ]
    */
-  myLine:[],
+  myLine:null,
   isDragging: null,
   draggingCard: null,
   /**
@@ -45,7 +48,9 @@ export const initialState = {
   dragResult: null,
   insertPlace: null,
   canDrawCard: false,
-  myDraggingLine:[]
+  myDraggingLine:null,
+  confirmUpdateLine: false,
+  disableDrag: true
 }
 
 
@@ -59,6 +64,12 @@ export const setCardNumB = num => ({
   type: CARD_NUM_B_ALTER,
   payload:{
     num
+  }
+})
+export const setDrawingCardColor = color => ({
+  type: DRAWING_CARD_COLOR_ALTER,
+  payload:{
+    color
   }
 })
 export const setIsDrawing = isDrawing => ({
@@ -131,21 +142,37 @@ export const setCanDrawCard = can => ({
     can
   }
 })
+export const setConfirmUpdateLine = confirm => ({
+  type: CONFIRM_UPDATE_LINE_ALTER,
+  payload:{
+    confirm
+  }
+})
+export const setDisableDrag = isDisable => ({
+  type: DISABLE_DRAG_ALTER,
+  payload:{
+    isDisable
+  }
+})
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
   case CARD_NUM_W_ALTER:
     return {
       ...state,
-      cardNumW: action.payload.num,
-      drawingCard: 'w'
+      cardNumW: action.payload.num
     }
   case CARD_NUM_B_ALTER:
     return {
       ...state,
-      cardNumB: action.payload.num,
-      drawingCard: 'b'
+      cardNumB: action.payload.num
     }
+  case DRAWING_CARD_COLOR_ALTER:
+    return {
+      ...state,
+      drawingCardColor: action.payload.color
+    }
+    
   case IS_DRAWING_ALTER:
     return {
       ...state,
@@ -202,6 +229,16 @@ export const reducer = (state = initialState, action) => {
     return{
       ...state,
       canDrawCard: action.payload.can
+    }
+  case CONFIRM_UPDATE_LINE_ALTER:
+    return{
+      ...state,
+      confirmUpdateLine: action.payload.confirm
+    }
+  case DISABLE_DRAG_ALTER:
+    return{
+      ...state,
+      disableDrag: action.payload.isDisable
     }
   default:
     return state

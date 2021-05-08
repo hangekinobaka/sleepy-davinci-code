@@ -17,7 +17,8 @@ export default function GameUI() {
   const room_code = useSelector(state => state.user.room_code)
   const status = useSelector(state => state.user.status)
   const socketClient = useSelector(state => state.user.socketClient)
-
+  const showConfirmBtn = useSelector(state => state.ui.showConfirmBtn)
+  
   // States
   const [loading, setLoading] = useState(false)
   const [gameInfo, setGameInfo] = useState('')
@@ -53,6 +54,10 @@ export default function GameUI() {
     case GAME_STATUS.USER_2_DRAW:
       if(user == 2) setGameInfo('Please draw a card...')
       else setGameInfo('Opponent is drawing card.')
+      break
+
+    case GAME_STATUS.PUT_IN_LINE_INIT:
+      setGameInfo('Please put the cards in your line')
       break
     default:
       break
@@ -103,7 +108,7 @@ export default function GameUI() {
         }>
         {/* Exit btn */}
         <Button 
-          className='events-all'
+          className='events-all' // for click event
           appearance="primary"
           onClick={sendExit}
           padding={5}
@@ -142,6 +147,17 @@ export default function GameUI() {
       <div className={styles['game-info-bar']}>
         <span>{gameInfo}</span>
       </div>
+
+      {/* confirm btn */}
+      <Button
+        className={`events-all ${styles['game-btn-confirm']}`}
+        appearance="primary"
+        // onClick={}
+        padding={5}
+        display="flex" alignItems="center" justifyContent="center"
+      >
+        Confirm
+      </Button>
 
       {/* Loading overlay */}
       <Overlay 

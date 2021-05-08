@@ -5,8 +5,9 @@ import { io } from 'socket.io-client'
 import { Pane, Spinner } from 'evergreen-ui'
 import { setWinW, setWinH } from 'redux/win/actions'
 import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive, 
-  setCanDrawCard, setMyLine, resetAll, setMyDarggingLine } from 'redux/card/actions'
+  setCanDrawCard, setMyLine, resetAll, setMyDarggingLine, setDisableDrag } from 'redux/card/actions'
 import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient} from 'redux/user/actions'
+import { setShowConfirmBtn, resetUi } from 'redux/ui/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, API_CODE_ROOM_DESTROYED} from 'configs/variables'
@@ -27,9 +28,10 @@ export default function Game() {
   const w = useSelector(state => state.win.w)
   const h = useSelector(state => state.win.h)
   const isDrawing = useSelector(state => state.card.isDrawing)
-  const drawingCard = useSelector(state => state.card.drawingCard)
+  const drawingCardColor = useSelector(state => state.card.drawingCardColor)
   const myLine = useSelector(state => state.card.myLine)
-  const myDraggingLine = useSelector(state => state.card.myDraggingLines)
+  const myDraggingLine = useSelector(state => state.card.myDraggingLine)
+  const confirmUpdateLine = useSelector(state => state.card.confirmUpdateLine)
   const globalStatus = useSelector(state => state.user.status)
   const user = useSelector(state => state.user.user)
   const socketClient = useSelector(state => state.user.socketClient)
@@ -42,18 +44,22 @@ export default function Game() {
   // Set game status based on the game turn
   useEffect(() => {
     console.log(`status change ${globalStatus}`)
+    console.log(`user ${user}`)
     switch(globalStatus){
     case null:
       break
     case GAME_STATUS.USER_1_DRAW:
     case GAME_STATUS.USER_1_DRAW_INIT:
-      console.log(`user ${user}`)
+      dispatch(setDisableDrag(true))
       if(user == 1) dispatch(setCanDrawCard(true))
       break
     case GAME_STATUS.USER_2_DRAW:
     case GAME_STATUS.USER_2_DRAW_INIT:
-      console.log(`user ${user}`)
+      dispatch(setDisableDrag(true))
       if(user == 2) dispatch(setCanDrawCard(true))
+      break
+    case GAME_STATUS.PUT_IN_LINE_INIT:
+      dispatch(setDisableDrag(false))
       break
     default:
       break
@@ -71,6 +77,7 @@ export default function Game() {
       // Clean up
       dispatch(resetAll())
       dispatch(resetUser())
+      dispatch(resetUi())
     }
   },[])
 
@@ -82,7 +89,9 @@ export default function Game() {
     dispatch(setUsername(username))
     dispatch(setRoom({room_num, room_code}))
     dispatch(setUser(user_num))
-
+    /**
+     * Start Socket.io handling
+     */
     // Connect the web socket
     const socket = io(ENDPOINT,{
       path: process.env.NODE_ENV === 'production' ? '/api/socket.io' : '/socket.io',
@@ -106,9 +115,15 @@ export default function Game() {
     })
 
     // Receive draw card number
-    sc.receiveCard(({num, draggingLine}) => {
+    sc.receiveCard(({num, draggingLine }) => {
       dispatch(setMyDarggingLine(draggingLine))
       dispatch(setDrawingNum(num))
+    })
+
+    // Add card number change listener
+    sc.cardNumChange(({ wNum, bNum }) => {
+      dispatch(setCardNumW(wNum))
+      dispatch(setCardNumB(bNum))
     })
 
     // Receive the gaem status change
@@ -122,16 +137,28 @@ export default function Game() {
   useEffect(() => {
     if(isDrawing) {
       // Sewnd draw card signal
-      socketClient.draw(drawingCard)
+      socketClient.draw(drawingCardColor)
       dispatch(setDrawingNum(null))
     }
   },[isDrawing])
 
   useEffect(() => {
-    if(myLine.length === 0) return
+    if(myLine === null || !confirmUpdateLine) return
 
     socketClient.updateLine(myLine)
-  },[myLine])
+  },[confirmUpdateLine])
+
+  useEffect(() => {
+    if(myDraggingLine === null) return
+    if(myDraggingLine.length !== 0) return
+    switch (globalStatus){
+    case GAME_STATUS.PUT_IN_LINE_INIT:
+      dispatch(setShowConfirmBtn(true))
+      break
+    default:
+      break
+    }
+  }, [myDraggingLine])
 
   // methods
   const sendInit = async () => {

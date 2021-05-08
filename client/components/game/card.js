@@ -5,14 +5,14 @@ import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY,
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
   LINE_X, LINE_Y, GAME_STATUS } from 'configs/game'
 import { setIsDrawing, setIsDragging, setDraggingCard, setIsInteractive, 
-  setInsertPlace } from 'redux/card/actions'
+  setInsertPlace, setMyDarggingLine } from 'redux/card/actions'
 import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
 
 let isDraggingLocal = false
 export default function Card({cardTextures, id}){
   // Stores
-  const drawingCard = useSelector(state => state.card.drawingCard)
+  const drawingCardColor = useSelector(state => state.card.drawingCardColor)
   const numSheetTextures = useSelector(state => state.card.numSheetTextures)
   const drawingNum = useSelector(state => state.card.drawingNum)
   const isInteractive = useSelector(state => state.card.isInteractive)
@@ -22,6 +22,7 @@ export default function Card({cardTextures, id}){
   const socketClient = useSelector(state => state.user.socketClient)
   const draggingCard = useSelector(state => state.card.draggingCard)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
+  const disableDrag = useSelector(state => state.card.disableDrag)
   const dispatch = useDispatch()
   // States
   const [cardPosition, setCardPosition] = useState({x: 0, y: 0})
@@ -35,9 +36,13 @@ export default function Card({cardTextures, id}){
   const [myNumber, setMyNumber] = useState()
   const [myId, setMyId] = useState(id)
   const [myIdex, setMyIdex] = useState(null)
+  const [cardInit, setCardInit] = useState(false)
+
   const me = useRef()
 
   useEffect(() => {
+    if(cardInit || myLine === null || myDraggingLine === null) return
+
     // Check if this id already exist in myLine
     // If yes means this card is an init stand card, directly go to the line
     for(let i = 0; i < myLine.length; i++ ){
@@ -70,6 +75,8 @@ export default function Card({cardTextures, id}){
       }  
     }  
 
+    setCardInit(true)
+
   }, [])
 
   useEffect(() => {
@@ -79,10 +86,18 @@ export default function Card({cardTextures, id}){
   useEffect(() => {
     if(dragResult === null || cardStatus !== CARD_STATUS.dragable || myId !== window.glDraggingId) return
 
+    // Insert card success
     if(dragResult.success){
       setCardStatus(CARD_STATUS.stand)
       positionByIndex(dragResult.index)
       setMyIdex(dragResult.index)
+      
+      // Remove the card dron the waiting line
+      const index = myId - myLine.length - 1
+      const newLine = [...myDraggingLine]
+      newLine.splice(index, 1)
+      dispatch(setMyDarggingLine(newLine))
+
       dispatch(setInsertPlace(null))
     }else{
       setDrag()
@@ -97,7 +112,7 @@ export default function Card({cardTextures, id}){
       setMyIdex(myIdex+1)
     }
   }, [myLine])
-
+  
   useEffect(() => {
     if(cardStatus !== CARD_STATUS.stand && cardStatus !== CARD_STATUS.lay && myIdex === null) return
     
@@ -127,21 +142,21 @@ export default function Card({cardTextures, id}){
       break
     case CARD_STATUS.draw:
       if(!drawingNum) return
-      if(drawingCard === 'w'){
+      if(drawingCardColor === 'w'){
         pos = {
           x: (DESIGN_WIDTH-CARD_PILE.CARD_MARGIN_BETWWEN)/2 + 100, y: DESIGN_HEIGHT/2 - 60
         }
         setCardTexture(cardTextures.stand.w)
       }
-      else if(drawingCard === 'b'){
+      else if(drawingCardColor === 'b'){
         pos = {
           x: (DESIGN_WIDTH+CARD_PILE.CARD_MARGIN_BETWWEN)/2 - 100, y: DESIGN_HEIGHT/2 - 60
         }
         setCardTexture(cardTextures.stand.b)
       }
 
-      addNumber(drawingCard, drawingNum)
-      setMyColor(drawingCard)
+      addNumber(drawingCardColor, drawingNum)
+      setMyColor(drawingCardColor)
       setMyNumber(drawingNum)
       setCardPosition(pos)
       break
@@ -265,7 +280,10 @@ export default function Card({cardTextures, id}){
         position={cardPosition}
         visible={displayMe}
 
-        interactive={isInteractive && (cardStatus === CARD_STATUS.dragable)}
+        interactive={
+          isInteractive && 
+          (cardStatus === CARD_STATUS.dragable && !disableDrag)
+        }
       />
     </>
   )

@@ -72,8 +72,14 @@ module.exports = function(io){
 
         socket.emit("receiveCard", {
           num:number,
-          draggingLine: data.game.draggingLines[user]
+          draggingLine: data.game.draggingLines[user],
         });
+
+        io.to(_room).emit("cardNumChange", {
+          wNum: data.game.wArr.length,
+          bNum: data.game.bArr.length,
+        });
+       
         callback();
       }
       catch (error) {

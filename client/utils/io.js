@@ -22,8 +22,14 @@ export default function SocketClient(socket){
   }
 
   this.receiveCard = (callback) => {
-    this.socket.on('receiveCard', ({num, draggingLine}) => {
-      callback({num, draggingLine})
+    this.socket.on('receiveCard', ({num, draggingLine }) => {
+      callback({num, draggingLine })
+    })
+  }
+
+  this.cardNumChange = (callback) => {
+    this.socket.on('cardNumChange', ({ wNum, bNum}) => {
+      callback({ wNum, bNum})
     })
   }
 

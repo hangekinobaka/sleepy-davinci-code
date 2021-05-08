@@ -32,6 +32,15 @@
     transform: translate(-50%, 0);
   }
 
+  &-btn{
+    &-confirm{
+      position: absolute;
+      top: 60%;
+      left: 70%;
+      transform: translate(-50%, 0);
+    }
+  }
+
   &-exit{
     &-fullscreen{
       position: absolute !important;

@@ -51,9 +51,6 @@ module.exports = function(io){
         let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
         data = JSON.parse(data);
 
-        // See which user it is
-        const user = data.user_1.session_id === _sessionId ? 1 : 2;
-        
         // Draw a number
         let number = null;
         if(color === "w") {
@@ -61,8 +58,6 @@ module.exports = function(io){
         }else{
           number = data.game.bArr.pop();
         }
-        // Push to the dragging line
-        data.game.draggingLines[user].push({num: number, color});
 
         // Save data
         await client.set(
@@ -70,10 +65,7 @@ module.exports = function(io){
           JSON.stringify(data)
         );
 
-        socket.emit("receiveCard", {
-          num:number,
-          draggingLine: data.game.draggingLines[user],
-        });
+        socket.emit("receiveCard", { num:number });
 
         io.to(_room).emit("cardNumChange", {
           wNum: data.game.wArr.length,
@@ -87,11 +79,17 @@ module.exports = function(io){
       }
     });
 
-    socket.on("drawFinish", async (callback) => {
+    socket.on("drawFinish", async ({ color, num }, callback) => {
       try {
         // Fetch data
         let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
         data = JSON.parse(data);
+
+        // See which user it is
+        const user = data.user_1.session_id === _sessionId ? 1 : 2;
+
+        // Push to the dragging line
+        data.game.draggingLines[user].push({num, color});
 
         switch(data.game.status){
         case GAME_STATUS.USER_1_DRAW_INIT:

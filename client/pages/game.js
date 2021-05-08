@@ -8,6 +8,7 @@ import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive,
   setCanDrawCard, setMyLine, resetAll, setMyDarggingLine, setDisableDrag } from 'redux/card/actions'
 import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient} from 'redux/user/actions'
 import { setShowConfirmBtn, resetUi } from 'redux/ui/actions'
+import { resetOp } from 'redux/opponent/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { API_STATUS } from 'configs/variables'
@@ -78,6 +79,7 @@ export default function Game() {
       dispatch(resetAll())
       dispatch(resetUser())
       dispatch(resetUi())
+      dispatch(resetOp())
     }
   },[])
 
@@ -115,8 +117,7 @@ export default function Game() {
     })
 
     // Receive draw card number
-    sc.receiveCard(({num, draggingLine }) => {
-      dispatch(setMyDarggingLine(draggingLine))
+    sc.receiveCard(({num}) => {
       dispatch(setDrawingNum(num))
     })
 

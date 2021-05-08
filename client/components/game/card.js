@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Sprite, useApp } from '@inlet/react-pixi'
+import { Sprite } from '@inlet/react-pixi'
 import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, 
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
-  LINE_X, LINE_Y, GAME_STATUS } from 'configs/game'
+  LINE_X, LINE_Y } from 'configs/game'
 import { setIsDrawing, setIsDragging, setIsInteractive, 
   setInsertPlace, setMyDarggingLine } from 'redux/card/actions'
 import { gsap } from 'gsap'
@@ -195,7 +195,12 @@ export default function Card({cardTextures, id}){
   const drawSuccessHandler = () => {
     setDrag()
     dispatch(setIsInteractive(true))
-    socketClient.drawFinish()
+    socketClient.drawFinish({color: drawingCardColor, num: drawingNum})
+
+    // Add the card to the waiting line
+    const newLine = [...myDraggingLine]
+    newLine.push({num: drawingNum, drawingCardColor})
+    dispatch(setMyDarggingLine(newLine))
   }
 
   // Set drag status

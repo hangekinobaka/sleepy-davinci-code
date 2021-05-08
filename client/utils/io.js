@@ -22,8 +22,8 @@ export default function SocketClient(socket){
   }
 
   this.receiveCard = (callback) => {
-    this.socket.on('receiveCard', ({num, draggingLine }) => {
-      callback({num, draggingLine })
+    this.socket.on('receiveCard', ({num}) => {
+      callback({num})
     })
   }
 
@@ -33,8 +33,8 @@ export default function SocketClient(socket){
     })
   }
 
-  this.drawFinish = (callback)=>{
-    this.socket.emit('drawFinish', (error) => {
+  this.drawFinish = ({color, num})=>{
+    this.socket.emit('drawFinish', {color, num}, (error) => {
       if(error) {
         console.error(error)
       }

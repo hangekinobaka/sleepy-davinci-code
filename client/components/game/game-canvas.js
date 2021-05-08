@@ -8,13 +8,14 @@ import store from 'redux/store'
 // redux
 import { setNumSheetTextures } from 'redux/card/actions'
 // configs
-import { DESIGN_WIDTH,DESIGN_HEIGHT } from 'configs/game'
+import { DESIGN_WIDTH, DESIGN_HEIGHT, WHITE_CARD_NUM, BLACK_CARD_NUM, GAME_STATUS } from 'configs/game'
 // utils
 import { setFps } from 'utils/pixi'
 // Components
 import Card from 'components/game/card'
 import CardPile from 'components/game/card-pile'
 import CardLine from 'components/game/card-line'
+import OpCard from 'components/game/op-card'
 // gsap plugin register
 import { PixiPlugin } from 'gsap/all'
 import { gsap } from 'gsap'
@@ -31,6 +32,8 @@ export default function GameCanvas() {
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const cardNumW = useSelector(state => state.card.cardNumW)
   const cardNumB = useSelector(state => state.card.cardNumB)
+  const globalStatus = useSelector(state => state.user.status)
+  const user = useSelector(state => state.user.user)
   const dispatch = useDispatch()
 
   // states
@@ -38,6 +41,7 @@ export default function GameCanvas() {
   const [ftpTextField, setFtpTextField] = useState('')
   const [loadingTextField, setLoadingTextField] = useState('')
   const [myCardNum, setMyCardNum] = useState(0)
+  const [opCardNum, setOpCardNum] = useState(0)
   const [cardInit, setCardInit] = useState(false)
 
 
@@ -77,9 +81,31 @@ export default function GameCanvas() {
     }
   },[])
 
-  useEffect(()=>{
-    if(isDrawing) setMyCardNum(myCardNum+1)
-  },[isDrawing])
+  // useEffect(()=>{
+  //   if(isDrawing) setMyCardNum(myCardNum+1)
+  // },[isDrawing])
+
+  useEffect(() => {
+    if(cardNumW + cardNumB === WHITE_CARD_NUM + BLACK_CARD_NUM) return
+    
+    const cardOnUse = WHITE_CARD_NUM + BLACK_CARD_NUM - (cardNumW + cardNumB)
+    if(cardOnUse === myCardNum + opCardNum) return
+
+    switch(globalStatus){
+    case GAME_STATUS.USER_1_DRAW:
+    case GAME_STATUS.USER_1_DRAW_INIT:
+      if(user == 1) setMyCardNum(myCardNum+1)
+      else setOpCardNum(opCardNum+1)
+      break
+    case GAME_STATUS.USER_2_DRAW:
+    case GAME_STATUS.USER_2_DRAW_INIT:
+      if(user == 2) setMyCardNum(myCardNum+1)
+      else setOpCardNum(opCardNum+1)
+      break
+    default:
+      break
+    }
+  }, [cardNumW, cardNumB])
 
   useEffect(() => {
     if(cardInit || myLine === null || myDraggingLine === null) return
@@ -172,6 +198,17 @@ export default function GameCanvas() {
                 {
                   [...new Array(myCardNum)].map((item, index) => (
                     <Card 
+                      key={`card-${index}`}
+                      id={index+1}
+                      cardTextures={{lay: layCardTextures, stand: standCardTextures}} 
+                    />
+                  ))
+                }
+
+                {/* opponent card instances */}
+                {
+                  [...new Array(myCardNum)].map((item, index) => (
+                    <OpCard 
                       key={`card-${index}`}
                       id={index+1}
                       cardTextures={{lay: layCardTextures, stand: standCardTextures}} 

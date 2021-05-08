@@ -13,7 +13,6 @@ export default function CardLine(){
   // Stores
   const myLine = useSelector(state => state.card.myLine)
   const isDragging = useSelector(state => state.card.isDragging)
-  const draggingCard = useSelector(state => state.card.draggingCard)
   const drawingNum = useSelector(state => state.card.drawingNum)
   const insertPlace = useSelector(state => state.card.insertPlace)
   const dispatch = useDispatch()
@@ -47,9 +46,11 @@ export default function CardLine(){
           // if the card insertion isa valid,
           // update the line
           let newLine = myLine === null ? [] : [...myLine]
+
           newLine.splice(insertPlace, 0, {
-            num: draggingCard.num, color: draggingCard.color, id: draggingCard.id
+            num: window.glDraggingCard.num, color: window.glDraggingCard.color, id: window.glDraggingCard.id
           })
+          window.glDraggingCard = null
           dispatch(setMyLine(newLine))
           dispatch(setDragRes({
             success: true,
@@ -93,10 +94,10 @@ export default function CardLine(){
   
   // check if the dragging card is colliding with the placeholder
   const collisionHandler = () => {
-    if(placeholders.length === 0 || !draggingCard) return
+    if(placeholders.length === 0 || window.glDraggingCard === null) return
     
     placeholders.forEach((ph, i) => {
-      const collide = testCollision(draggingCard.sprite, ph.current) 
+      const collide = testCollision(window.glDraggingCard.sprite, ph.current) 
       if(collide) {
         if(collideArea === i) return
         collideArea = i
@@ -135,7 +136,7 @@ export default function CardLine(){
       }
       return (
         (parseInt(myLine[i].num) < num) || 
-        (parseInt(myLine[i].num) === num && draggingCard.color === 'b')
+        (parseInt(myLine[i].num) === num && window.glDraggingCard.color === 'b')
       )
     }
 
@@ -154,11 +155,11 @@ export default function CardLine(){
       }
       return (
         (parseInt(myLine[i].num) > num) || 
-        (parseInt(myLine[i].num) === num && draggingCard.color === 'w')
+        (parseInt(myLine[i].num) === num && window.glDraggingCard.color === 'w')
       )
     }
 
-    const num = parseInt(draggingCard.num)
+    const num = parseInt(window.glDraggingCard.num)
     const cur = myLine[i] ? 
       myLine[i].num === 'J' ? 
         'J'
@@ -177,7 +178,7 @@ export default function CardLine(){
         // you can put the card in this place if the prev number is smaller
         if(testPrevSmaller(i-1)) dispatch(setInsertPlace(i))
         else dispatch(setInsertPlace(null))
-      }else if(cur === num && draggingCard.color === 'w'){
+      }else if(cur === num && window.glDraggingCard.color === 'w'){
         // If the number is the same
         // you can put it here if the color is white
         dispatch(setInsertPlace(i))

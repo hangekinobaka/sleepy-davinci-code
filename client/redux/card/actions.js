@@ -11,7 +11,6 @@ export const DRAWING_NUM_ALTER = 'DRAWING_NUM_ALTER'
 export const MY_LINE_ALTER = 'MY_LINE_ALTER'
 export const MY_DRAG_LINE_ALTER = 'MY_DRAG_LINE_ALTER'
 export const IS_DRAGGING_ALTER = 'IS_DRAGGING_ALTER'
-export const DRAGGING_CARD_ALTER = 'DRAGGING_CARD_ALTER'
 export const DRAG_RESULT_ALTER = 'DRAG_RESULT_ALTER'
 export const INSERT_PLACE_ALTER = 'INSERT_PLACE_ALTER'
 export const CAN_DRAW_CARD_ALTER = 'CAN_DRAW_CARD_ALTER'
@@ -37,7 +36,6 @@ export const initialState = {
    */
   myLine:null,
   isDragging: null,
-  draggingCard: null,
   /**
    * dragResult example:  
    * {
@@ -117,13 +115,6 @@ export const setIsDragging = isDragging => ({
     isDragging
   }
 })
-export const setDraggingCard = card => {
-  return {
-    type: DRAGGING_CARD_ALTER,
-    payload:{
-      card
-    }
-  }}
 export const setDragRes = res => ({
   type: DRAG_RESULT_ALTER,
   payload:{
@@ -209,11 +200,6 @@ export const reducer = (state = initialState, action) => {
     return {
       ...state,
       isDragging: action.payload.isDragging
-    }
-  case DRAGGING_CARD_ALTER:
-    return {
-      ...state,
-      draggingCard: action.payload.card
     }
   case DRAG_RESULT_ALTER:
     return {

@@ -4,7 +4,7 @@ import { Sprite, useApp } from '@inlet/react-pixi'
 import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, 
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
   LINE_X, LINE_Y, GAME_STATUS } from 'configs/game'
-import { setIsDrawing, setIsDragging, setDraggingCard, setIsInteractive, 
+import { setIsDrawing, setIsDragging, setIsInteractive, 
   setInsertPlace, setMyDarggingLine } from 'redux/card/actions'
 import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
@@ -20,7 +20,6 @@ export default function Card({cardTextures, id}){
   const myLine = useSelector(state => state.card.myLine)
   const insertPlace = useSelector(state => state.card.insertPlace)
   const socketClient = useSelector(state => state.user.socketClient)
-  const draggingCard = useSelector(state => state.card.draggingCard)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const disableDrag = useSelector(state => state.card.disableDrag)
   const dispatch = useDispatch()
@@ -29,7 +28,7 @@ export default function Card({cardTextures, id}){
   const [cardWidth, setCardWidth] = useState(CARD_WIDTH)
   const [cardHeight, setCardHeight] = useState(CARD_HEIGHT)
   const [cardTexture, setCardTexture] = useState(cardTextures.stand.w)
-  const [cardStatus, setCardStatus] = useState(CARD_STATUS.draw)  
+  const [cardStatus, setCardStatus] = useState(null)  
   const [displayMe, setDisplayMe] = useState(false)
   const [numSprite, setNumSprite] = useState()
   const [myColor, setMyColor] = useState()
@@ -54,8 +53,8 @@ export default function Card({cardTextures, id}){
         addNumber(color, num)
         setMyColor(color)
         setMyNumber(num) 
-        setDisplayMe(true)
         setCardStatus(CARD_STATUS.stand)  
+        return setCardInit(true)  
       }
     }    
 
@@ -69,13 +68,13 @@ export default function Card({cardTextures, id}){
           addNumber(color, num)
           setMyColor(color)
           setMyNumber(num) 
-          setDrag()
-          setDisplayMe(true)
+          return setCardInit(true)      
         }
       }  
     }  
 
-    setCardInit(true)
+    setCardStatus(CARD_STATUS.draw)  
+    return setCardInit(true)  
 
   }, [])
 
@@ -88,11 +87,12 @@ export default function Card({cardTextures, id}){
 
     // Insert card success
     if(dragResult.success){
+      // Put card in place
       setCardStatus(CARD_STATUS.stand)
       positionByIndex(dragResult.index)
       setMyIdex(dragResult.index)
       
-      // Remove the card dron the waiting line
+      // Remove the card from the waiting line
       const index = myId - myLine.length - 1
       const newLine = [...myDraggingLine]
       newLine.splice(index, 1)
@@ -128,8 +128,9 @@ export default function Card({cardTextures, id}){
   }, [insertPlace])
 
   useEffect(() => {
-    if(!myNumber || !myColor || !myId || cardStatus !== CARD_STATUS.draw) return
-    drawAnimation()
+    if(!myNumber || !myColor || !myId ) return
+    if( cardStatus === CARD_STATUS.draw )drawAnimation()
+    if( cardStatus === null ) setDrag()
     setDisplayMe(true)
   }, [myNumber, myColor, myId])
 
@@ -235,12 +236,12 @@ export default function Card({cardTextures, id}){
 
   // Card drag handlers
   const onDragStart = () => {
-    dispatch(setDraggingCard({
+    window.glDraggingCard = {
       id: myId,
       sprite: me.current,
       num: myNumber,
       color: myColor
-    }))
+    }
     window.glDraggingId = myId
     isDraggingLocal = true
     dispatch(setIsDragging(true))
@@ -252,7 +253,7 @@ export default function Card({cardTextures, id}){
     me.current.removeAllListeners()
   }
   const onDragMove = event => {
-    if (isDraggingLocal && draggingCard && window.glDraggingId === myId) {
+    if (isDraggingLocal && window.glDraggingCard !== null && window.glDraggingId === myId) {
       const newPosition = event.data.getLocalPosition(me.current.parent)
       setCardPosition({
         x:newPosition.x,

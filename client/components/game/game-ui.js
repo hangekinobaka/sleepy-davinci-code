@@ -63,6 +63,14 @@ export default function GameUI() {
       if(myDraggingLine !== null && myDraggingLine.length !== 0) setGameInfo('Please put the cards in your line')
       else if(myDraggingLine !== null && myDraggingLine.length === 0) setGameInfo('Your opponent didn\'t finish yet, please wait.')
       break
+    case GAME_STATUS.USER_1_GUESS_MUST:
+      if(user == 1) setGameInfo('Please guess a card in your opponent\'s line...')
+      else setGameInfo('Opponent is guessing your card. Please wait.')
+      break
+    case GAME_STATUS.USER_2_GUESS_MUST:
+      if(user == 2) setGameInfo('Please guess a card in your opponent\'s line...')
+      else setGameInfo('Opponent is guessing your card. Please wait.')
+      break
     default:
       break
     }

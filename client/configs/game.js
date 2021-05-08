@@ -24,7 +24,7 @@ export const LINE_WIDTH = CARD_WIDTH * 12 + 20
 export const LINE_HEIGHT = 140
 
 export const CARD_PILE = {
-  CARD_MARGIN_BETWWEN: 1000
+  CARD_MARGIN_BETWWEN: 800
 }
 
 // Usage example: numSheetTextures[NUM_SHEET_MAP.b2_l]

@@ -85,10 +85,9 @@ export default function OpCard({cardTextures, id}){
     case CARD_STATUS.dragable:
       if( opLine === null || opDraggingLine === null) return
       // Insert all un-arranged cards
-      for(let i = 0, hasId = false; i < opLine.length; i++ ){
-        hasId = (opDraggingLine.filter(obj => obj.id === opLine[i].id)).length !== 0
-        if(hasId){
-          console.log('i' + i)
+      for(let i = 0; i < opLine.length; i++ ){
+        if( myId === opLine[i].id && 
+          (opDraggingLine.filter(obj => obj.id === opLine[i].id)).length !== 0 ){
           positionByIndex(i)
           setMyIndex(i)
           setCardStatus(CARD_STATUS.stand)  

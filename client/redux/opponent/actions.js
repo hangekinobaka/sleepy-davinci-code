@@ -4,6 +4,7 @@ export const OP_LINE_ALTER = 'OP_LINE_ALTER'
 export const OP_DRAG_LINE_ALTER = 'OP_DRAG_LINE_ALTER'
 export const OP_DRAG_LINE_TEMP_ALTER = 'OP_DRAG_LINE_TEMP_ALTER'
 export const DISABLE_SELECT_ALTER = 'DISABLE_SELECT_ALTER'
+export const SELECT_INDEX_ALTER = 'SELECT_INDEX_ALTER'
 
 export const initialState = {
   opDrawingCardColor: null,
@@ -19,7 +20,8 @@ export const initialState = {
   opLine: null,
   opDraggingLine: null,
   opDraggingLineTemp: null,
-  disableSelect: true
+  disableSelect: true,
+  selectIndex: null
 }
 
 export const resetOp = () => ({
@@ -55,6 +57,12 @@ export const setDisableSelect = isDisabled => ({
     isDisabled
   }
 })
+export const setSelectIndex = index => ({
+  type: SELECT_INDEX_ALTER,
+  payload:{
+    index
+  }
+})
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -83,6 +91,12 @@ export const reducer = (state = initialState, action) => {
       ...state,
       disableSelect: action.payload.isDisabled
     }
+  case SELECT_INDEX_ALTER:
+    return {
+      ...state,
+      selectIndex: action.payload.index
+    }
+
   case RESET:
     return {
       ...initialState

@@ -36,9 +36,15 @@ export default function GameUI() {
   useEffect(() => {
     switch(status){
     case null:
-      setFullScreenInfoTitle(GAME_INFO.waitingTitle)
-      setFullScreenInfo(GAME_INFO.waitingText)
-      setFullScreenRoomInfo(`${GAME_INFO.roomCodeText}${room_code}`)
+      if(room_code !== ''){
+        setFullScreenInfoTitle(GAME_INFO.waitingTitle)
+        setFullScreenInfo(GAME_INFO.waitingText)
+        setFullScreenRoomInfo(`${GAME_INFO.roomCodeText}${room_code}`)
+        break
+      }
+
+      setFullScreenInfoTitle(GAME_INFO.initTitle)
+      setFullScreenInfo(GAME_INFO.initText)
       break
     case GAME_STATUS.USER_LEFT:
       setFullScreenInfoTitle(GAME_INFO.opLeftTitle)

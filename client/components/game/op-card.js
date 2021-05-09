@@ -5,7 +5,7 @@ import { CARD_WIDTH, CARD_HEIGHT, CARD_STATUS, CARD_PILE,
   NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
   OP_LINE_X, OP_LINE_Y, GAME_STATUS } from 'configs/game'
 import { gsap } from 'gsap'
-import { setOpDrawingCardColor, setOpDarggingLine, setOpDarggingLineTemp } from 'redux/opponent/actions'
+import { setOpDrawingCardColor, setOpDarggingLine, setOpDarggingLineTemp, setSelectIndex } from 'redux/opponent/actions'
 import { setIsInteractive } from 'redux/card/actions'
 
 
@@ -19,6 +19,7 @@ export default function OpCard({cardTextures, id}){
   const opDraggingLine = useSelector(state => state.opponent.opDraggingLine)
   const opDraggingLineTemp = useSelector(state => state.opponent.opDraggingLineTemp)
   const disableSelect = useSelector(state => state.opponent.disableSelect)
+  const selectIndex = useSelector(state => state.opponent.selectIndex)
   const globalStatus = useSelector(state => state.user.status)
   const user = useSelector(state => state.user.user)
 
@@ -186,7 +187,7 @@ export default function OpCard({cardTextures, id}){
   // Positioning by index
   const positionByIndex = index => {
     setCardPosition({
-      x: OP_LINE_X + cardWidth/2 + index * cardWidth + 2, 
+      x: OP_LINE_X + cardWidth/2 + index * cardWidth + 3, 
       y: OP_LINE_Y
     })
   }
@@ -199,18 +200,44 @@ export default function OpCard({cardTextures, id}){
 
     if( ((globalStatus === GAME_STATUS.USER_1_GUESS_MUST || globalStatus === GAME_STATUS.USER_1_GUESS ) && user === 1 ) || 
     ((globalStatus === GAME_STATUS.USER_2_GUESS_MUST || globalStatus === GAME_STATUS.USER_1_GUESS) && user === 2 )){
+      
       if(selected){
         setCardWidth(CARD_WIDTH*0.7)
         setCardHeight(CARD_HEIGHT*0.7)
         setCardTexture(cardTextures.stand[myColor])
+
+        dispatch(setSelectIndex(null))
       }else{
         setCardWidth(CARD_WIDTH*0.8)
         setCardHeight(CARD_HEIGHT*0.8)
         setCardTexture(cardTextures.select[myColor])
+
+        dispatch(setSelectIndex(myIndex))
       }
       setSelected(!selected)
     }
   }
+
+  // Watch if the select index is changed
+  useEffect(() => {
+    // For card selection
+    // Only available for standing card
+    if(cardStatus !== CARD_STATUS.stand) return
+
+    if( ((globalStatus === GAME_STATUS.USER_1_GUESS_MUST || globalStatus === GAME_STATUS.USER_1_GUESS ) && user === 1 ) || 
+    ((globalStatus === GAME_STATUS.USER_2_GUESS_MUST || globalStatus === GAME_STATUS.USER_1_GUESS) && user === 2 )){
+
+      if(selectIndex !== myIndex && selected){
+        setCardWidth(CARD_WIDTH*0.7)
+        setCardHeight(CARD_HEIGHT*0.7)
+        setCardTexture(cardTextures.stand[myColor])
+      
+        setSelected(!selected)
+      }
+    }
+    
+  }, [selectIndex])
+
 
   return (
     <>
@@ -223,7 +250,7 @@ export default function OpCard({cardTextures, id}){
         position={cardPosition}
         visible={displayMe}
 
-        pointerdown={cardClickHandler}
+        pointertap={cardStatus === CARD_STATUS.stand ? cardClickHandler : null}
         interactive={
           isInteractive && 
           (cardStatus === CARD_STATUS.stand && !disableSelect)

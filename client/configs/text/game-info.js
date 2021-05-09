@@ -1,4 +1,6 @@
 export const GAME_INFO = {
+  initTitle: 'Please wait',
+  initText: 'If there is no response. Try to refresh the page',
   waitingTitle: 'Waiting',
   waitingText: 'Waiting for your opponent...',
   roomCodeText: 'Your room code is: ',

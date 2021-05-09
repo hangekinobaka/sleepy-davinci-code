@@ -8,7 +8,8 @@ import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive,
   setCanDrawCard, setMyLine, resetAll, setMyDarggingLine, setDisableDrag } from 'redux/card/actions'
 import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient} from 'redux/user/actions'
 import { setShowConfirmBtn, resetUi } from 'redux/ui/actions'
-import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine, setDisableSelect } from 'redux/opponent/actions'
+import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine, setDisableSelect,
+  setOpDarggingLineTemp } from 'redux/opponent/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { API_STATUS } from 'configs/variables'
@@ -124,6 +125,7 @@ export default function Game() {
       // Opponent data
       dispatch(setOpLine(initData.opLine))
       dispatch(setOpDarggingLine(initData.opDrawingLine))
+      dispatch(setOpDarggingLineTemp(initData.opDrawingLine))
 
       dispatch(setCardNumW(initData.wNum))
       dispatch(setCardNumB(initData.bNum))
@@ -190,12 +192,6 @@ export default function Game() {
     if(opDraggingLine === null || opDraggingLine.length === 0 || opLine === null || opLine.length === 0) return
     dispatch(setOpDarggingLine([]))
   }, [opLine, opDraggingLine])
-
-  useEffect(() => {
-    
-    console.log('drag -------------')
-    console.log(opDraggingLineTemp)
-  }, [opDraggingLineTemp])
 
   // methods
   const sendInit = async () => {

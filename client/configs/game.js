@@ -23,6 +23,9 @@ export const LINE_Y = DESIGN_HEIGHT - 160
 export const LINE_WIDTH = CARD_WIDTH * 12 + 20
 export const LINE_HEIGHT = 140
 
+export const OP_LINE_X = 500
+export const OP_LINE_Y = 270
+
 export const CARD_PILE = {
   CARD_MARGIN_BETWWEN: 800
 }
@@ -98,6 +101,3 @@ export const GAME_STATUS = {
   USER_EXIT: 16,
   PUT_IN_LINE_INIT: 17,
 }
-
-export const OP_LINE_X = 120
-export const OP_LINE_Y = 300

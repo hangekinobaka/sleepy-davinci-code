@@ -13,6 +13,13 @@ export default function SocketClient(socket){
     })
   }
 
+
+  this.init = (callback)=>{
+    this.socket.on('init', initData => {
+      callback(initData)
+    })
+  }
+
   this.draw = color => {
     this.socket.emit('draw', {color}, (error) => {
       if(error) {
@@ -47,9 +54,9 @@ export default function SocketClient(socket){
     })
   }
 
-  this.init = (callback)=>{
-    this.socket.on('init', initData => {
-      callback(initData)
+  this.opUpdateLine = (callback)=>{
+    this.socket.on('opUpdateLine', ({newLine}) => {
+      callback({newLine})
     })
   }
 

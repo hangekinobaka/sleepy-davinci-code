@@ -115,7 +115,7 @@ export default function CardLine(){
     if(myLine.length === 0) {dispatch(setInsertPlace(0)); return}
 
     // If we are inserting the 'J' card, we can put it any where.
-    if(drawingNum === 'J') {
+    if(window.glDraggingCard.num === 'J') {
       if(!myLine[i]) dispatch(setInsertPlace(myLine.length))
       else dispatch(setInsertPlace(i))
       return

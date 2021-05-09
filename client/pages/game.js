@@ -142,6 +142,11 @@ export default function Game() {
       dispatch(setOpDrawingCardColor(color))
     })
 
+    // Receive opponent line update
+    sc.opUpdateLine(({newLine}) => {
+      dispatch(setOpLine(newLine))
+    })
+
     dispatch(setSocketClient(sc))
   },[ENDPOINT])
 

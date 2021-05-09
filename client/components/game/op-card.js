@@ -37,7 +37,7 @@ export default function OpCard({cardTextures, id}){
 
   useEffect(() => {
     if(cardInit || opLine === null || opDraggingLine === null) return
-
+    
     // Check if this id already exist in opLine
     // If yes means this card is an init stand card, directly go to the opponent line
     for(let i = 0; i < opLine.length; i++ ){
@@ -47,6 +47,7 @@ export default function OpCard({cardTextures, id}){
         setMyIndex(i)
         setCardTexture(cardTextures.stand[color])
         setMyColor(color)
+        setDisplayMe(true)
         setCardStatus(CARD_STATUS.stand)  
         return setCardInit(true)  
       }
@@ -77,10 +78,23 @@ export default function OpCard({cardTextures, id}){
   },[cardStatus, opDrawingCardColor, opLine])
 
   const statusHandler = () => {
+    if( cardStatus === null ) return
     let pos = { x: 0, y: 0 }
 
     switch (cardStatus){
     case CARD_STATUS.dragable:
+      if( opLine === null || opDraggingLine === null) return
+      // Insert all un-arranged cards
+      for(let i = 0, hasId = false; i < opLine.length; i++ ){
+        hasId = (opDraggingLine.filter(obj => obj.id === opLine[i].id)).length !== 0
+        if(hasId){
+          console.log('i' + i)
+          positionByIndex(i)
+          setMyIndex(i)
+          setCardStatus(CARD_STATUS.stand)  
+          return
+        }
+      }    
       break
     case CARD_STATUS.draw:
       if(opDrawingCardColor === null || opLine === null) return
@@ -114,7 +128,7 @@ export default function OpCard({cardTextures, id}){
   const drawAnimation = () => {
     // Add the card to the waiting line
     const newLine = [...opDraggingLine]
-    newLine.push({ color: opDrawingCardColor })
+    newLine.push({ color: opDrawingCardColor, id: myId })
     dispatch(setOpDarggingLine(newLine))
 
     const tl = gsap.timeline()
@@ -127,7 +141,7 @@ export default function OpCard({cardTextures, id}){
 
         },
         {
-          pixi: {x:DESIGN_WIDTH - 170 - (CARD_WIDTH-40) * prevNum, y:350, scale:scale},
+          pixi: {x:DESIGN_WIDTH - 110 - cardWidth * prevNum, y:OP_LINE_Y + 70, scale:scale},
           ease: 'power1.inOut',
           duration: 1.6,
           onComplete: () => {
@@ -137,7 +151,7 @@ export default function OpCard({cardTextures, id}){
   }
   const drawSuccessHandler = () => {
     const prevNum = myId - opLine.length - 1
-    setCardPosition({x:DESIGN_WIDTH - 170 - (CARD_WIDTH-40) * prevNum, y:350})
+    setCardPosition({x:DESIGN_WIDTH - 110 - cardWidth * prevNum, y:OP_LINE_Y + 70})
     setCardStatus(CARD_STATUS.dragable)
     dispatch(setOpDrawingCardColor(null))
   }
@@ -145,7 +159,7 @@ export default function OpCard({cardTextures, id}){
   // Positioning by index
   const positionByIndex = index => {
     setCardPosition({
-      x: OP_LINE_X + CARD_WIDTH/2 + index * CARD_WIDTH + 2, 
+      x: OP_LINE_X + cardWidth/2 + index * cardWidth + 2, 
       y: OP_LINE_Y
     })
   }

@@ -138,6 +138,7 @@ export default function Card({cardTextures, id}){
 
   // Methods
   const statusHandler = () => {
+    if(cardStatus === null) return
     let pos = { x: 0, y: 0 }
     switch (cardStatus){
     case CARD_STATUS.dragable:
@@ -179,12 +180,12 @@ export default function Card({cardTextures, id}){
     setDragIndex(prevNum)
     tl
       .to(me.current, {
-        pixi: {x:DESIGN_WIDTH-1000, y:DESIGN_HEIGHT-350, scale:scale+1},
+        pixi: {x:DESIGN_WIDTH-1000, y:LINE_Y - 150, scale:scale+1},
         ease: 'power1.inOut',
         duration: 1.1
       })
       .to(me.current, {
-        pixi: {x:DESIGN_WIDTH - 170 - CARD_WIDTH * prevNum, y:DESIGN_HEIGHT-350, scale:scale},
+        pixi: {x:DESIGN_WIDTH - 170 - cardWidth * prevNum, y:LINE_Y - 150, scale:scale},
         ease: 'power1.out',
         duration: .5,
         onComplete: () => {
@@ -207,7 +208,7 @@ export default function Card({cardTextures, id}){
   // Set drag status
   const setDrag = () => {
     const prevNum = dragIndex === null ? myId - myLine.length - 1 : dragIndex
-    setCardPosition({x:DESIGN_WIDTH - 170 - CARD_WIDTH * prevNum, y:DESIGN_HEIGHT-350})
+    setCardPosition({x:DESIGN_WIDTH - 170 - cardWidth * prevNum, y:LINE_Y - 150})
     setCardStatus(CARD_STATUS.dragable)
 
     me.current
@@ -222,7 +223,7 @@ export default function Card({cardTextures, id}){
     if(!numSheetTextures) return
 
     const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${color}${number}_s`]])
-    sprite.width = CARD_WIDTH / 2
+    sprite.width = cardWidth / 2
     sprite.height = CARD_HEIGHT / 2
     sprite.anchor.set(0.5)
     setNumSprite(sprite)
@@ -273,7 +274,7 @@ export default function Card({cardTextures, id}){
   // Positioning by index
   const positionByIndex = index => {
     setCardPosition({
-      x: LINE_X + CARD_WIDTH/2 + index * CARD_WIDTH + 2, 
+      x: LINE_X + cardWidth/2 + index * cardWidth + 2, 
       y: LINE_Y
     })
   }

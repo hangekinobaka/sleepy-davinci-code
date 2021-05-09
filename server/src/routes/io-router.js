@@ -39,7 +39,7 @@ module.exports = function(io){
           bNum: data.game.bArr.length,
           line: data.game.lines[user],
           drawingLine: data.game.draggingLines[user],
-          opLine: (data.game.lines[opponent]).map(card => ({color: card.color, id: card.color})),
+          opLine: (data.game.lines[opponent]).map(card => ({color: card.color, id: card.id})),
           opDrawingLine: (data.game.draggingLines[opponent]).map(card => ({color: card.color})),
         });
 
@@ -176,6 +176,10 @@ module.exports = function(io){
 
         socket.emit("updateLineRes", {
           res: API_STATUS.API_CODE_SUCCESS
+        });
+
+        socket.broadcast.to(_room).emit("opUpdateLine", { 
+          newLine: newLine.map(card => ({color: card.color, id: card.id}))
         });
 
         io.to(_room).emit("status", {

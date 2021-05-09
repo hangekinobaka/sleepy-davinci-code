@@ -10,6 +10,7 @@ import api from 'utils/api'
 import styles from 'styles/game.module.scss'
 import { API_STATUS } from 'configs/variables'
 import { GAME_STATUS } from 'configs/game'
+import { GAME_INFO } from 'configs/text/game-info'
 
 export default function GameUI() {
   // Stores
@@ -35,41 +36,41 @@ export default function GameUI() {
   useEffect(() => {
     switch(status){
     case null:
-      setFullScreenInfoTitle('Waiting')
-      setFullScreenInfo('Waiting for your opponent...')
-      setFullScreenRoomInfo(`Your room code is: ${room_code}`)
+      setFullScreenInfoTitle(GAME_INFO.waitingTitle)
+      setFullScreenInfo(GAME_INFO.waitingText)
+      setFullScreenRoomInfo(`${GAME_INFO.roomCodeText}${room_code}`)
       break
     case GAME_STATUS.USER_LEFT:
-      setFullScreenInfoTitle('Your Opponent has left')
-      setFullScreenInfo('If he or she comes back in 3 mins, the game will be resumed')
+      setFullScreenInfoTitle(GAME_INFO.opLeftTitle)
+      setFullScreenInfo(GAME_INFO.opLeftText)
       setFullScreenRoomInfo('')
       break
     case GAME_STATUS.USER_EXIT:
-      setFullScreenInfoTitle('Your Opponent has exited')
-      setFullScreenInfo('Please click exit and restart a game')
+      setFullScreenInfoTitle(GAME_INFO.opExitTitle)
+      setFullScreenInfo(GAME_INFO.opExitText)
       setFullScreenRoomInfo('')
       break
     case GAME_STATUS.USER_1_DRAW_INIT:
     case GAME_STATUS.USER_1_DRAW:
-      if(user == 1) setGameInfo('Please draw a card...')
-      else setGameInfo('Opponent is drawing card.')
+      if(user == 1) setGameInfo(GAME_INFO.drawCardNotification)
+      else setGameInfo(GAME_INFO.waitDrawNotification)
       break
     case GAME_STATUS.USER_2_DRAW_INIT:
     case GAME_STATUS.USER_2_DRAW:
-      if(user == 2) setGameInfo('Please draw a card...')
-      else setGameInfo('Opponent is drawing card.')
+      if(user == 2) setGameInfo(GAME_INFO.drawCardNotification)
+      else setGameInfo(GAME_INFO.waitDrawNotification)
       break
     case GAME_STATUS.PUT_IN_LINE_INIT:
-      if(myDraggingLine !== null && myDraggingLine.length !== 0) setGameInfo('Please put the cards in your line')
-      else if(myDraggingLine !== null && myDraggingLine.length === 0) setGameInfo('Your opponent didn\'t finish yet, please wait.')
+      if(myDraggingLine !== null && myDraggingLine.length !== 0) setGameInfo(GAME_INFO.putCardNotification)
+      else if(myDraggingLine !== null && myDraggingLine.length === 0) setGameInfo(GAME_INFO.waitPutNotification)
       break
     case GAME_STATUS.USER_1_GUESS_MUST:
-      if(user == 1) setGameInfo('Please guess a card in your opponent\'s line...')
-      else setGameInfo('Opponent is guessing your card. Please wait.')
+      if(user == 1) setGameInfo(GAME_INFO.guessCardNotification)
+      else setGameInfo(GAME_INFO.waitGuessNotification)
       break
     case GAME_STATUS.USER_2_GUESS_MUST:
-      if(user == 2) setGameInfo('Please guess a card in your opponent\'s line...')
-      else setGameInfo('Opponent is guessing your card. Please wait.')
+      if(user == 2) setGameInfo(GAME_INFO.guessCardNotification)
+      else setGameInfo(GAME_INFO.waitGuessNotification)
       break
     default:
       break

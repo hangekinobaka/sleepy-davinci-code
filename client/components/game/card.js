@@ -197,7 +197,7 @@ export default function Card({cardTextures, id}){
   const drawSuccessHandler = () => {
     setDrag()
     dispatch(setIsInteractive(true))
-    socketClient.drawFinish({color: drawingCardColor, num: drawingNum})
+    socketClient.drawFinish({color: drawingCardColor, num: drawingNum, drawId: myId})
 
     // Add the card to the waiting line
     const newLine = [...myDraggingLine]

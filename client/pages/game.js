@@ -8,7 +8,7 @@ import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive,
   setCanDrawCard, setMyLine, resetAll, setMyDarggingLine, setDisableDrag } from 'redux/card/actions'
 import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient} from 'redux/user/actions'
 import { setShowConfirmBtn, resetUi } from 'redux/ui/actions'
-import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine } from 'redux/opponent/actions'
+import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine, setDisableSelect } from 'redux/opponent/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { API_STATUS } from 'configs/variables'
@@ -23,7 +23,7 @@ const GameCanvas = dynamic(() => import('components/game/game-canvas'), {
 })
 
 const ENDPOINT = process.env.NEXT_PUBLIC_API_URL|| 'localhost:5000'
-
+const emptyArr = []
 export default function Game() {
   // Stores
   const w = useSelector(state => state.win.w)
@@ -36,6 +36,9 @@ export default function Game() {
   const globalStatus = useSelector(state => state.user.status)
   const user = useSelector(state => state.user.user)
   const socketClient = useSelector(state => state.user.socketClient)
+  const opDraggingLine = useSelector(state => state.opponent.opDraggingLine)
+  const opLine = useSelector(state => state.opponent.opLine)
+  const opDraggingLineTemp = useSelector(state => state.opponent.opDraggingLineTemp)
   const dispatch = useDispatch()
 
   const router = useRouter()
@@ -61,6 +64,12 @@ export default function Game() {
       break
     case GAME_STATUS.PUT_IN_LINE_INIT:
       dispatch(setDisableDrag(false))
+      break
+    case GAME_STATUS.USER_1_GUESS_MUST:
+      if(user == 1) dispatch(setDisableSelect(true))
+      break
+    case GAME_STATUS.USER_2_GUESS_MUST:
+      if(user == 2) dispatch(setDisableSelect(true))
       break
     default:
       break
@@ -149,14 +158,14 @@ export default function Game() {
 
     dispatch(setSocketClient(sc))
   },[ENDPOINT])
-
+  
   useEffect(() => {
     if(isDrawing) {
       // Sewnd draw card signal
       socketClient.draw(drawingCardColor)
       dispatch(setDrawingNum(null))
     }
-  },[isDrawing])
+  },[socketClient, isDrawing])
 
   useEffect(() => {
     if(myLine === null || !confirmUpdateLine) return
@@ -175,6 +184,18 @@ export default function Game() {
       break
     }
   }, [myDraggingLine])
+
+  // Handle the receive opponent line side effect
+  useEffect(() => {
+    if(opDraggingLine === null || opDraggingLine.length === 0 || opLine === null || opLine.length === 0) return
+    dispatch(setOpDarggingLine([]))
+  }, [opLine, opDraggingLine])
+
+  useEffect(() => {
+    
+    console.log('drag -------------')
+    console.log(opDraggingLineTemp)
+  }, [opDraggingLineTemp])
 
   // methods
   const sendInit = async () => {

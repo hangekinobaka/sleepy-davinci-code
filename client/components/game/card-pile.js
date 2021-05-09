@@ -6,7 +6,7 @@ import { setDrawingCardColor, setIsInteractive, setIsDrawing, setCanDrawCard } f
 
 const CARD_WIDTH = 180
 const CARD_HEIGHT = 120
-const CARD_DELTA_Y = 25
+const CARD_DELTA_Y = 28
 const CARD_X = [-5,0,5]
 
 export default function CardPile({cardTextures}){

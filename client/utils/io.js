@@ -40,8 +40,8 @@ export default function SocketClient(socket){
     })
   }
 
-  this.drawFinish = ({color, num})=>{
-    this.socket.emit('drawFinish', {color, num}, (error) => {
+  this.drawFinish = ({color, num, drawId})=>{
+    this.socket.emit('drawFinish', {color, num, drawId}, (error) => {
       if(error) {
         console.error(error)
       }

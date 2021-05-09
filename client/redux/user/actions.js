@@ -9,7 +9,7 @@ export const initialState = {
   user: null,
   username: '',
   room_num: 0,
-  room_code: '0000',
+  room_code: '',
   /**
    * 1 for user1 draw, 
    * 2 for user2 draw, 

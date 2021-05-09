@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Sprite } from '@inlet/react-pixi'
-import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, 
-  CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
-  OP_LINE_X, OP_LINE_Y } from 'configs/game'
+import { CARD_WIDTH, CARD_HEIGHT, CARD_STATUS, CARD_PILE, 
+  NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
+  OP_LINE_X, OP_LINE_Y, GAME_STATUS } from 'configs/game'
 import { gsap } from 'gsap'
-import { setOpDrawingCardColor, setOpDarggingLine } from 'redux/opponent/actions'
+import { setOpDrawingCardColor, setOpDarggingLine, setOpDarggingLineTemp } from 'redux/opponent/actions'
 
 
 export default function OpCard({cardTextures, id}){
@@ -16,6 +16,9 @@ export default function OpCard({cardTextures, id}){
   const opDrawingCardColor = useSelector(state => state.opponent.opDrawingCardColor)
   const opLine = useSelector(state => state.opponent.opLine)
   const opDraggingLine = useSelector(state => state.opponent.opDraggingLine)
+  const opDraggingLineTemp = useSelector(state => state.opponent.opDraggingLineTemp)
+  const disableSelect = useSelector(state => state.opponent.disableSelect)
+  const globalStatus = useSelector(state => state.user.status)
 
   const dispatch = useDispatch()
   // States
@@ -23,9 +26,8 @@ export default function OpCard({cardTextures, id}){
   const [cardWidth, setCardWidth] = useState(CARD_WIDTH*0.7)
   const [cardHeight, setCardHeight] = useState(CARD_HEIGHT*0.7)
   const [cardTexture, setCardTexture] = useState(cardTextures.stand.w)
-  const [cardStatus, setCardStatus] = useState(CARD_STATUS.draw)  
+  const [cardStatus, setCardStatus] = useState(CARD_STATUS.none)  
   const [displayMe, setDisplayMe] = useState(false)
-  const [cardScale, setCardScale] = useState(1.5)
   const [numSprite, setNumSprite] = useState()
   const [myColor, setMyColor] = useState(null)
   const [myNumber, setMyNumber] = useState()
@@ -74,8 +76,38 @@ export default function OpCard({cardTextures, id}){
   }, [opLine, opDraggingLine])
 
   useEffect(() => {
+    switch(globalStatus){
+    case GAME_STATUS.PUT_IN_LINE_INIT:
+    case GAME_STATUS.USER_1_PUT_IN_LINE:
+    case GAME_STATUS.USER_2_PUT_IN_LINE:
+      setCardStatus(CARD_STATUS.dragable)
+      break
+    default: 
+      break
+    }
+  }, [globalStatus])
+
+  // Handle drag status triggered by line change
+  useEffect(() => {
+    if( cardStatus === CARD_STATUS.dragable){
+      if( opLine === null || opDraggingLineTemp === null ) return
+      
+      // Insert all un-arranged cards
+      for(let i = 0; i < opLine.length; i++ ){
+        if( myId === opLine[i].id && 
+          (opDraggingLineTemp.filter(obj => obj.id === opLine[i].id)).length !== 0 ){
+          positionByIndex(i)
+          setMyIndex(i)
+          setCardStatus(CARD_STATUS.stand)  
+          return
+        }
+      }    
+    }
+  }, [opLine, opDraggingLineTemp, cardStatus])
+
+  useEffect(() => {
     statusHandler()
-  },[cardStatus, opDrawingCardColor, opLine])
+  },[cardStatus, opDrawingCardColor ])
 
   const statusHandler = () => {
     if( cardStatus === null ) return
@@ -83,17 +115,6 @@ export default function OpCard({cardTextures, id}){
 
     switch (cardStatus){
     case CARD_STATUS.dragable:
-      if( opLine === null || opDraggingLine === null) return
-      // Insert all un-arranged cards
-      for(let i = 0; i < opLine.length; i++ ){
-        if( myId === opLine[i].id && 
-          (opDraggingLine.filter(obj => obj.id === opLine[i].id)).length !== 0 ){
-          positionByIndex(i)
-          setMyIndex(i)
-          setCardStatus(CARD_STATUS.stand)  
-          return
-        }
-      }    
       break
     case CARD_STATUS.draw:
       if(opDrawingCardColor === null || opLine === null) return
@@ -118,6 +139,7 @@ export default function OpCard({cardTextures, id}){
     case CARD_STATUS.stand:
       break
     case CARD_STATUS.none:
+      break
     default: 
       setCardPosition(pos)
       break
@@ -129,6 +151,7 @@ export default function OpCard({cardTextures, id}){
     const newLine = [...opDraggingLine]
     newLine.push({ color: opDrawingCardColor, id: myId })
     dispatch(setOpDarggingLine(newLine))
+    dispatch(setOpDarggingLineTemp(newLine))
 
     const tl = gsap.timeline()
     const scale = me.current.scale.x
@@ -137,7 +160,6 @@ export default function OpCard({cardTextures, id}){
       .fromTo(me.current, 
         {
           pixi: { scale:scale*1.7},
-
         },
         {
           pixi: {x:DESIGN_WIDTH - 110 - cardWidth * prevNum, y:OP_LINE_Y + 70, scale:scale},
@@ -151,7 +173,8 @@ export default function OpCard({cardTextures, id}){
   const drawSuccessHandler = () => {
     const prevNum = myId - opLine.length - 1
     setCardPosition({x:DESIGN_WIDTH - 110 - cardWidth * prevNum, y:OP_LINE_Y + 70})
-    setCardStatus(CARD_STATUS.dragable)
+    
+    setCardStatus(CARD_STATUS.none)
     dispatch(setOpDrawingCardColor(null))
   }
 
@@ -173,6 +196,13 @@ export default function OpCard({cardTextures, id}){
         anchor={0.5}
         position={cardPosition}
         visible={displayMe}
-      /></>
+
+        interactive={
+          isInteractive && 
+          (cardStatus === CARD_STATUS.stand && !disableSelect)
+        }
+      />
+      
+    </>
   )
 }

@@ -40,7 +40,7 @@ module.exports = function(io){
           line: data.game.lines[user],
           drawingLine: data.game.draggingLines[user],
           opLine: (data.game.lines[opponent]).map(card => ({color: card.color, id: card.id})),
-          opDrawingLine: (data.game.draggingLines[opponent]).map(card => ({color: card.color})),
+          opDrawingLine: (data.game.draggingLines[opponent]).map(card => ({color: card.color, id: card.id})),
         });
 
         io.to(_room).emit("status", {
@@ -85,7 +85,7 @@ module.exports = function(io){
       }
     });
 
-    socket.on("drawFinish", async ({ color, num }, callback) => {
+    socket.on("drawFinish", async ({ color, num, drawId }, callback) => {
       try {
         // Fetch data
         let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
@@ -95,7 +95,7 @@ module.exports = function(io){
         const user = data.user_1.session_id === _sessionId ? 1 : 2;
 
         // Push to the dragging line
-        data.game.draggingLines[user].push({num, color});
+        data.game.draggingLines[user].push({num, color, id: drawId});
 
         switch(data.game.status){
         case GAME_STATUS.USER_1_DRAW_INIT:
@@ -105,6 +105,12 @@ module.exports = function(io){
         case GAME_STATUS.USER_2_DRAW_INIT:
           if(data.game.draggingLines[1].length < 4) data.game.status = GAME_STATUS.USER_1_DRAW_INIT;
           else data.game.status = GAME_STATUS.PUT_IN_LINE_INIT;
+          break;
+        case GAME_STATUS.USER_1_DRAW:
+          data.game.status = GAME_STATUS.USER_1_GUESS_MUST;
+          break;
+        case GAME_STATUS.USER_2_DRAW:
+          data.game.status = GAME_STATUS.USER_2_GUESS_MUST;
           break;
         default:
           break;
@@ -159,8 +165,8 @@ module.exports = function(io){
         switch(data.game.status){
         case GAME_STATUS.PUT_IN_LINE_INIT:
           if(data.game.draggingLines[opponent].length !== 0) break;
-          else if(data.game.senTe === 1) status = GAME_STATUS.USER_1_GUESS_MUST;
-          else if(data.game.senTe === 2) status = GAME_STATUS.USER_2_GUESS_MUST;
+          else if(data.game.senTe === 1) status = GAME_STATUS.USER_1_DRAW;
+          else if(data.game.senTe === 2) status = GAME_STATUS.USER_2_DRAG;
           break;
         default:
           break;

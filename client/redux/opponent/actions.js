@@ -2,6 +2,8 @@ export const RESET = 'RESET'
 export const OP_DRAWING_CARD_COLOR_ALTER = 'OP_DRAWING_CARD_COLOR_ALTER'
 export const OP_LINE_ALTER = 'OP_LINE_ALTER'
 export const OP_DRAG_LINE_ALTER = 'OP_DRAG_LINE_ALTER'
+export const OP_DRAG_LINE_TEMP_ALTER = 'OP_DRAG_LINE_TEMP_ALTER'
+export const DISABLE_SELECT_ALTER = 'DISABLE_SELECT_ALTER'
 
 export const initialState = {
   opDrawingCardColor: null,
@@ -15,7 +17,9 @@ export const initialState = {
    * ]
    */
   opLine: null,
-  opDraggingLine: null
+  opDraggingLine: null,
+  opDraggingLineTemp: null,
+  disableSelect: true
 }
 
 export const resetOp = () => ({
@@ -39,6 +43,18 @@ export const setOpDarggingLine = newLine => ({
     newLine
   }
 })
+export const setOpDarggingLineTemp = newLine => ({
+  type: OP_DRAG_LINE_TEMP_ALTER,
+  payload:{
+    newLine
+  }
+})
+export const setDisableSelect = isDisabled => ({
+  type: DISABLE_SELECT_ALTER,
+  payload:{
+    isDisabled
+  }
+})
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -56,6 +72,16 @@ export const reducer = (state = initialState, action) => {
     return {
       ...state,
       opDraggingLine: [...action.payload.newLine]
+    }
+  case OP_DRAG_LINE_TEMP_ALTER:
+    return {
+      ...state,
+      opDraggingLineTemp: [...action.payload.newLine]
+    }
+  case DISABLE_SELECT_ALTER:
+    return {
+      ...state,
+      disableSelect: action.payload.isDisabled
     }
   case RESET:
     return {

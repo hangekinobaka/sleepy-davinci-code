@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
-import { Pane, Spinner, Overlay, toaster, Dialog, Button, SideSheet, 
-  Paragraph, Position, DoubleChevronRightIcon, LogOutIcon, IconButton, Icon } from 'evergreen-ui'
+import { Pane, Spinner, Overlay, toaster, Dialog, Button, LogOutIcon, Icon } from 'evergreen-ui'
 import Component from '@reach/component-component'
 import { setShowConfirmBtn } from 'redux/ui/actions'
 
@@ -146,30 +145,6 @@ export default function GameUI() {
         >
             exit <Icon icon={LogOutIcon} marginLeft={4} size={10} />
         </Button>
-        {/* side bar menu */}
-        {/* <Component initialState={{ sideIsShown: false }}>
-          {({ state, setState }) => (
-            <>
-              <SideSheet
-                width={300}
-                position={Position.LEFT}
-                isShown={state.sideIsShown 
-                && !loading 
-                && status !== null
-                && status !== GAME_STATUS.USER_EXIT
-                && status !== GAME_STATUS.USER_LEFT
-                }
-                onCloseComplete={() => setState({ sideIsShown: false })}
-              >
-                <Paragraph margin={40}>Basic Example</Paragraph>
-              </SideSheet>
-              <IconButton icon={DoubleChevronRightIcon} appearance="primary" intent="success" onClick={() => setState({ sideIsShown: true })}
-                display="flex" alignItems="center"  width={40}>
-
-              </IconButton>
-            </>
-          )}
-        </Component> */}
       </Pane>
       
       {/* Game Info */}

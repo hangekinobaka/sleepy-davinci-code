@@ -16,6 +16,7 @@ import Card from 'components/game/card'
 import CardPile from 'components/game/card-pile'
 import CardLine from 'components/game/card-line'
 import OpCard from 'components/game/op-card'
+import NumberLine from 'components/game/number-line'
 // gsap plugin register
 import { PixiPlugin } from 'gsap/all'
 import { gsap } from 'gsap'
@@ -223,6 +224,11 @@ export default function GameCanvas() {
                     />
                   ))
                 }
+
+                {/* Number selection line */}
+                <NumberLine 
+                
+                />
 
               </Container>
               

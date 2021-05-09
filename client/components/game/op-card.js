@@ -139,7 +139,7 @@ export default function OpCard({cardTextures, id}){
     const prevNum = myId - opLine.length - 1
     setCardPosition({x:DESIGN_WIDTH - 170 - (CARD_WIDTH-40) * prevNum, y:350})
     setCardStatus(CARD_STATUS.dragable)
-    setOpDrawingCardColor(null)
+    dispatch(setOpDrawingCardColor(null))
   }
 
   // Positioning by index

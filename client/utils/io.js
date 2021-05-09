@@ -42,8 +42,8 @@ export default function SocketClient(socket){
   }
 
   this.opReceiveCard = (callback)=>{
-    this.socket.on('opReceiveCard', ({ color}) => {
-      callback({ color})
+    this.socket.on('opReceiveCard', ({color}) => {
+      callback({color})
     })
   }
 

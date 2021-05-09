@@ -20,8 +20,8 @@ export default function OpCard({cardTextures, id}){
   const dispatch = useDispatch()
   // States
   const [cardPosition, setCardPosition] = useState({x: 0, y: 0})
-  const [cardWidth, setCardWidth] = useState(CARD_WIDTH)
-  const [cardHeight, setCardHeight] = useState(CARD_HEIGHT)
+  const [cardWidth, setCardWidth] = useState(CARD_WIDTH*0.7)
+  const [cardHeight, setCardHeight] = useState(CARD_HEIGHT*0.7)
   const [cardTexture, setCardTexture] = useState(cardTextures.stand.w)
   const [cardStatus, setCardStatus] = useState(CARD_STATUS.draw)  
   const [displayMe, setDisplayMe] = useState(false)
@@ -73,21 +73,6 @@ export default function OpCard({cardTextures, id}){
   }, [opLine, opDraggingLine])
 
   useEffect(() => {
-    switch (cardStatus){
-    case CARD_STATUS.dragable:
-      me.current.scale.x *= 0.7
-      me.current.scale.y *= 0.7
-      break
-    case CARD_STATUS.stand:
-      me.current.scale.x *= 0.7
-      me.current.scale.y *= 0.7
-      break
-    default: 
-      break
-    }
-  }, [cardTexture, cardPosition])
-
-  useEffect(() => {
     statusHandler()
   },[cardStatus, opDrawingCardColor, opLine])
 
@@ -136,21 +121,24 @@ export default function OpCard({cardTextures, id}){
     const scale = me.current.scale.x
     const prevNum = myId - opLine.length - 1
     tl
-      .to(me.current, {
-        pixi: {x:DESIGN_WIDTH - 170 - (CARD_WIDTH-40) * prevNum, y:350, scale:scale*0.7},
-        ease: 'power1.inOut',
-        duration: 1.6,
-        onComplete: () => {
-          drawSuccessHandler()
-        }
-      })
+      .fromTo(me.current, 
+        {
+          pixi: { scale:scale*1.7},
+
+        },
+        {
+          pixi: {x:DESIGN_WIDTH - 170 - (CARD_WIDTH-40) * prevNum, y:350, scale:scale},
+          ease: 'power1.inOut',
+          duration: 1.6,
+          onComplete: () => {
+            drawSuccessHandler()
+          }}
+      )
   }
   const drawSuccessHandler = () => {
     const prevNum = myId - opLine.length - 1
     setCardPosition({x:DESIGN_WIDTH - 170 - (CARD_WIDTH-40) * prevNum, y:350})
     setCardStatus(CARD_STATUS.dragable)
-    me.current.scale.x *= 0.7
-    me.current.scale.y *= 0.7
     setOpDrawingCardColor(null)
   }
 

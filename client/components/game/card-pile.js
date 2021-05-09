@@ -5,8 +5,8 @@ import { WHITE_CARD_NUM, BLACK_CARD_NUM, CARD_PILE, DESIGN_WIDTH, DESIGN_HEIGHT 
 import { setDrawingCardColor, setIsInteractive, setIsDrawing, setCanDrawCard } from 'redux/card/actions'
 
 const CARD_WIDTH = 180
-const CARD_HEIGHT = 130
-const CARD_DELTA_Y = 30
+const CARD_HEIGHT = 120
+const CARD_DELTA_Y = 25
 const CARD_X = [-5,0,5]
 
 export default function CardPile({cardTextures}){
@@ -44,7 +44,7 @@ export default function CardPile({cardTextures}){
 
   return (
     <>
-      <Container position={[DESIGN_WIDTH/2 - CARD_PILE.CARD_MARGIN_BETWWEN/2,DESIGN_HEIGHT/2 + 100]}>
+      <Container position={[DESIGN_WIDTH/2 - CARD_PILE.CARD_MARGIN_BETWWEN/2,DESIGN_HEIGHT/2 + 180]}>
 
         {/* white card pile */}
         <Container 

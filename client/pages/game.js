@@ -67,10 +67,10 @@ export default function Game() {
       dispatch(setDisableDrag(false))
       break
     case GAME_STATUS.USER_1_GUESS_MUST:
-      if(user == 1) dispatch(setDisableSelect(true))
+      if(user == 1) dispatch(setDisableSelect(false))
       break
     case GAME_STATUS.USER_2_GUESS_MUST:
-      if(user == 2) dispatch(setDisableSelect(true))
+      if(user == 2) dispatch(setDisableSelect(false))
       break
     default:
       break

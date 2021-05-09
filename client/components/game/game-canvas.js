@@ -52,6 +52,7 @@ export default function GameCanvas() {
   const [bgTexture, setBgTexture] = useState('')
   const [layCardTextures, setLayCardTextures] = useState({})
   const [standCardTextures, setStandCardTextures] = useState({})
+  const [selectCardTextures, setSelectCardTextures] = useState({})
 
   // Refs
   const isMounted = useRef(false)
@@ -127,7 +128,9 @@ export default function GameCanvas() {
         { name: 'card_b_stand', url: 'img/card-b.png'},
         { name: 'card_w_lay', url: 'img/card-w-lay.png'},
         { name: 'card_b_lay', url: 'img/card-b-lay.png'},
-        { name: 'num_sheet', url: 'img/number-sheet.json'}
+        { name: 'num_sheet', url: 'img/number-sheet.json'},
+        { name: 'card_w_select', url: 'img/card-w-select.png'},
+        { name: 'card_b_selec', url: 'img/card-b-select.png'}
       ])
       .load(setup)
       .onProgress.add((e) => {
@@ -148,6 +151,10 @@ export default function GameCanvas() {
         b: resources.card_b_stand.texture
       })
       dispatch(setNumSheetTextures(resources.num_sheet.textures))
+      setSelectCardTextures({
+        w: resources.card_w_select.texture,
+        b: resources.card_b_selec.texture
+      })
 
       initTextures(resources)
 
@@ -201,7 +208,7 @@ export default function GameCanvas() {
                     <Card 
                       key={`card-${index}`}
                       id={index+1}
-                      cardTextures={{lay: layCardTextures, stand: standCardTextures}} 
+                      cardTextures={{lay: layCardTextures, stand: standCardTextures, select: selectCardTextures}} 
                     />
                   ))
                 }
@@ -212,7 +219,7 @@ export default function GameCanvas() {
                     <OpCard 
                       key={`card-${index}`}
                       id={index+1}
-                      cardTextures={{lay: layCardTextures, stand: standCardTextures}} 
+                      cardTextures={{lay: layCardTextures, stand: standCardTextures, select: selectCardTextures}} 
                     />
                   ))
                 }

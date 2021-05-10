@@ -4,3 +4,12 @@ html{
 body{
   margin: 0;
 }
+.events-none{
+  pointer-events: none;
+}
+.events-auto{
+  pointer-events: auto;
+}
+.events-all{
+  pointer-events: all;
+}

@@ -1,4 +1,4 @@
-import {DESIGN_WIDTH,DESIGN_HEIGHT} from 'configs/variables'
+import {DESIGN_WIDTH,DESIGN_HEIGHT} from 'configs/game'
 
 const canvasRatio = DESIGN_HEIGHT / DESIGN_WIDTH
 

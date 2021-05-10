@@ -6,8 +6,7 @@ import { Pane, Tablist, Tab, TextInputField, Switch, Button, CaretRightIcon,
   Text, Heading, Spinner, Overlay,toaster} from 'evergreen-ui'
 
 import api from 'utils/api'
-import {USERNAME_LEN,INVITE_CODE_LEN, API_CODE_SUCCESS, API_CODE_FAIL, API_CODE_NO_DATA, 
-  API_CODE_ROOM_GEN_FAIL, API_CODE_NO_ROOM, API_CODE_ROOM_TAKEN} from 'configs/variables'
+import { USERNAME_LEN, INVITE_CODE_LEN, API_STATUS } from 'configs/variables'
 
 export default function Join() {
   const router = useRouter()
@@ -49,15 +48,15 @@ export default function Join() {
     try {
       const res = await api('post', '/login', { username, isPrivate })
       switch (res.code) {
-      case API_CODE_SUCCESS:
+      case API_STATUS.API_CODE_SUCCESS:
         router.push('/game')
         return 
-      case API_CODE_ROOM_GEN_FAIL:  
+      case API_STATUS.API_CODE_ROOM_GEN_FAIL:  
         toaster.danger(
           'Oops! The room might be full. Please try it later...'
         )
         break
-      case API_CODE_FAIL:
+      case API_STATUS.API_CODE_FAIL:
       default:
         toaster.danger(
           'Oops! login error. Please try it later...'
@@ -74,11 +73,11 @@ export default function Join() {
   const sendInit = async () => {
     const res = await api('post', '/init')
     switch (res.code) {
-    case API_CODE_SUCCESS:
+    case API_STATUS.API_CODE_SUCCESS:
       router.push('/game')
       return
-    case API_CODE_NO_DATA:
-    case API_CODE_FAIL:
+    case API_STATUS.API_CODE_NO_DATA:
+    case API_STATUS.API_CODE_FAIL:
     default:
       break
     }
@@ -89,21 +88,21 @@ export default function Join() {
     try {
       const res = await api('post', '/join', { username, inviteCode })
       switch (res.code) {
-      case API_CODE_SUCCESS:
+      case API_STATUS.API_CODE_SUCCESS:
         router.push('/game')
         return
-      case API_CODE_NO_ROOM:  
+      case API_STATUS.API_CODE_NO_ROOM:  
         toaster.warning(
           'Seems no room left, try to create one yourself!'
         )
         setSelectedIndex(0)
         break
-      case API_CODE_ROOM_TAKEN:
+      case API_STATUS.API_CODE_ROOM_TAKEN:
         toaster.warning(
           'Sorry, this room is taken.'
         )
         break
-      case API_CODE_FAIL:
+      case API_STATUS.API_CODE_FAIL:
       default:
         toaster.danger(
           'Oops! login error. Please try it later...'

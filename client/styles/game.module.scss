@@ -1,14 +1,58 @@
 .game{
+  @mixin data-show {
+    &[data-show='true']{
+      opacity: 1;
+    }
+    &[data-show='false']{
+      opacity: 0;
+    }
+  }
+
   &-ui{
     left: 0;
     top: 0;
     position: absolute;
     z-index: 10;
+    width: 100%;
+    height: 100vh;
   }
 
   &-canvas{
     position: absolute;
     z-index: 1;
     width: 100%;
+  }
+
+  &-menu{
+    @include data-show;
+  }
+
+  &-info-bar{
+    color: #fff;
+    font-size: 20px;
+    position: absolute;
+    top: 6%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 60%;
+    text-align: center;
+  }
+
+  &-btn{
+    &-confirm{
+      @include data-show; 
+      position: absolute;
+      top: 42%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  &-exit{
+    &-fullscreen{
+      position: absolute !important;
+      top: 0;
+      right: 0;
+    }
   }
 }

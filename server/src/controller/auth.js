@@ -1,7 +1,8 @@
 const PromiseClient = require("../utils/redis");
 const client = new PromiseClient();
-const { roomCodeGenerator } = require("../utils/user");
+const { roomCodeGenerator, initData } = require("../utils/user");
 const {redis_keys, ROOM_DATA_EXPIRE_TIME} = require("../variables/config");
+const { GAME_STATUS, API_STATUS } = require("../variables/consts");
 
 const init = async (req, res)=>{
   try {
@@ -10,22 +11,22 @@ const init = async (req, res)=>{
       let room_data = await client.get(`${redis_keys.ROOM_DATA}${req.session.room_num}`);
       if(room_data === null) {
         req.session.destroy();
-        res.status(200).json({code: 6, msg:"room is not exist"}); 
+        res.status(200).json({code: API_STATUS.API_CODE_ROOM_DESTROYED, msg:"room is not exist"}); 
         return;
       }
       // If there is room data, send the needed information
       room_data = JSON.parse(room_data);
-      res.status(200).json({code: 1, data:{
+      res.status(200).json({code: API_STATUS.API_CODE_SUCCESS, data:{
         ...room_data,
         user_num: req.sessionID === room_data.user_1.session_id ? 1 : 2
       }, msg:"resume game"});
     }else{
       req.session.destroy();
-      res.status(200).json({code: 2, msg:"no previous data"});
+      res.status(200).json({code: API_STATUS.API_CODE_NO_DATA, msg:"no previous data"});
     }
   } catch (error) {
     req.session.destroy();
-    res.status(403).json({code: 0, msg:"init failed", error});
+    res.status(403).json({code: API_STATUS.API_CODE_FAIL, msg:"init failed", error});
   }
 };
 
@@ -38,7 +39,10 @@ const login = async (req, res)=>{
 
     // Generate and save room code
     const room = await roomCodeGenerator(client);
-    if(room === null) { res.status(200).json({code: 3, msg:"room generate failed"}); return;}
+    if(room === null) { res.status(200).json({code: API_STATUS.API_CODE_ROOM_GEN_FAIL, msg:"room generate failed"}); return;}
+
+    // Generate game data
+    const data = initData();
 
     // Store room number in `room_data` and `session`
     await client.setex(
@@ -48,6 +52,7 @@ const login = async (req, res)=>{
         room_num: room.room_num,
         room_code: room.room_code,
         is_public: isPrivate,
+        game:data,
         user_1:{
           session_id: req.sessionID,
           username
@@ -66,11 +71,11 @@ const login = async (req, res)=>{
     // Store the session data
     req.session.room_num = room.room_num;
     
-    res.status(200).json({code: 1, msg:"login success"});
+    res.status(200).json({code: API_STATUS.API_CODE_SUCCESS, msg:"login success"});
   } catch (error) {
     
     req.session.destroy();
-    res.status(200).json({code: 0, msg:"login failed", error});
+    res.status(200).json({code: API_STATUS.API_CODE_FAIL, msg:"login failed", error});
   }
 };
 
@@ -83,9 +88,9 @@ const exit = async (req, res)=>{
     // Remove session
     req.session.destroy();
     
-    res.status(200).json({code: 1, msg:"exit success"});
+    res.status(200).json({code: API_STATUS.API_CODE_SUCCESS, msg:"exit success"});
   } catch (error) {
-    res.status(200).json({code: 0, msg:"exit failed", error});
+    res.status(200).json({code: API_STATUS.API_CODE_FAIL, msg:"exit failed", error});
   }
 };
 
@@ -99,7 +104,7 @@ const join = async (req, res)=>{
       // check if list exist
         const list_len = await client.llen(redis_keys.PUBLIC_QUEUE);
         // If there is no room left, tell user to create a room instead
-        if(list_len == 0) {res.status(200).json({code: 4, msg:"no room to join"}); return;}
+        if(list_len == 0) {res.status(200).json({code: API_STATUS.API_CODE_NO_ROOM, msg:"no room to join"}); return;}
         // Pop the room out and see if it is still valid, if not, repeat the pop
         let data = await client.brpop(redis_keys.PUBLIC_QUEUE, 0);
         room_num = parseInt(data[1]);
@@ -109,12 +114,13 @@ const join = async (req, res)=>{
       // If has a invite room code, find the room 
       room_num = parseInt(inviteCode);
       room_data = await client.get(`${redis_keys.ROOM_DATA}${room_num}`);
-      if(room_data === null) {res.status(200).json({code: 4, msg:"no room to join"}); return;}
+      if(room_data === null) {res.status(200).json({code: API_STATUS.API_CODE_NO_ROOM, msg:"no room to join"}); return;}
     }
     // save the user 2 to the room
     room_data = JSON.parse(room_data);
+    room_data.game.status = GAME_STATUS.USER_1_DRAW_INIT;
     // If for some reason the room is already taken, return a msg
-    if("user_2" in room_data) {res.status(200).json({code: 5, msg:"the room is taken"}); return;}
+    if("user_2" in room_data) {res.status(200).json({code: API_STATUS.API_CODE_ROOM_TAKEN, msg:"the room is taken"}); return;}
     await client.setex(
       `${redis_keys.ROOM_DATA}${room_num}`, 
       ROOM_DATA_EXPIRE_TIME,
@@ -123,15 +129,15 @@ const join = async (req, res)=>{
         user_2:{
           session_id: req.sessionID,
           username
-        }
+        },
       })
     );
 
     // save back to the session
     req.session.room_num = room_num;
-    res.status(200).json({code: 1, msg:"join success"});
+    res.status(200).json({code: API_STATUS.API_CODE_SUCCESS, msg:"join success"});
   }catch(error){
-    res.status(200).json({code: 0, msg:"join failed", error});
+    res.status(200).json({code: API_STATUS.API_CODE_FAIL, msg:"join failed", error});
   }
 };
 

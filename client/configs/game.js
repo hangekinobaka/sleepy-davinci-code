@@ -1,21 +1,33 @@
+export const DESIGN_WIDTH = 2436
+export const DESIGN_HEIGHT = 1125
+
 export const CARD_STATUS = {
   none: 0,
   draw: 1,
-  standHide: 2,
-  standShow:3,
+  dragable: 2,
+  stand:3,
   lay:4,
-  dragable: 5,
-  drawOver: 6
-}
-export const CARD_TYPE = {
-  draw: 1,
+  disabled: 5
 }
 
 export const WHITE_CARD_NUM = 12
 export const BLACK_CARD_NUM = 12
 
+export const CARD_WIDTH = 180
+export const CARD_HEIGHT = 252
+export const CARD_WIDTH_LAY = 250
+export const CARD_HEIGHT_LAY = 200
+
+export const LINE_X = 120
+export const LINE_Y = DESIGN_HEIGHT - 160
+export const LINE_WIDTH = CARD_WIDTH * 12 + 20
+export const LINE_HEIGHT = 140
+
+export const OP_LINE_X = 500
+export const OP_LINE_Y = 270
+
 export const CARD_PILE = {
-  CARD_MARGIN_BETWWEN: 1000
+  CARD_MARGIN_BETWWEN: 800
 }
 
 // Usage example: numSheetTextures[NUM_SHEET_MAP.b2_l]
@@ -68,4 +80,24 @@ export const NUM_SHEET_MAP = {
   bJ_s: 'Jb-s.png', 
   wJ_l: 'Jw-l.png', 
   wJ_s: 'Jw-s.png'  
+}
+
+export const GAME_STATUS = {
+  USER_1_DRAW_INIT: 1,
+  USER_2_DRAW_INIT: 2,
+  USER_1_PUT_IN_LINE: 3,
+  USER_2_PUT_IN_LINE: 4,
+  USER_1_DRAW: 5,
+  USER_2_DRAW: 6,
+  USER_1_GUESS_MUST: 7,
+  USER_2_GUESS_MUST: 8,
+  USER_1_GUESS: 9,
+  USER_2_GUESS: 10,
+  USER_1_ANSWER: 11,
+  USER_2_ANSWER: 12,
+  USER_1_DRAG: 13,
+  USER_2_DRAG: 14,
+  USER_LEFT: 15,
+  USER_EXIT: 16,
+  PUT_IN_LINE_INIT: 17,
 }

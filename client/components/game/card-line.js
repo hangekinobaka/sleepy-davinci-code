@@ -16,9 +16,12 @@ export default function CardLine(){
   const drawingNum = useSelector(state => state.card.drawingNum)
   const insertPlace = useSelector(state => state.card.insertPlace)
   const dispatch = useDispatch()
+  
 
   // Refs
   const me = useRef()
+  // const itemsRef = useMemo(() => Array(props.items.length).fill().map(() => createRef()), [props.items]);
+
   const placeholders = useRef(new Array(WHITE_CARD_NUM))
 
   useEffect(() => {
@@ -218,7 +221,7 @@ export default function CardLine(){
         [...new Array(WHITE_CARD_NUM)].map((item, index) => (
         
           <Graphics 
-            ref={placeholders.current[index]}
+            ref={el => placeholders.current[index] = el}
             key={`placeholders-${index}`}
             draw={drawPlaceHolder(index)}
           />

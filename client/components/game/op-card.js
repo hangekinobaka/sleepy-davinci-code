@@ -161,7 +161,7 @@ export default function OpCard({cardTextures, id}){
     const tl = gsap.timeline()
     const scale = me.current.scale.x
     const prevNum = myId - opLine.length - 1
-    tl
+    gsap
       .fromTo(me.current, 
         {
           pixi: { scale:scale*1.7},

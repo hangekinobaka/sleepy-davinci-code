@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Graphics, Container, useTick } from '@inlet/react-pixi'
 import { CARD_WIDTH, LINE_X, LINE_Y, LINE_WIDTH, LINE_HEIGHT, WHITE_CARD_NUM } from 'configs/game'
 import { useSelector, useDispatch } from 'react-redux'
@@ -16,12 +16,10 @@ export default function CardLine(){
   const drawingNum = useSelector(state => state.card.drawingNum)
   const insertPlace = useSelector(state => state.card.insertPlace)
   const dispatch = useDispatch()
-  // Refs 
+
+  // Refs
   const me = useRef()
-  const placeholders = []
-  for ( let i = 0; i < WHITE_CARD_NUM; i++){
-    placeholders.push(useRef())
-  }
+  const placeholders = useRef(new Array(WHITE_CARD_NUM))
 
   useEffect(() => {
     return () => {
@@ -94,10 +92,10 @@ export default function CardLine(){
   
   // check if the dragging card is colliding with the placeholder
   const collisionHandler = () => {
-    if(placeholders.length === 0 || window.glDraggingCard === null) return
+    if(placeholders.current.length === 0 || window.glDraggingCard === null) return
     
-    placeholders.forEach((ph, i) => {
-      const collide = testCollision(window.glDraggingCard.sprite, ph.current) 
+    placeholders.current.forEach((ph, i) => {
+      const collide = testCollision(window.glDraggingCard.sprite, ph) 
       if(collide) {
         if(collideArea === i) return
         collideArea = i
@@ -220,7 +218,7 @@ export default function CardLine(){
         [...new Array(WHITE_CARD_NUM)].map((item, index) => (
         
           <Graphics 
-            ref={placeholders[index]}
+            ref={placeholders.current[index]}
             key={`placeholders-${index}`}
             draw={drawPlaceHolder(index)}
           />

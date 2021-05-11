@@ -129,11 +129,7 @@ export default function GameUI() {
         paddingLeft={5}
         height={80}
         width={100}
-        style={
-          {
-            background: '#cc6600'
-          }
-        }>
+      >
         {/* Exit btn */}
         <Button 
           className='events-all' // for click event

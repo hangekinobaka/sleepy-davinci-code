@@ -1,0 +1,13 @@
+// controls showing the content or not
+@mixin data-show {
+  &[data-show='true']{
+    opacity: 1;
+  }
+  &[data-show='false']{
+    opacity: 0;
+  }
+}
+
+@mixin background-image($url){
+  background-image: url("~img/#{$url}");
+}

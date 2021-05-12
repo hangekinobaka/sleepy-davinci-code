@@ -6,7 +6,8 @@ import { Pane, Spinner } from 'evergreen-ui'
 import { setWinW, setWinH } from 'redux/win/actions'
 import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive, 
   setCanDrawCard, setMyLine, resetAll, setMyDarggingLine, setDisableDrag } from 'redux/card/actions'
-import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient} from 'redux/user/actions'
+import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient,
+  setScore} from 'redux/user/actions'
 import { setShowConfirmBtn, resetUi } from 'redux/ui/actions'
 import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine, setDisableSelect,
   setOpDarggingLineTemp, setOpUsername } from 'redux/opponent/actions'
@@ -121,12 +122,14 @@ export default function Game() {
       dispatch(setMyLine(initData.line))
       dispatch(setMyDarggingLine(initData.drawingLine))
       dispatch(setIsInteractive(true))
+      dispatch(setScore(initData.score))
 
       // Opponent data
       dispatch(setOpLine(initData.opLine))
       dispatch(setOpDarggingLine(initData.opDrawingLine))
       dispatch(setOpDarggingLineTemp(initData.opDrawingLine))
 
+      // Game data
       dispatch(setCardNumW(initData.wNum))
       dispatch(setCardNumB(initData.bNum))
       dispatch(setGlobalStatus(initData.status))

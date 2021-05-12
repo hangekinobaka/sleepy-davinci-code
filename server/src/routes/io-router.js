@@ -41,6 +41,7 @@ module.exports = function(io){
           drawingLine: data.game.draggingLines[user],
           opLine: (data.game.lines[opponent]).map(card => ({color: card.color, id: card.id})),
           opDrawingLine: (data.game.draggingLines[opponent]).map(card => ({color: card.color, id: card.id})),
+          score: data.game.score
         });
 
         io.to(_room).emit("usernames", {

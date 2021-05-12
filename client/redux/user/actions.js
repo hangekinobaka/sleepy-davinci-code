@@ -3,6 +3,7 @@ export const USERNAME_ALTER = 'USERNAME_ALTER'
 export const ROOM_ALTER = 'ROOM_ALTER'
 export const STATUS_ALTER = 'STATUS_ALTER'
 export const SOCKET_ALTER = 'SOCKET_ALTER'
+export const SCORE_ALTER = 'SCORE_ALTER'
 export const RESET = 'RESET'
 
 export const initialState = {
@@ -17,7 +18,8 @@ export const initialState = {
    * null for not satrt yet
    */
   status: null,
-  socketClient: null
+  socketClient: null,
+  score: null
 }
 export const setUser = user => ({
   type: USER_ALTER,
@@ -48,6 +50,12 @@ export const setSocketClient = sc => ({
   type: SOCKET_ALTER,
   payload:{
     sc
+  }
+})
+export const setScore = score => ({
+  type: SCORE_ALTER,
+  payload:{
+    score
   }
 })
 export const resetUser = () => ({
@@ -81,6 +89,11 @@ export const reducer = (state = initialState, action) => {
     return {
       ...state,
       socketClient: action.payload.sc
+    }
+  case SCORE_ALTER:
+    return {
+      ...state,
+      score: action.payload.score
     }
   case RESET:
     return {

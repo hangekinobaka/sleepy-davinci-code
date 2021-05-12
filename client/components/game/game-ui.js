@@ -11,9 +11,9 @@ import { GAME_STATUS } from 'configs/game'
 import { GAME_INFO } from 'configs/text/game-info'
 
 const userFontArr = {
-  s: 8,
-  m: 11,
-  l: 15,
+  s: '8px',
+  m: '11px',
+  l: '15px',
 }
 
 export default function GameUI() {
@@ -23,6 +23,7 @@ export default function GameUI() {
   const room_code = useSelector(state => state.user.room_code)
   const status = useSelector(state => state.user.status)
   const socketClient = useSelector(state => state.user.socketClient)
+  const score = useSelector(state => state.user.score)
   const showConfirmBtn = useSelector(state => state.ui.showConfirmBtn)
   const myLine = useSelector(state => state.card.myLine)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
@@ -40,6 +41,7 @@ export default function GameUI() {
 
   useEffect(() => {
     switch(status){
+    case undefined:
     case null:
       if(room_code !== ''){
         setFullScreenInfoTitle(GAME_INFO.waitingTitle)
@@ -126,7 +128,8 @@ export default function GameUI() {
       <Pane 
         className={[styles['game-menu']]}
         data-show={
-          status !== null 
+          status !== undefined 
+          && status !== null 
           && status !== GAME_STATUS.USER_LEFT
           && status !== GAME_STATUS.USER_EXIT
         }
@@ -172,6 +175,16 @@ export default function GameUI() {
             {username} VS {opUsername}
           </span>
         </Pane>
+
+        {/* Third Line */}
+        <Pane display="flex" alignItems="center" justifyContent="center" height={30}>
+          {/* score info */}
+          <span
+            className={`${styles['game-menu-text']}`}
+          >
+            {score === null ? '' : `${score[user]} : ${score[user===1?2:1]}`}
+          </span>
+        </Pane>
       </Pane>
 
       {/* Game Info */}
@@ -208,7 +221,8 @@ export default function GameUI() {
       {/* Full Screen Info */}
       <Dialog
         isShown={!loading && (
-          status === null
+          status === undefined
+          || status === null
           || status === GAME_STATUS.USER_LEFT
           || status === GAME_STATUS.USER_EXIT
         )}

@@ -2,6 +2,7 @@
 
 - [Sleepy Davinci Code Game](#sleepy-davinci-code-game)
   - [Links](#links)
+  - [Game Preview](#game-preview)
   - [Local Develop and Remote Deploy Structure](#local-develop-and-remote-deploy-structure)
   - [Application Logic Structure](#application-logic-structure)
   - [Data Flow](#data-flow)
@@ -15,7 +16,11 @@
 
 ## Links
 [![](https://github.com/hangekinobaka/sleepy-davinci-code/actions/workflows/release.yml/badge.svg)](https://github.com/hangekinobaka/sleepy-davinci-code/releases)      
-[![](https://img.shields.io/static/v1?label=DEMO&message=https://dvc.sleepystudio.ga&color=blue)](https://dvc.sleepystudio.ga)       
+[![](https://img.shields.io/static/v1?label=DEMO&message=https://dvc.sleepystudio.ga&color=blue)](https://dvc.sleepystudio.ga)   
+
+## Game Preview
+
+![](img/dvc-preview.png)
 
 ## Local Develop and Remote Deploy Structure
 

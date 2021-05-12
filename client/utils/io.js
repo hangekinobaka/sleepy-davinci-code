@@ -13,10 +13,21 @@ export default function SocketClient(socket){
     })
   }
 
-
   this.init = (callback)=>{
     this.socket.on('init', initData => {
       callback(initData)
+    })
+  }
+
+  this.status = (callback)=>{
+    this.socket.on('status', ({status}) => {
+      callback(status)
+    })
+  }
+
+  this.usernames = (callback)=>{
+    this.socket.on('usernames', ({user_1, user_2}) => {
+      callback({user_1, user_2})
     })
   }
 
@@ -71,12 +82,6 @@ export default function SocketClient(socket){
   this.updateLineRes = (callback) => {
     this.socket.on('updateLineRes', ({res}) => {
       callback(res)
-    })
-  }
-
-  this.status = (callback)=>{
-    this.socket.on('status', ({status}) => {
-      callback(status)
     })
   }
 

@@ -9,7 +9,7 @@ import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive,
 import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient} from 'redux/user/actions'
 import { setShowConfirmBtn, resetUi } from 'redux/ui/actions'
 import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine, setDisableSelect,
-  setOpDarggingLineTemp } from 'redux/opponent/actions'
+  setOpDarggingLineTemp, setOpUsername } from 'redux/opponent/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { API_STATUS } from 'configs/variables'
@@ -130,6 +130,11 @@ export default function Game() {
       dispatch(setCardNumW(initData.wNum))
       dispatch(setCardNumB(initData.bNum))
       dispatch(setGlobalStatus(initData.status))
+    })
+
+    // Receive opponent username
+    sc.usernames(({user_1, user_2}) => {
+      dispatch(setOpUsername(user_num === 1 ? user_2 : user_1))
     })
 
     // Receive draw card number

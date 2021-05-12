@@ -10,6 +10,12 @@ import { API_STATUS } from 'configs/variables'
 import { GAME_STATUS } from 'configs/game'
 import { GAME_INFO } from 'configs/text/game-info'
 
+const userFontArr = {
+  s: 8,
+  m: 11,
+  l: 15,
+}
+
 export default function GameUI() {
   // Stores
   const username = useSelector(state => state.user.username)
@@ -20,6 +26,7 @@ export default function GameUI() {
   const showConfirmBtn = useSelector(state => state.ui.showConfirmBtn)
   const myLine = useSelector(state => state.card.myLine)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
+  const opUsername = useSelector(state => state.opponent.opUsername)
   const dispatch = useDispatch()
   
   // States
@@ -40,7 +47,6 @@ export default function GameUI() {
         setFullScreenRoomInfo(`${GAME_INFO.roomCodeText}${room_code}`)
         break
       }
-
       setFullScreenInfoTitle(GAME_INFO.initTitle)
       setFullScreenInfo(GAME_INFO.initText)
       break
@@ -152,8 +158,22 @@ export default function GameUI() {
             {room_code}
           </span>
         </Pane>
+
+        {/* Second Line */}
+        <Pane display="flex" alignItems="center" justifyContent="center" height={30}>
+          {/* User info */}
+          <span
+            className={`${styles['game-menu-text']}`}
+            style={{fontSize: username.length + opUsername.length <= 10 ? 
+              userFontArr.l : 
+              username.length + opUsername.length <= 15 ? 
+                userFontArr.m :
+                userFontArr.s}}>
+            {username} VS {opUsername}
+          </span>
+        </Pane>
       </Pane>
-      
+
       {/* Game Info */}
       <div className={styles['game-info-bar']}>
         <span>{gameInfo}</span>
@@ -212,13 +232,7 @@ export default function GameUI() {
         {fullScreenInfo}<br />
         {fullScreenRoomInfo}
       </Dialog>
-
-      {/* remove `X` icon on the side bar */}
-      <style global jsx>{`
-        .css-1y9310r{
-          display:none;
-        }
-      `}</style>
+      
     </Pane>
   )
 }

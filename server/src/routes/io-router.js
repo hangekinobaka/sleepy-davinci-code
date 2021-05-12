@@ -43,6 +43,11 @@ module.exports = function(io){
           opDrawingLine: (data.game.draggingLines[opponent]).map(card => ({color: card.color, id: card.id})),
         });
 
+        io.to(_room).emit("usernames", {
+          user_1: data.user_1.username,
+          user_2: data.user_2.username
+        });
+
         io.to(_room).emit("status", {
           status: data.game.status
         });

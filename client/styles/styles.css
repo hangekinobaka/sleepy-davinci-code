@@ -1,3 +1,5 @@
+@import url(animations.css);
+
 html{
   touch-action: none;
 }
@@ -13,3 +15,4 @@ body{
 .events-all{
   pointer-events: all;
 }
+

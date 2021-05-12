@@ -1,0 +1,17 @@
+@keyframes swinging{
+    0%{transform: rotateX(-90deg)}
+    15%{transform: rotateX(0deg);}
+    30%{transform: rotateX(30deg)}
+    45%{transform: rotateX(-30deg);}
+
+    55%{transform: rotateX(15deg)}
+    65%{transform: rotateX(-15deg);}
+    70%{transform: rotateX(0deg);}
+    
+    100%{transform: rotateX(0deg);}
+}
+
+.swingimage{
+    transform-origin: 50% 0;
+    animation: swinging 2.5s ease-out forwards infinite;
+}

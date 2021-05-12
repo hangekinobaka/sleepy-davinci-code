@@ -9,5 +9,12 @@
 }
 
 @mixin background-image($url){
-  background-image: url("~img/#{$url}");
+  background-image: url("~public/img/#{$url}");
+}
+
+@mixin background-with-image($url, $height: 100px, $width: 100px ){
+  @include background-image($url);
+  height: $height;
+  width: $width;
+  background-size: 100% 100%;
 }

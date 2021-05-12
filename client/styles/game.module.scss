@@ -15,8 +15,28 @@
   }
 
   &-menu{
-    @include data-show;
+    position: absolute;
+    @include background-image('menu-bg.png');
+    background-size: 100% 100%;
+    transform-origin: 50% 0;
 
+    &[data-show='true']{
+      transform: rotateX(0);
+    }
+    &[data-show='false']{
+      transform: rotateX(-90deg);
+    }
+
+    -webkit-transition: -webkit-transform 0.8s;
+    transition: transform 0.8s;
+    &-text{
+      font-size: 15px;
+      color: #c7a785;
+      font-weight: 700;
+      text-align: center;
+      filter: drop-shadow(1px 1px 4px #333);
+      text-shadow: -2px -2px #444;
+    }
   }
 
   &-info-bar{
@@ -26,15 +46,24 @@
     top: 6%;
     left: 50%;
     transform: translate(-50%, 0);
-    width: 60%;
+    width: 55%;
     text-align: center;
   }
 
   &-btn{
+    &-exit{
+      background: #ba261c !important;
+      box-shadow: #333 2px 2px 3px, inset 1px 1px 3px #fff !important;
+      color: #fff !important;
+      &-text{
+        font-size: 15px;
+        font-weight: 700;
+      }
+    }
     &-confirm{
       @include data-show; 
       position: absolute;
-      top: 42%;
+      top: 55%;
       left: 50%;
       transform: translate(-50%, -50%);
     }
@@ -47,4 +76,5 @@
       right: 0;
     }
   }
+
 }

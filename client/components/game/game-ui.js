@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
 import { Pane, Spinner, Overlay, toaster, Dialog, Button, LogOutIcon, Icon } from 'evergreen-ui'
-import Component from '@reach/component-component'
 import { setShowConfirmBtn } from 'redux/ui/actions'
 
 import api from 'utils/api'
@@ -118,29 +117,41 @@ export default function GameUI() {
   return (
     <Pane className={[styles['game-ui'], 'events-none']} >
       {/* Menu board */}
-      <Pane display="flex" alignItems="center"
-        className={styles['game-menu']}
+      <Pane 
+        className={[styles['game-menu']]}
         data-show={
           status !== null 
           && status !== GAME_STATUS.USER_LEFT
           && status !== GAME_STATUS.USER_EXIT
         }
-        elevation={1}
-        paddingLeft={5}
-        height={80}
-        width={100}
+        paddingTop={30}
+        paddingLeft={20}
+        paddingRight={20}
+        width={150}
+        height={135}
       >
-        {/* Exit btn */}
-        <Button 
-          className='events-all' // for click event
-          appearance="primary"
-          onClick={sendExit}
-          padding={5}
-          display="flex" alignItems="center" justifyContent="center"
-          marginRight={5}
-        >
-            exit <Icon icon={LogOutIcon} marginLeft={4} size={10} />
-        </Button>
+        {/* First Line */}
+        <Pane display="flex" alignItems="center" justifyContent="space-between">
+          {/* Exit btn */}
+          <Button 
+            className={`events-all ${styles['game-btn-exit']}`}
+            onClick={sendExit}
+            padding={5}
+            display="flex" alignItems="center" justifyContent="center"
+          >
+            <span
+              className={styles['game-btn-exit-text']}>
+              exit 
+            </span>
+            <Icon icon={LogOutIcon} marginLeft={4} size={12} />
+          </Button>
+          {/* room number text */}
+          <span
+            className={`${styles['game-menu-text']}`}>
+            Room: <br />
+            {room_code}
+          </span>
+        </Pane>
       </Pane>
       
       {/* Game Info */}

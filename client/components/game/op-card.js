@@ -1,12 +1,15 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Sprite } from '@inlet/react-pixi'
+import { gsap } from 'gsap'
+import { setOpDrawingCardColor, setOpDarggingLine, setOpDarggingLineTemp, 
+  setSelectIndex } from 'redux/opponent/actions'
+import { setIsInteractive } from 'redux/card/actions'
+import { setShowConfirmBtn } from 'redux/ui/actions'
+import { CONFIRM_TYPE } from 'configs/ui'
 import { CARD_WIDTH, CARD_HEIGHT, CARD_STATUS, CARD_PILE, 
   NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
   OP_LINE_X, OP_LINE_Y, GAME_STATUS } from 'configs/game'
-import { gsap } from 'gsap'
-import { setOpDrawingCardColor, setOpDarggingLine, setOpDarggingLineTemp, setSelectIndex } from 'redux/opponent/actions'
-import { setIsInteractive } from 'redux/card/actions'
 import * as PIXI from 'pixi.js'
 
 export default function OpCard({cardTextures, id}){
@@ -154,9 +157,10 @@ export default function OpCard({cardTextures, id}){
 
   // Handle when select number changed
   useEffect(() => {
-    if(selectIndex !== myIndex || selectNum === null) return
+    if(selectIndex !== myIndex || selectNum === null) return 
 
     addNumber(selectNum)
+    dispatch(setShowConfirmBtn(true, CONFIRM_TYPE.NUM_SELECT))
     
   }, [selectNum])
 

@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from 'react'
-import { Sprite, Container, useTick } from '@inlet/react-pixi'
-import { WHITE_CARD_NUM, NUM_SHEET_MAP, DESIGN_WIDTH, DESIGN_HEIGHT } from 'configs/game'
+import { Sprite, Container } from '@inlet/react-pixi'
+import { WHITE_CARD_NUM, NUM_SHEET_MAP} from 'configs/game'
 import { useSelector, useDispatch } from 'react-redux'
 import { gsap } from 'gsap'
 import { setIsInteractive } from 'redux/card/actions'
 import { setSelectNum } from 'redux/opponent/actions'
+import { setShowConfirmBtn } from 'redux/ui/actions'
 
 const NUM_WIDTH = 120
 const NUM_LINE_X = 530
@@ -15,6 +16,7 @@ export default function NumberLine(){
   const isInteractive = useSelector(state => state.card.isInteractive)
   const numSheetTextures = useSelector(state => state.card.numSheetTextures)
   const selectIndex = useSelector(state => state.opponent.selectIndex)
+  const selectNum = useSelector(state => state.opponent.selectNum)
   const dispatch = useDispatch()
   // States
   const [displayMe, setDisplayMe] = useState(false)
@@ -22,20 +24,29 @@ export default function NumberLine(){
   // Refs 
   const numberBlocks = useRef(new Array(WHITE_CARD_NUM))
 
+  // Watch the selected number
+  useEffect(() => {
+    if(selectNum === null){
+      dispatch(setShowConfirmBtn(false))
+      return
+    }
+  }, [selectNum])
+
   // Watch if a card is selected
   useEffect(() => {
+    dispatch(setSelectNum(null))
+
+    if(selectIndex === null) {
+      setDisplayMe(false) 
+      return
+    }
+
     if(!numberBlocks.current) return
 
     numberBlocks.current.forEach(block => {
       // Reset all events
       block.removeAllListeners()
     })
-
-    if(selectIndex === null) {
-      dispatch(setSelectNum(null))
-      setDisplayMe(false) 
-      return
-    }
     setDisplayMe(true)
     setNumPositions(numPositions.map((pos,i) => ({
       x:NUM_WIDTH * selectIndex, 

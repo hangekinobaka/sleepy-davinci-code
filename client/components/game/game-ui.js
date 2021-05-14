@@ -9,6 +9,7 @@ import styles from 'styles/game.module.scss'
 import { API_STATUS } from 'configs/variables'
 import { GAME_STATUS } from 'configs/game'
 import { GAME_INFO } from 'configs/text/game-info'
+import { CONFIRM_TYPE } from 'configs/ui'
 
 const userFontArr = {
   s: '8px',
@@ -113,17 +114,25 @@ export default function GameUI() {
   
   // Handlers
   const confirmHandler = () => {
-    if(myLine.length === 0) return
-    socketClient.updateLine(myLine)
-    socketClient.updateLineRes(res => {
-      if(res === API_STATUS.API_CODE_SUCCESS){
-        dispatch(setShowConfirmBtn(false))
-        setGameInfo('Your opponent didn\'t finish yet, please wait.')
-      }
-    })
-  }
-  const numConfirmHandler = () => {
-    console.log('click')
+    switch(showConfirmBtn.type){
+    case CONFIRM_TYPE.LINE_UPDATE:
+      if(myLine.length === 0) return
+
+      socketClient.updateLine(myLine)
+      socketClient.updateLineRes(res => {
+        if(res === API_STATUS.API_CODE_SUCCESS){
+          dispatch(setShowConfirmBtn(false))
+          setGameInfo('Your opponent didn\'t finish yet, please wait.')
+        }
+      })
+      break
+    case CONFIRM_TYPE.NUM_SELECT:
+      if(selectNum === null) return
+      console.log('click')
+      break
+    default:
+      break
+    }
   }
 
   return (
@@ -196,27 +205,13 @@ export default function GameUI() {
         <span>{gameInfo}</span>
       </div>
 
-      {/* confirm line update btn */}
+      {/* confirm btn - for line update and num selection */}
       <Button
         className={`events-all ${styles['game-btn-confirm']}`}
         appearance="primary"
         onClick={confirmHandler}
-        padding={5}
-        display="flex" alignItems="center" justifyContent="center"
-        data-show={showConfirmBtn}
+        data-show={showConfirmBtn.show}
         iconAfter={TickIcon}
-      >
-        Confirm
-      </Button>
-
-      {/* confirm number selection btn */}
-      <Button
-        className={`events-all ${styles['game-btn-num-confirm']}`}
-        appearance="primary"
-        onClick={numConfirmHandler}
-        padding={5}
-        display="flex" alignItems="center" justifyContent="center"
-        data-show={selectNum !== null}
       >
         Confirm
       </Button>

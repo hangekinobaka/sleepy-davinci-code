@@ -15,6 +15,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 import { API_STATUS } from 'configs/variables'
 import { GAME_STATUS } from 'configs/game'
+import { CONFIRM_TYPE } from 'configs/ui'
 import api from 'utils/api'
 import SocketClient from 'utils/io'
 import GameLayout from 'layouts/game-layout'
@@ -188,7 +189,7 @@ export default function Game() {
     if(myDraggingLine.length !== 0) return
     switch (globalStatus){
     case GAME_STATUS.PUT_IN_LINE_INIT:
-      dispatch(setShowConfirmBtn(true))
+      dispatch(setShowConfirmBtn(true, CONFIRM_TYPE.LINE_UPDATE))
       break
     default:
       break

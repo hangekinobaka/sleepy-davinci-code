@@ -224,7 +224,7 @@ export default function Card({cardTextures, id}){
 
     const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${color}${number}_s`]])
     sprite.width = cardWidth / 2
-    sprite.height = CARD_HEIGHT / 2
+    sprite.height = cardHeight / 2
     sprite.anchor.set(0.5)
     setNumSprite(sprite)
     me.current.addChild(sprite)

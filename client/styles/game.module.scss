@@ -67,6 +67,13 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
+    &-num-confirm{
+      @include data-show; 
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
   }
 
   &-exit{

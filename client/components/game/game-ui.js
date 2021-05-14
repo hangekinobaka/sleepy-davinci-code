@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
-import { Pane, Spinner, Overlay, toaster, Dialog, Button, LogOutIcon, Icon } from 'evergreen-ui'
+import { Pane, Spinner, Overlay, toaster, Dialog, Button, LogOutIcon, Icon, TickIcon } from 'evergreen-ui'
 import { setShowConfirmBtn } from 'redux/ui/actions'
 
 import api from 'utils/api'
@@ -28,6 +28,7 @@ export default function GameUI() {
   const myLine = useSelector(state => state.card.myLine)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const opUsername = useSelector(state => state.opponent.opUsername)
+  const selectNum = useSelector(state => state.opponent.selectNum)
   const dispatch = useDispatch()
   
   // States
@@ -121,6 +122,9 @@ export default function GameUI() {
       }
     })
   }
+  const numConfirmHandler = () => {
+    console.log('click')
+  }
 
   return (
     <Pane className={[styles['game-ui'], 'events-none']} >
@@ -192,7 +196,7 @@ export default function GameUI() {
         <span>{gameInfo}</span>
       </div>
 
-      {/* confirm btn */}
+      {/* confirm line update btn */}
       <Button
         className={`events-all ${styles['game-btn-confirm']}`}
         appearance="primary"
@@ -200,6 +204,19 @@ export default function GameUI() {
         padding={5}
         display="flex" alignItems="center" justifyContent="center"
         data-show={showConfirmBtn}
+        iconAfter={TickIcon}
+      >
+        Confirm
+      </Button>
+
+      {/* confirm number selection btn */}
+      <Button
+        className={`events-all ${styles['game-btn-num-confirm']}`}
+        appearance="primary"
+        onClick={numConfirmHandler}
+        padding={5}
+        display="flex" alignItems="center" justifyContent="center"
+        data-show={selectNum !== null}
       >
         Confirm
       </Button>

@@ -7,7 +7,7 @@ import { CARD_WIDTH, CARD_HEIGHT, CARD_STATUS, CARD_PILE,
 import { gsap } from 'gsap'
 import { setOpDrawingCardColor, setOpDarggingLine, setOpDarggingLineTemp, setSelectIndex } from 'redux/opponent/actions'
 import { setIsInteractive } from 'redux/card/actions'
-
+import * as PIXI from 'pixi.js'
 
 export default function OpCard({cardTextures, id}){
   // Stores
@@ -34,7 +34,7 @@ export default function OpCard({cardTextures, id}){
   const [displayMe, setDisplayMe] = useState(false)
   const [numSprite, setNumSprite] = useState()
   const [myColor, setMyColor] = useState(null)
-  const [myNumber, setMyNumber] = useState()
+  const [myNumber, setMyNumber] = useState(null)
   const [myId, setMyId] = useState(id)
   const [myIndex, setMyIndex] = useState(null)
   const [cardInit, setCardInit] = useState(false)
@@ -156,7 +156,7 @@ export default function OpCard({cardTextures, id}){
   useEffect(() => {
     if(selectIndex !== myIndex || selectNum === null) return
 
-    console.log(selectNum)
+    addNumber(selectNum)
     
   }, [selectNum])
 
@@ -247,6 +247,30 @@ export default function OpCard({cardTextures, id}){
     
   }, [selectIndex])
 
+  useEffect(() => {
+    if(selected) return
+    if(myNumber !== null) return
+    if(!numSprite) return
+    numSprite.visible = false
+  }, [selected])
+
+  // Add the number sprite
+  const addNumber = number => {
+    if(!numSheetTextures) return
+
+    if(numSprite){
+      numSprite.visible = true
+      numSprite.texture = numSheetTextures[NUM_SHEET_MAP[`${myColor}${number}_s`]]
+      return
+    }
+
+    const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${myColor}${number}_s`]])
+    sprite.width = cardWidth / 2
+    sprite.height = cardHeight / 2
+    sprite.anchor.set(0.5)
+    setNumSprite(sprite)
+    me.current.addChild(sprite)
+  }
 
   return (
     <>

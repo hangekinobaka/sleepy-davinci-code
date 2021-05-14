@@ -23,8 +23,8 @@ export const LINE_Y = DESIGN_HEIGHT - 160
 export const LINE_WIDTH = CARD_WIDTH * 12 + 20
 export const LINE_HEIGHT = 140
 
-export const OP_LINE_X = 500
-export const OP_LINE_Y = 270
+export const OP_LINE_X = 530
+export const OP_LINE_Y = 250
 
 export const CARD_PILE = {
   CARD_MARGIN_BETWWEN: 800

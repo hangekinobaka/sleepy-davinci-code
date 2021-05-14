@@ -5,6 +5,7 @@ export const OP_DRAG_LINE_ALTER = 'OP_DRAG_LINE_ALTER'
 export const OP_DRAG_LINE_TEMP_ALTER = 'OP_DRAG_LINE_TEMP_ALTER'
 export const DISABLE_SELECT_ALTER = 'DISABLE_SELECT_ALTER'
 export const SELECT_INDEX_ALTER = 'SELECT_INDEX_ALTER'
+export const SELECT_NUM_ALTER = 'SELECT_NUM_ALTER'
 export const OP_USERNAME_ALTER = 'OP_USERNAME_ALTER'
 
 export const initialState = {
@@ -23,6 +24,7 @@ export const initialState = {
   opDraggingLineTemp: null,
   disableSelect: true,
   selectIndex: null,
+  selectNum: null,
   opUsername: ''
 }
 
@@ -65,6 +67,12 @@ export const setSelectIndex = index => ({
     index
   }
 })
+export const setSelectNum = num => ({
+  type: SELECT_NUM_ALTER,
+  payload:{
+    num
+  }
+})
 export const setOpUsername = username => ({
   type: OP_USERNAME_ALTER,
   payload:{
@@ -103,6 +111,11 @@ export const reducer = (state = initialState, action) => {
     return {
       ...state,
       selectIndex: action.payload.index
+    }
+  case SELECT_NUM_ALTER:
+    return {
+      ...state,
+      selectNum: action.payload.num
     }
   case OP_USERNAME_ALTER:
     return {

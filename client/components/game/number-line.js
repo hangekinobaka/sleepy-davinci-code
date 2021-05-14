@@ -3,13 +3,16 @@ import { Sprite, Container, useTick } from '@inlet/react-pixi'
 import { WHITE_CARD_NUM, NUM_SHEET_MAP, DESIGN_WIDTH, DESIGN_HEIGHT } from 'configs/game'
 import { useSelector, useDispatch } from 'react-redux'
 import { gsap } from 'gsap'
+import { setIsInteractive } from 'redux/card/actions'
+import { setSelectNum } from 'redux/opponent/actions'
 
 const NUM_WIDTH = 120
-const NUM_LINE_X = 500
+const NUM_LINE_X = 530
 const NUM_LINE_Y = 360
 
 export default function NumberLine(){
   // Stores
+  const isInteractive = useSelector(state => state.card.isInteractive)
   const numSheetTextures = useSelector(state => state.card.numSheetTextures)
   const selectIndex = useSelector(state => state.opponent.selectIndex)
   const dispatch = useDispatch()
@@ -21,11 +24,18 @@ export default function NumberLine(){
 
   // Watch if a card is selected
   useEffect(() => {
+    if(!numberBlocks.current) return
+
+    numberBlocks.current.forEach(block => {
+      // Reset all events
+      block.removeAllListeners()
+    })
+
     if(selectIndex === null) {
+      dispatch(setSelectNum(null))
       setDisplayMe(false) 
       return
     }
-    
     setDisplayMe(true)
     setNumPositions(numPositions.map((pos,i) => ({
       x:NUM_WIDTH * selectIndex, 
@@ -41,9 +51,11 @@ export default function NumberLine(){
           {
             pixi: { x:NUM_WIDTH * i, y: 0},
             ease: 'power1.out',
-            duration: .6,
+            duration: .4,
             onComplete: () => {
               initPos()
+              dispatch(setIsInteractive(true))
+              setTap(block)
             }
           },
           '<'
@@ -58,6 +70,14 @@ export default function NumberLine(){
       x:NUM_WIDTH * i, 
       y:0
     })))
+  }
+
+  const setTap = (block) => {
+    block.on('pointerdown', numClickHandler)
+  }
+
+  const numClickHandler = e => {
+    dispatch(setSelectNum(e.target['data-num']))
   }
 
   return (
@@ -78,6 +98,10 @@ export default function NumberLine(){
             height={100}
             data-num={index === WHITE_CARD_NUM - 1 ? 'J' : index+1}
             position={numPositions[index]}
+
+            interactive={
+              isInteractive
+            }
           />
         ))
       }

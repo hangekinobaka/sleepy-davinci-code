@@ -20,6 +20,7 @@ export default function OpCard({cardTextures, id}){
   const opDraggingLineTemp = useSelector(state => state.opponent.opDraggingLineTemp)
   const disableSelect = useSelector(state => state.opponent.disableSelect)
   const selectIndex = useSelector(state => state.opponent.selectIndex)
+  const selectNum = useSelector(state => state.opponent.selectNum)
   const globalStatus = useSelector(state => state.user.status)
   const user = useSelector(state => state.user.user)
 
@@ -150,6 +151,14 @@ export default function OpCard({cardTextures, id}){
       break
     }
   }
+
+  // Handle when select number changed
+  useEffect(() => {
+    if(selectIndex !== myIndex || selectNum === null) return
+
+    console.log(selectNum)
+    
+  }, [selectNum])
 
   const drawAnimation = () => {
     // Add the card to the waiting line

@@ -144,6 +144,10 @@ export default function GameUI() {
     }
   }
 
+  const iSeeHandler = () => {
+
+  }
+
   return (
     <Pane className={[styles['game-ui'], 'events-none']} >
       {/* Menu board */}
@@ -213,16 +217,35 @@ export default function GameUI() {
       <div className={styles['game-info-bar']} dangerouslySetInnerHTML={{__html: gameInfo}} />
 
       {/* confirm btn - for line update and num selection */}
-      <Button
-        className={`events-all ${styles['game-btn-confirm']}`}
-        appearance="primary"
-        onClick={confirmHandler}
-        data-show={showConfirmBtn.show}
-        iconAfter={TickIcon}
-      >
+      {
+        showConfirmBtn.show ? 
+          <Button
+            className={`events-all ${styles['game-btn-confirm']}`}
+            appearance="primary"
+            onClick={confirmHandler}
+            iconAfter={TickIcon}
+          >
         Confirm
-      </Button>
-
+          </Button>
+          :
+          <></>
+      }
+      
+      {/* `I see` btn */}
+      {
+        ((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 1) ||
+        (statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 2)) ? 
+          <Button
+            className={`events-all ${styles['game-btn-isee']}`}
+            onClick={iSeeHandler}
+            appearance="primary" intent={statusObj.statusData.isCorrect ? 'danger' : 'success'}
+          >
+          I see {statusObj.statusData.isCorrect? '😢' : '😃'}
+          </Button> 
+          :
+          <></>
+      }
+         
       {/* Loading overlay */}
       <Overlay 
         isShown={loading} 

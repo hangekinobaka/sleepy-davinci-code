@@ -61,7 +61,7 @@ export default function Card({cardTextures, id}){
         setMyNumber(num) 
         setCardStatus(CARD_STATUS.stand)  
         // Check if I am guessing a card
-        // If yes highlight the card and show the guessing number
+        // If yes highlight the card
         if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 1) || 
         statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 2){
           if(statusObj.statusData.index === i){
@@ -95,7 +95,7 @@ export default function Card({cardTextures, id}){
 
   useEffect(() => {
     statusHandler()
-  },[cardStatus, drawingNum])
+  },[cardStatus, drawingNum, statusObj])
 
   useEffect(() => {
     if(dragResult === null || cardStatus !== CARD_STATUS.dragable || myId !== window.glDraggingId) return
@@ -167,13 +167,16 @@ export default function Card({cardTextures, id}){
   // Methods
   const statusHandler = () => {
     if(cardStatus === null) return
+    // pos init
     let pos = { x: 0, y: 0 }
+
     switch (cardStatus){
     case CARD_STATUS.dragable:
       dispatch(setIsDrawing(false))
       break
     case CARD_STATUS.draw:
       if(!drawingNum) return
+      
       if(drawingCardColor === 'w'){
         pos = {
           x: (DESIGN_WIDTH-CARD_PILE.CARD_MARGIN_BETWWEN)/2 + 100, y: DESIGN_HEIGHT/2 - 60
@@ -193,6 +196,14 @@ export default function Card({cardTextures, id}){
       setCardPosition(pos)
       break
     case CARD_STATUS.stand:
+      // Check if I am guessing a card
+      // If yes highlight the card
+      if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 1) || 
+        statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 2){
+        if(statusObj.statusData.index === myIndex){
+          setHighlighted(true)
+        }
+      }
       break
     case CARD_STATUS.none:
     default: 

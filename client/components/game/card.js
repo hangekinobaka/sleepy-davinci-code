@@ -3,12 +3,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Sprite } from '@inlet/react-pixi'
 import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, 
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
-  LINE_X, LINE_Y } from 'configs/game'
+  LINE_X, LINE_Y, GAME_STATUS } from 'configs/game'
 import { setIsDrawing, setIsDragging, setIsInteractive, 
   setInsertPlace, setMyDarggingLine } from 'redux/card/actions'
 import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
 
+const SCALE_CARD_HIGHLIGHT = 1.1
 let isDraggingLocal = false
 export default function Card({cardTextures, id}){
   // Stores
@@ -22,6 +23,8 @@ export default function Card({cardTextures, id}){
   const socketClient = useSelector(state => state.user.socketClient)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const disableDrag = useSelector(state => state.card.disableDrag)
+  const statusObj = useSelector(state => state.user.statusObj)
+  const user = useSelector(state => state.user.user)
   const dispatch = useDispatch()
   // States
   const [cardPosition, setCardPosition] = useState({x: 0, y: 0})
@@ -37,6 +40,8 @@ export default function Card({cardTextures, id}){
   const [myIndex, setMyIndex] = useState(null)
   const [cardInit, setCardInit] = useState(false)
   const [dragIndex, setDragIndex] = useState(null)
+  const [highlighted, setHighlighted] = useState(false)
+
 
   const me = useRef()
 
@@ -55,6 +60,14 @@ export default function Card({cardTextures, id}){
         setMyColor(color)
         setMyNumber(num) 
         setCardStatus(CARD_STATUS.stand)  
+        // Check if I am guessing a card
+        // If yes highlight the card and show the guessing number
+        if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 1) || 
+        statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 2){
+          if(statusObj.statusData.index === i){
+            setHighlighted(true)
+          }
+        }
         return setCardInit(true)  
       }
     }    
@@ -135,6 +148,21 @@ export default function Card({cardTextures, id}){
     if( cardStatus === null ) setDrag()
     setDisplayMe(true)
   }, [myNumber, myColor, myId])
+
+  useEffect(() => {
+    if(myColor === null) return
+
+    if(highlighted){
+      setCardTexture(cardTextures.select[myColor])
+      setCardWidth(CARD_WIDTH*SCALE_CARD_HIGHLIGHT)
+      setCardHeight(CARD_HEIGHT*SCALE_CARD_HIGHLIGHT)
+      return
+    }else{
+      setCardTexture(cardTextures.stand[myColor])
+      setCardWidth(CARD_WIDTH)
+      setCardHeight(CARD_HEIGHT)
+    }
+  }, [highlighted, myColor])
 
   // Methods
   const statusHandler = () => {

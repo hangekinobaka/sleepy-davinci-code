@@ -89,11 +89,11 @@ export default function GameUI() {
       break
     case GAME_STATUS.USER_1_ANSWER:
       if(user == 2) setGameInfo(GAME_INFO.waitOpConfirmNotification)
-      else setGameInfo(`Your Component thinks that this is a ${statusObj.statusData.number}`)
+      else setGameInfo(GAME_INFO.confirmNumInfoGenerator(statusObj.statusData.number))
       break
     case GAME_STATUS.USER_2_ANSWER:
       if(user == 1) setGameInfo(GAME_INFO.waitOpConfirmNotification)
-      else setGameInfo(`Your Component thinks that this is a ${statusObj.statusData.number}`)
+      else setGameInfo(GAME_INFO.confirmNumInfoGenerator(statusObj.statusData.number))
       break
     default:
       break
@@ -210,9 +210,7 @@ export default function GameUI() {
       </Pane>
 
       {/* Game Info */}
-      <div className={styles['game-info-bar']}>
-        <span>{gameInfo}</span>
-      </div>
+      <div className={styles['game-info-bar']} dangerouslySetInnerHTML={{__html: gameInfo}} />
 
       {/* confirm btn - for line update and num selection */}
       <Button

@@ -13,6 +13,7 @@ import { CARD_WIDTH, CARD_HEIGHT, CARD_STATUS, CARD_PILE,
 import * as PIXI from 'pixi.js'
 
 const SCALE_CARD_SIZE = 0.7
+const SCALE_CARD_SIZE_SELECT = 0.8
 
 export default function OpCard({cardTextures, id}){
   // Stores
@@ -236,14 +237,8 @@ export default function OpCard({cardTextures, id}){
     ((statusObj.status === GAME_STATUS.USER_2_GUESS_MUST || statusObj.status === GAME_STATUS.USER_1_GUESS) && user === 2 )){
       
       if(selected){
-        setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE)
-        setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE)
-
         dispatch(setSelectIndex(null))
       }else{
-        setCardWidth(CARD_WIDTH*0.8)
-        setCardHeight(CARD_HEIGHT*0.8)
-
         dispatch(setSelectIndex(myIndex))
       }
       setSelected(!selected)
@@ -260,8 +255,6 @@ export default function OpCard({cardTextures, id}){
     ((statusObj.status === GAME_STATUS.USER_2_GUESS_MUST || statusObj.status === GAME_STATUS.USER_1_GUESS) && user === 2 )){
 
       if(selectIndex !== myIndex && selected){
-        setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE)
-        setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE)
       
         setSelected(!selected)
       }
@@ -270,20 +263,24 @@ export default function OpCard({cardTextures, id}){
   }, [selectIndex])
 
   useEffect(() => {
-    if(myNumber !== null) return
+    if(myNumber !== null || myColor === null) return
 
     if(selected){
       setCardTexture(cardTextures.select[myColor])
+      setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE_SELECT)
+      setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE_SELECT)
       return
     }else{
       setCardTexture(cardTextures.stand[myColor])
+      setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE)
+      setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE)
     }
 
     if(numSprite) {
       numSprite.visible = false
     }
 
-  }, [selected])
+  }, [selected, myColor])
 
   // Add the number sprite
   const addNumber = (number, color=null) => {

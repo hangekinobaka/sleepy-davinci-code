@@ -14,5 +14,10 @@ export const GAME_INFO = {
   waitPutNotification: 'Your opponent didn\'t finish yet, please wait.',
   guessCardNotification: 'Please guess a card in your opponent\'s line...',
   waitGuessNotification: 'Opponent is guessing your card. Please wait.',
-  waitOpConfirmNotification: 'Opponent is confirming your guess. Please wait.'
+  waitOpConfirmNotification: 'Opponent is confirming your guess. Please wait.',
+
+  // functions
+  confirmNumInfoGenerator: num => `
+  <span>Your opponent thinks that this card is a</span> 
+  <span class="highlight" style="margin-left: 8px;">${num}</span>`,
 }

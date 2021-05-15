@@ -40,6 +40,8 @@ module.exports = function(io){
         case GAME_STATUS.USER_2_ANSWER:
         case GAME_STATUS.USER_1_GUESS:
         case GAME_STATUS.USER_2_GUESS:
+        case GAME_STATUS.USER_1_PUT_IN_LINE:
+        case GAME_STATUS.USER_2_PUT_IN_LINE:
           statusData = data.game.guessing_card;
           break;
         default:
@@ -52,7 +54,7 @@ module.exports = function(io){
           line: data.game.lines[user],
           drawingLine: data.game.draggingLines[user],
           opLine: (data.game.lines[opponent]).map(card => ({color: card.color, id: card.id})),
-          opDrawingLine: (data.game.draggingLines[opponent]).map(card => ({color: card.color, id: card.id})),
+          opDraggingLine: (data.game.draggingLines[opponent]).map(card => ({color: card.color, id: card.id})),
           score: data.game.score
         });
 
@@ -180,6 +182,7 @@ module.exports = function(io){
         data.game.lines[user] = newLine;
         data.game.draggingLines[user] = [];
 
+        // Update status
         let status = data.game.status;
         switch(data.game.status){
         case GAME_STATUS.PUT_IN_LINE_INIT:
@@ -187,11 +190,24 @@ module.exports = function(io){
           else if(data.game.senTe === 1) status = GAME_STATUS.USER_1_DRAW;
           else if(data.game.senTe === 2) status = GAME_STATUS.USER_2_DRAG;
           break;
+        case GAME_STATUS.USER_1_PUT_IN_LINE:
+          status = GAME_STATUS.USER_2_DRAW;
+          break;
+        case GAME_STATUS.USER_2_PUT_IN_LINE:
+          status = GAME_STATUS.USER_2_DRAW;
+          break;
         default:
           break;
         }
-
         data.game.status = status;
+
+        // Reset guessing card
+        data.game.guessing_card = {
+          number: null, 
+          index: null,
+          isCorrect: null,
+          opDraggingNum: null
+        };
 
         // Save data
         await client.set(
@@ -291,6 +307,8 @@ module.exports = function(io){
           // Set status
           data.game.status = user === 1 ? GAME_STATUS.USER_2_GUESS : GAME_STATUS.USER_1_GUESS;
         }else{
+          data.game.guessing_card.opDraggingNum = data.game.draggingLines[opponent][0].num;
+
           // Set status
           data.game.status = user === 1 ? GAME_STATUS.USER_2_PUT_IN_LINE : GAME_STATUS.USER_1_PUT_IN_LINE;
         }
@@ -304,7 +322,7 @@ module.exports = function(io){
 
         io.to(_room).emit("status", {
           status: data.game.status,
-          statusData: data.game.guessing_card
+          statusData:data.game.guessing_card
         });
       }
       catch (error) {

@@ -144,16 +144,12 @@ export default function Game() {
 
       // Opponent data
       dispatch(setOpLine(initData.opLine))
-      dispatch(setOpDarggingLine(initData.opDrawingLine))
-      dispatch(setOpDarggingLineTemp(initData.opDrawingLine))
+      dispatch(setOpDarggingLine(initData.opDraggingLine))
+      dispatch(setOpDarggingLineTemp(initData.opDraggingLine))
 
       // Game data
       dispatch(setCardNumW(initData.wNum))
       dispatch(setCardNumB(initData.bNum))
-      dispatch(setGlobalStatus({
-        status: initData.status,
-        statusData: initData.statusData
-      }))
     })
 
     // Receive opponent username
@@ -209,18 +205,14 @@ export default function Game() {
     if(myDraggingLine.length !== 0) return
     switch (globalStatus){
     case GAME_STATUS.PUT_IN_LINE_INIT:
+    case GAME_STATUS.USER_1_PUT_IN_LINE:
+    case GAME_STATUS.USER_2_PUT_IN_LINE:
       dispatch(setShowConfirmBtn(true, CONFIRM_TYPE.LINE_UPDATE))
       break
     default:
       break
     }
   }, [myDraggingLine])
-
-  // Handle the receive opponent line side effect
-  useEffect(() => {
-    if(opDraggingLine === null || opDraggingLine.length === 0 || opLine === null || opLine.length === 0) return
-    dispatch(setOpDarggingLine([]))
-  }, [opLine, opDraggingLine])
 
   // methods
   const sendInit = async () => {

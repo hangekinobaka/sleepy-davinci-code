@@ -41,6 +41,7 @@ export default function Card({cardTextures, id}){
   const [cardInit, setCardInit] = useState(false)
   const [dragIndex, setDragIndex] = useState(null)
   const [highlighted, setHighlighted] = useState(false)
+  const [myRevealed, setMyRevealed] = useState(false)
 
 
   const me = useRef()
@@ -52,13 +53,14 @@ export default function Card({cardTextures, id}){
     // If yes means this card is an init stand card, directly go to the line
     for(let i = 0; i < myLine.length; i++ ){
       if(myId === myLine[i].id){
-        const { num, color } = myLine[i]
+        const { num, color, revealed } = myLine[i]
         positionByIndex(i)
         setMyIndex(i)
         setCardTexture(cardTextures.stand[color])
         addNumber(color, num)
         setMyColor(color)
         setMyNumber(num) 
+        setMyRevealed(revealed)
         setCardStatus(CARD_STATUS.stand)  
         // Check if I am the guessing card
         // If yes highlight the card
@@ -92,10 +94,6 @@ export default function Card({cardTextures, id}){
     return setCardInit(true)  
 
   }, [myLine, myDraggingLine])
-
-  useEffect(() => {
-    statusHandler()
-  },[cardStatus, drawingNum, statusObj])
 
   useEffect(() => {
     if(dragResult === null || cardStatus !== CARD_STATUS.dragable || myId !== window.glDraggingId) return
@@ -164,6 +162,10 @@ export default function Card({cardTextures, id}){
     }
   }, [highlighted, myColor])
 
+  useEffect(() => {
+    statusHandler()
+  },[cardStatus, drawingNum, statusObj, myRevealed])
+
   // Methods
   const statusHandler = () => {
     if(cardStatus === null) return
@@ -203,6 +205,11 @@ export default function Card({cardTextures, id}){
         // If yes highlight the card
         if(statusObj.statusData.index === myIndex){
           setHighlighted(true)
+        }
+
+        // Check if I should be put down
+        if(myRevealed){
+          putDownCard(myColor, myNumber)
         }
       }else{
         // cancel the highlight

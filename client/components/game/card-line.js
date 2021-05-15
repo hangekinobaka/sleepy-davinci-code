@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Graphics, Container, useTick } from '@inlet/react-pixi'
-import { CARD_WIDTH, LINE_X, LINE_Y, LINE_WIDTH, LINE_HEIGHT, WHITE_CARD_NUM } from 'configs/game'
+import { CARD_WIDTH, LINE_X, LINE_Y, LINE_WIDTH, LINE_HEIGHT, 
+  WHITE_CARD_NUM, GAME_STATUS } from 'configs/game'
 import { useSelector, useDispatch } from 'react-redux'
 import { setMyLine, setDragRes, setInsertPlace } from 'redux/card/actions'
 import * as PIXI from 'pixi.js'
@@ -14,8 +15,9 @@ export default function CardLine(){
   const myLine = useSelector(state => state.card.myLine)
   const isDragging = useSelector(state => state.card.isDragging)
   const insertPlace = useSelector(state => state.card.insertPlace)
+  const statusObj = useSelector(state => state.user.statusObj)
+  const user = useSelector(state => state.user.user)
   const dispatch = useDispatch()
-  
 
   // Refs
   const me = useRef()
@@ -41,16 +43,30 @@ export default function CardLine(){
       if(collideArea !== null){
         // If the card is still in the colliding area
         if(insertPlace !== null){
-          // if the card insertion isa valid,
+          // if the card insertion is valid,
           // update the line
           let newLine = myLine === null ? [] : [...myLine]
-
-          newLine.splice(insertPlace, 0, {
+          const newCard = {
             num: window.glDraggingCard.num, 
             color: window.glDraggingCard.color, 
             id: window.glDraggingCard.id,
             revealed: false
-          })
+          }
+          switch(statusObj.status){
+          case GAME_STATUS.USER_1_PUT_IN_LINE:
+            if(user === 1 && !statusObj.statusData.isCorrect){
+              newCard.revealed = true
+            }
+            break
+          case GAME_STATUS.USER_2_PUT_IN_LINE:
+            if(user === 2 && !statusObj.statusData.isCorrect){
+              newCard.revealed = true
+            }
+            break
+          default:
+            break
+          }
+          newLine.splice(insertPlace, 0, newCard)
           window.glDraggingCard = null
           dispatch(setMyLine(newLine))
           dispatch(setDragRes({

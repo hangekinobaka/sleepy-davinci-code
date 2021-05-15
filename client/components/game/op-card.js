@@ -51,7 +51,6 @@ export default function OpCard({cardTextures, id}){
     // init process
 
     if(cardInit || opLine === null || opDraggingLine === null || statusObj.status === null ) return
-    
     // Check if this id already exist in opLine
     // If yes means this card is an init stand card, directly go to the opponent line
     for(let i = 0; i < opLine.length; i++ ){
@@ -61,7 +60,6 @@ export default function OpCard({cardTextures, id}){
         setMyIndex(i)
         setCardTexture(cardTextures.stand[color])
         setMyColor(color)
-        setDisplayMe(true)
 
         // Check if I am the guessing card
         // If yes highlight the card and show the guessing number
@@ -81,6 +79,7 @@ export default function OpCard({cardTextures, id}){
         }else{
           setCardStatus(CARD_STATUS.stand)
         }
+        setDisplayMe(true)
         return setCardInit(true)  
       }
     }    
@@ -130,9 +129,15 @@ export default function OpCard({cardTextures, id}){
   const statusHandler = () => {
     if( cardStatus === null ) return
     let pos = { x: 0, y: 0 }
-
+    
     switch (cardStatus){
     case CARD_STATUS.dragable:
+      if((statusObj.status === GAME_STATUS.USER_1_PUT_IN_LINE && user === 2) ||
+      (statusObj.status === GAME_STATUS.USER_2_PUT_IN_LINE && user === 1)){
+        if(!statusObj.statusData.isCorrect){
+          addNumber(statusObj.statusData.opDraggingNum)
+        }
+      }
       break
     case CARD_STATUS.draw:
       if(opDrawingCardColor === null || opLine === null) return
@@ -165,12 +170,14 @@ export default function OpCard({cardTextures, id}){
         setSelected(false)
       }
       break
-    case CARD_STATUS.none:
+    case CARD_STATUS.disabled:
       if(statusObj.status === GAME_STATUS.PUT_IN_LINE_INIT || 
         statusObj.status === GAME_STATUS.USER_1_PUT_IN_LINE || 
         statusObj.status === GAME_STATUS.USER_2_PUT_IN_LINE){
         setCardStatus(CARD_STATUS.dragable)
       }
+      break
+    case CARD_STATUS.none:
       break
     default: 
       setCardPosition(pos)
@@ -216,7 +223,7 @@ export default function OpCard({cardTextures, id}){
     const prevNum = myId - opLine.length - 1
     setCardPosition({x:DESIGN_WIDTH - 110 - cardWidth * prevNum, y:OP_LINE_Y + 70})
     
-    setCardStatus(CARD_STATUS.none)
+    setCardStatus(CARD_STATUS.disabled)
     dispatch(setOpDrawingCardColor(null))
   }
 

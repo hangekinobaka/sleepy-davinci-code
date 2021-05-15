@@ -63,6 +63,12 @@ const initData = () => {
     score: {
       1: 0,
       2: 0
+    },
+    guessing_card: {
+      number: null, 
+      index: null,
+      isCorrect: null,
+      opDraggingNum: null
     }
   };
 };

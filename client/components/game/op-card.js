@@ -12,11 +12,12 @@ import { CARD_WIDTH, CARD_HEIGHT, CARD_STATUS, CARD_PILE,
   OP_LINE_X, OP_LINE_Y, GAME_STATUS } from 'configs/game'
 import * as PIXI from 'pixi.js'
 
+const SCALE_CARD_SIZE = 0.7
+
 export default function OpCard({cardTextures, id}){
   // Stores
   const numSheetTextures = useSelector(state => state.card.numSheetTextures)
   const isInteractive = useSelector(state => state.card.isInteractive)
-  const socketClient = useSelector(state => state.user.socketClient)
   const opDrawingCardColor = useSelector(state => state.opponent.opDrawingCardColor)
   const opLine = useSelector(state => state.opponent.opLine)
   const opDraggingLine = useSelector(state => state.opponent.opDraggingLine)
@@ -24,18 +25,18 @@ export default function OpCard({cardTextures, id}){
   const disableSelect = useSelector(state => state.opponent.disableSelect)
   const selectIndex = useSelector(state => state.opponent.selectIndex)
   const selectNum = useSelector(state => state.opponent.selectNum)
-  const globalStatus = useSelector(state => state.user.status)
+  const statusObj = useSelector(state => state.user.statusObj)
   const user = useSelector(state => state.user.user)
 
   const dispatch = useDispatch()
   // States
   const [cardPosition, setCardPosition] = useState({x: 0, y: 0})
-  const [cardWidth, setCardWidth] = useState(CARD_WIDTH*0.7)
-  const [cardHeight, setCardHeight] = useState(CARD_HEIGHT*0.7)
+  const [cardWidth, setCardWidth] = useState(CARD_WIDTH*SCALE_CARD_SIZE)
+  const [cardHeight, setCardHeight] = useState(CARD_HEIGHT*SCALE_CARD_SIZE)
   const [cardTexture, setCardTexture] = useState(cardTextures.stand.w)
   const [cardStatus, setCardStatus] = useState(CARD_STATUS.none)  
   const [displayMe, setDisplayMe] = useState(false)
-  const [numSprite, setNumSprite] = useState()
+  const [numSprite, setNumSprite] = useState(null)
   const [myColor, setMyColor] = useState(null)
   const [myNumber, setMyNumber] = useState(null)
   const [myId, setMyId] = useState(id)
@@ -46,19 +47,39 @@ export default function OpCard({cardTextures, id}){
   const me = useRef()
 
   useEffect(() => {
-    if(cardInit || opLine === null || opDraggingLine === null) return
+    // init process
+
+    if(cardInit || opLine === null || opDraggingLine === null || statusObj.status === null ) return
     
     // Check if this id already exist in opLine
     // If yes means this card is an init stand card, directly go to the opponent line
     for(let i = 0; i < opLine.length; i++ ){
       if(myId === opLine[i].id){
-        const { color } = opLine[i]
+        const { color, revealed } = opLine[i]
         positionByIndex(i)
         setMyIndex(i)
         setCardTexture(cardTextures.stand[color])
         setMyColor(color)
         setDisplayMe(true)
-        setCardStatus(CARD_STATUS.stand)  
+
+        // Check if I am guessing a card
+        // If yes highlight the card and show the guessing number
+        if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 2) || 
+        statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 1){
+          if(statusObj.statusData.index === i){
+            addNumber(statusObj.statusData.number, color)
+            setSelected(true)
+          }
+        }
+
+        // Check if I am revealed
+        // If yes, show the number and becomes immutable
+        if(revealed){
+          addNumber(10, color)
+          setCardStatus(CARD_STATUS.standShow)
+        }else{
+          setCardStatus(CARD_STATUS.stand)
+        }
         return setCardInit(true)  
       }
     }    
@@ -81,10 +102,10 @@ export default function OpCard({cardTextures, id}){
     setCardStatus(CARD_STATUS.draw)  
     return setCardInit(true)  
 
-  }, [opLine, opDraggingLine])
+  }, [opLine, opDraggingLine, statusObj])
 
   useEffect(() => {
-    switch(globalStatus){
+    switch(statusObj.status){
     case GAME_STATUS.PUT_IN_LINE_INIT:
     case GAME_STATUS.USER_1_PUT_IN_LINE:
     case GAME_STATUS.USER_2_PUT_IN_LINE:
@@ -93,7 +114,7 @@ export default function OpCard({cardTextures, id}){
     default: 
       break
     }
-  }, [globalStatus])
+  }, [statusObj.status])
 
   // Handle drag status triggered by line change
   useEffect(() => {
@@ -145,8 +166,8 @@ export default function OpCard({cardTextures, id}){
       setDisplayMe(true)
       drawAnimation()
       break
+    case CARD_STATUS.standShow:
     case CARD_STATUS.stand:
-      break
     case CARD_STATUS.none:
       break
     default: 
@@ -211,19 +232,17 @@ export default function OpCard({cardTextures, id}){
     // Only available for standing card
     if(cardStatus !== CARD_STATUS.stand) return
 
-    if( ((globalStatus === GAME_STATUS.USER_1_GUESS_MUST || globalStatus === GAME_STATUS.USER_1_GUESS ) && user === 1 ) || 
-    ((globalStatus === GAME_STATUS.USER_2_GUESS_MUST || globalStatus === GAME_STATUS.USER_1_GUESS) && user === 2 )){
+    if( ((statusObj.status === GAME_STATUS.USER_1_GUESS_MUST || statusObj.status === GAME_STATUS.USER_1_GUESS ) && user === 1 ) || 
+    ((statusObj.status === GAME_STATUS.USER_2_GUESS_MUST || statusObj.status === GAME_STATUS.USER_1_GUESS) && user === 2 )){
       
       if(selected){
-        setCardWidth(CARD_WIDTH*0.7)
-        setCardHeight(CARD_HEIGHT*0.7)
-        setCardTexture(cardTextures.stand[myColor])
+        setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE)
+        setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE)
 
         dispatch(setSelectIndex(null))
       }else{
         setCardWidth(CARD_WIDTH*0.8)
         setCardHeight(CARD_HEIGHT*0.8)
-        setCardTexture(cardTextures.select[myColor])
 
         dispatch(setSelectIndex(myIndex))
       }
@@ -237,13 +256,12 @@ export default function OpCard({cardTextures, id}){
     // Only available for standing card
     if(cardStatus !== CARD_STATUS.stand) return
 
-    if( ((globalStatus === GAME_STATUS.USER_1_GUESS_MUST || globalStatus === GAME_STATUS.USER_1_GUESS ) && user === 1 ) || 
-    ((globalStatus === GAME_STATUS.USER_2_GUESS_MUST || globalStatus === GAME_STATUS.USER_1_GUESS) && user === 2 )){
+    if( ((statusObj.status === GAME_STATUS.USER_1_GUESS_MUST || statusObj.status === GAME_STATUS.USER_1_GUESS ) && user === 1 ) || 
+    ((statusObj.status === GAME_STATUS.USER_2_GUESS_MUST || statusObj.status === GAME_STATUS.USER_1_GUESS) && user === 2 )){
 
       if(selectIndex !== myIndex && selected){
-        setCardWidth(CARD_WIDTH*0.7)
-        setCardHeight(CARD_HEIGHT*0.7)
-        setCardTexture(cardTextures.stand[myColor])
+        setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE)
+        setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE)
       
         setSelected(!selected)
       }
@@ -252,23 +270,33 @@ export default function OpCard({cardTextures, id}){
   }, [selectIndex])
 
   useEffect(() => {
-    if(selected) return
     if(myNumber !== null) return
-    if(!numSprite) return
-    numSprite.visible = false
+
+    if(selected){
+      setCardTexture(cardTextures.select[myColor])
+      return
+    }else{
+      setCardTexture(cardTextures.stand[myColor])
+    }
+
+    if(numSprite) {
+      numSprite.visible = false
+    }
+
   }, [selected])
 
   // Add the number sprite
-  const addNumber = number => {
-    if(!numSheetTextures) return
+  const addNumber = (number, color=null) => {
+    color = color === null ? myColor :  color
+    if(!numSheetTextures || color === null) return
 
     if(numSprite){
+      numSprite.texture = numSheetTextures[NUM_SHEET_MAP[`${color}${number}_s`]]
       numSprite.visible = true
-      numSprite.texture = numSheetTextures[NUM_SHEET_MAP[`${myColor}${number}_s`]]
       return
     }
 
-    const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${myColor}${number}_s`]])
+    const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${color}${number}_s`]])
     sprite.width = cardWidth / 2
     sprite.height = cardHeight / 2
     sprite.anchor.set(0.5)

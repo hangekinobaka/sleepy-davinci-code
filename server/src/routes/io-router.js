@@ -33,6 +33,16 @@ module.exports = function(io){
           user = 2;
           opponent = 1;
         }
+
+        let statusData = null;
+        switch(data.game.status){
+        case GAME_STATUS.USER_1_ANSWER:
+        case GAME_STATUS.USER_2_ANSWER:
+          statusData = data.game.guessing_card;
+          break;
+        default:
+          break;
+        }
         
         socket.emit("init", {
           wNum: data.game.wArr.length,
@@ -50,7 +60,8 @@ module.exports = function(io){
         });
 
         io.to(_room).emit("status", {
-          status: data.game.status
+          status: data.game.status,
+          statusData
         });
 
         if (callback) callback();
@@ -187,7 +198,7 @@ module.exports = function(io){
         );
 
         socket.emit("updateLineRes", {
-          res: API_STATUS.API_CODE_SUCCESS
+          code: API_STATUS.API_CODE_SUCCESS
         });
 
         socket.broadcast.to(_room).emit("opUpdateLine", { 
@@ -202,7 +213,54 @@ module.exports = function(io){
         callback(error);
 
         socket.emit("updateLineRes", {
-          res: API_STATUS.API_CODE_FAIL
+          code: API_STATUS.API_CODE_FAIL
+        });
+      }
+    });
+    
+    socket.on("submitSelection", async ({ number, index }, callback) => {
+      try {
+        // Fetch data
+        let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
+        data = JSON.parse(data);
+        
+        // See which user it is
+        let user, opponent;
+        if(data.user_1.session_id === _sessionId){
+          user = 1;
+          opponent = 2;
+        }else{
+          user = 2;
+          opponent = 1;
+        }
+
+        // Check if the guessing is correct
+        const isCorrect = data.game.lines[opponent][index].num === number;
+
+        data.game.guessing_card = {
+          number, 
+          index,
+          isCorrect
+        };
+
+        // Set status
+        data.game.status = user === 1 ? GAME_STATUS.USER_2_ANSWER : GAME_STATUS.USER_1_ANSWER;
+        
+        // Save data
+        await client.set(
+          `${redis_keys.ROOM_DATA}${_room}`, 
+          JSON.stringify(data)
+        );
+
+        io.to(_room).emit("status", {
+          status: data.game.status,
+          statusData: data.game.guessing_card
+        });
+      }
+      catch (error) {
+        callback(error);
+        socket.emit("submitSelectionRes", {
+          code: API_STATUS.API_CODE_FAIL
         });
       }
     });

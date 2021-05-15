@@ -33,7 +33,7 @@ export default function GameCanvas() {
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const cardNumW = useSelector(state => state.card.cardNumW)
   const cardNumB = useSelector(state => state.card.cardNumB)
-  const globalStatus = useSelector(state => state.user.status)
+  const globalStatus = useSelector(state => state.user.statusObj.status)
   const user = useSelector(state => state.user.user)
   const opLine = useSelector(state => state.opponent.opLine)
   const opDraggingLine = useSelector(state => state.opponent.opDraggingLine)

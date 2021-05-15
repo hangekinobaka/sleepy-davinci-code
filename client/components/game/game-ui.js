@@ -22,13 +22,14 @@ export default function GameUI() {
   const username = useSelector(state => state.user.username)
   const user = useSelector(state => state.user.user)
   const room_code = useSelector(state => state.user.room_code)
-  const status = useSelector(state => state.user.status)
+  const statusObj = useSelector(state => state.user.statusObj)
   const socketClient = useSelector(state => state.user.socketClient)
   const score = useSelector(state => state.user.score)
   const showConfirmBtn = useSelector(state => state.ui.showConfirmBtn)
   const myLine = useSelector(state => state.card.myLine)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const opUsername = useSelector(state => state.opponent.opUsername)
+  const selectIndex = useSelector(state => state.opponent.selectIndex)
   const selectNum = useSelector(state => state.opponent.selectNum)
   const dispatch = useDispatch()
   
@@ -42,7 +43,7 @@ export default function GameUI() {
   const router = useRouter()
 
   useEffect(() => {
-    switch(status){
+    switch(statusObj.status){
     case undefined:
     case null:
       if(room_code !== ''){
@@ -86,10 +87,18 @@ export default function GameUI() {
       if(user == 2) setGameInfo(GAME_INFO.guessCardNotification)
       else setGameInfo(GAME_INFO.waitGuessNotification)
       break
+    case GAME_STATUS.USER_1_ANSWER:
+      if(user == 2) setGameInfo(GAME_INFO.waitOpConfirmNotification)
+      else setGameInfo(`Your Component thinks that this is a ${statusObj.statusData.number}`)
+      break
+    case GAME_STATUS.USER_2_ANSWER:
+      if(user == 1) setGameInfo(GAME_INFO.waitOpConfirmNotification)
+      else setGameInfo(`Your Component thinks that this is a ${statusObj.statusData.number}`)
+      break
     default:
       break
     }
-  }, [status])
+  }, [statusObj])
 
   // APIs
   const sendExit = async () => {
@@ -120,15 +129,15 @@ export default function GameUI() {
 
       socketClient.updateLine(myLine)
       socketClient.updateLineRes(res => {
-        if(res === API_STATUS.API_CODE_SUCCESS){
+        if(res.code === API_STATUS.API_CODE_SUCCESS){
           dispatch(setShowConfirmBtn(false))
-          setGameInfo('Your opponent didn\'t finish yet, please wait.')
+          setGameInfo(GAME_INFO.waitPutNotification)
         }
       })
       break
     case CONFIRM_TYPE.NUM_SELECT:
-      if(selectNum === null) return
-      console.log('click')
+      if(selectNum === null || selectIndex === null) return
+      socketClient.submitSelection(selectNum, selectIndex)
       break
     default:
       break
@@ -141,10 +150,10 @@ export default function GameUI() {
       <Pane 
         className={[styles['game-menu']]}
         data-show={
-          status !== undefined 
-          && status !== null 
-          && status !== GAME_STATUS.USER_LEFT
-          && status !== GAME_STATUS.USER_EXIT
+          statusObj.status !== undefined 
+          && statusObj.status !== null 
+          && statusObj.status !== GAME_STATUS.USER_LEFT
+          && statusObj.status !== GAME_STATUS.USER_EXIT
         }
         paddingTop={30}
         paddingLeft={20}
@@ -233,10 +242,10 @@ export default function GameUI() {
       {/* Full Screen Info */}
       <Dialog
         isShown={!loading && (
-          status === undefined
-          || status === null
-          || status === GAME_STATUS.USER_LEFT
-          || status === GAME_STATUS.USER_EXIT
+          statusObj.status === undefined
+          || statusObj.status === null
+          || statusObj.status === GAME_STATUS.USER_LEFT
+          || statusObj.status === GAME_STATUS.USER_EXIT
         )}
         title={fullScreenInfoTitle}
         hasFooter={false}

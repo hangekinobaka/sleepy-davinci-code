@@ -13,5 +13,6 @@ export const GAME_INFO = {
   putCardNotification: 'Please put the cards in your line',
   waitPutNotification: 'Your opponent didn\'t finish yet, please wait.',
   guessCardNotification: 'Please guess a card in your opponent\'s line...',
-  waitGuessNotification: 'Opponent is guessing your card. Please wait.'
+  waitGuessNotification: 'Opponent is guessing your card. Please wait.',
+  waitOpConfirmNotification: 'Opponent is confirming your guess. Please wait.'
 }

@@ -28,10 +28,10 @@ export const initialState = {
   /**
    * myLine example:  
    * [
-   *   {num: 1, color: 'b', id: 1},
-   *   {num: 5, color: 'b', id: 3},
-   *   {num: 6, color: 'w', id: 4},
-   *   {num: 6, color: 'b', id: 2}
+   *   {num: 1, color: 'b', id: 1, revealed: false},
+   *   {num: 5, color: 'b', id: 3, revealed: false},
+   *   {num: 6, color: 'w', id: 4, revealed: false},
+   *   {num: 6, color: 'b', id: 2, revealed: true}
    * ]
    */
   myLine:null,
@@ -169,8 +169,6 @@ export const reducer = (state = initialState, action) => {
       ...state,
       isDrawing: action.payload.isDrawing
     }
-  case RESET_ALL:
-    return initialState
   case IS_INTERAVTIVE_ALTER:
     return {
       ...state,
@@ -226,6 +224,8 @@ export const reducer = (state = initialState, action) => {
       ...state,
       disableDrag: action.payload.isDisable
     }
+  case RESET_ALL:
+    return initialState
   default:
     return state
   }

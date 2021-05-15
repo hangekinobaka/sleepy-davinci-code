@@ -231,16 +231,25 @@ export default function Card({cardTextures, id}){
   }
 
   // Make the card lay down 
-  const putDownCard = () => {
+  const putDownCard = (color, number) => {
     if(!myColor || !myNumber) return
     // Set card texture
     setCardTexture(cardTextures.lay[myColor])
     setCardWidth(CARD_WIDTH_LAY)
     setCardHeight(CARD_HEIGHT_LAY)
     // Set number texture
-    numSprite.texture = numSheetTextures[NUM_SHEET_MAP[`${myColor}${myNumber}_l`]]
-    numSprite.width = CARD_WIDTH_LAY / 2
-    numSprite.height = CARD_HEIGHT_LAY / 2
+    if(!numSprite) {
+      const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${color}${number}_l`]])
+      sprite.width = CARD_WIDTH_LAY / 2
+      sprite.height = CARD_HEIGHT_LAY / 2
+      sprite.anchor.set(0.5)
+      setNumSprite(sprite)
+      me.current.addChild(sprite)
+    }else{
+      numSprite.texture = numSheetTextures[NUM_SHEET_MAP[`${color}${number}_l`]]
+      numSprite.width = CARD_WIDTH_LAY / 2
+      numSprite.height = CARD_HEIGHT_LAY / 2
+    }
   }
 
   // Card drag handlers

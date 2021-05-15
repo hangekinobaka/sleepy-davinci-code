@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Graphics, Container, useTick } from '@inlet/react-pixi'
 import { CARD_WIDTH, LINE_X, LINE_Y, LINE_WIDTH, LINE_HEIGHT, WHITE_CARD_NUM } from 'configs/game'
 import { useSelector, useDispatch } from 'react-redux'
@@ -13,15 +13,12 @@ export default function CardLine(){
   // Stores
   const myLine = useSelector(state => state.card.myLine)
   const isDragging = useSelector(state => state.card.isDragging)
-  const drawingNum = useSelector(state => state.card.drawingNum)
   const insertPlace = useSelector(state => state.card.insertPlace)
   const dispatch = useDispatch()
   
 
   // Refs
   const me = useRef()
-  // const itemsRef = useMemo(() => Array(props.items.length).fill().map(() => createRef()), [props.items]);
-
   const placeholders = useRef(new Array(WHITE_CARD_NUM))
 
   useEffect(() => {
@@ -49,7 +46,10 @@ export default function CardLine(){
           let newLine = myLine === null ? [] : [...myLine]
 
           newLine.splice(insertPlace, 0, {
-            num: window.glDraggingCard.num, color: window.glDraggingCard.color, id: window.glDraggingCard.id
+            num: window.glDraggingCard.num, 
+            color: window.glDraggingCard.color, 
+            id: window.glDraggingCard.id,
+            revealed: false
           })
           window.glDraggingCard = null
           dispatch(setMyLine(newLine))

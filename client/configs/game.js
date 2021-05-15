@@ -6,8 +6,9 @@ export const CARD_STATUS = {
   draw: 1,
   dragable: 2,
   stand:3,
-  lay:4,
-  disabled: 5
+  standShow:4,
+  lay:5,
+  disabled: 6
 }
 
 export const WHITE_CARD_NUM = 12

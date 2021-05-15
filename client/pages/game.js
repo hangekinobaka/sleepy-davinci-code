@@ -10,7 +10,7 @@ import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketCl
   setScore} from 'redux/user/actions'
 import { setShowConfirmBtn, resetUi } from 'redux/ui/actions'
 import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine, setDisableSelect,
-  setOpDarggingLineTemp, setOpUsername } from 'redux/opponent/actions'
+  setOpDarggingLineTemp, setOpUsername, setSelectIndex } from 'redux/opponent/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { API_STATUS } from 'configs/variables'
@@ -36,12 +36,11 @@ export default function Game() {
   const myLine = useSelector(state => state.card.myLine)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const confirmUpdateLine = useSelector(state => state.card.confirmUpdateLine)
-  const globalStatus = useSelector(state => state.user.status)
+  const globalStatus = useSelector(state => state.user.statusObj.status)
   const user = useSelector(state => state.user.user)
   const socketClient = useSelector(state => state.user.socketClient)
   const opDraggingLine = useSelector(state => state.opponent.opDraggingLine)
   const opLine = useSelector(state => state.opponent.opLine)
-  const opDraggingLineTemp = useSelector(state => state.opponent.opDraggingLineTemp)
   const dispatch = useDispatch()
 
   const router = useRouter()
@@ -73,6 +72,18 @@ export default function Game() {
       break
     case GAME_STATUS.USER_2_GUESS_MUST:
       if(user == 2) dispatch(setDisableSelect(false))
+      break
+    case GAME_STATUS.USER_1_ANSWER:
+      if(user == 2){ 
+        dispatch(setDisableSelect(true))
+        dispatch(setSelectIndex(null))
+      }
+      break
+    case GAME_STATUS.USER_2_ANSWER:
+      if(user == 1) {
+        dispatch(setDisableSelect(true))
+        dispatch(setSelectIndex(null))
+      }
       break
     default:
       break
@@ -133,7 +144,10 @@ export default function Game() {
       // Game data
       dispatch(setCardNumW(initData.wNum))
       dispatch(setCardNumB(initData.bNum))
-      dispatch(setGlobalStatus(initData.status))
+      dispatch(setGlobalStatus({
+        status: initData.status,
+        statusData: initData.statusData
+      }))
     })
 
     // Receive opponent username
@@ -153,8 +167,8 @@ export default function Game() {
     })
 
     // Receive the gaem status change
-    sc.status(status => {
-      dispatch(setGlobalStatus(status))
+    sc.status(res => {
+      dispatch(setGlobalStatus(res))
     })
 
     // Receive opponent card

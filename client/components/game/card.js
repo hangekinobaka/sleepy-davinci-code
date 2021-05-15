@@ -60,7 +60,7 @@ export default function Card({cardTextures, id}){
         setMyColor(color)
         setMyNumber(num) 
         setCardStatus(CARD_STATUS.stand)  
-        // Check if I am guessing a card
+        // Check if I am the guessing card
         // If yes highlight the card
         if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 1) || 
         statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 2){
@@ -196,13 +196,17 @@ export default function Card({cardTextures, id}){
       setCardPosition(pos)
       break
     case CARD_STATUS.stand:
-      // Check if I am guessing a card
-      // If yes highlight the card
+      // If it is under the ANSWER status
       if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 1) || 
         statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 2){
+        // Check if I am the guessing card
+        // If yes highlight the card
         if(statusObj.statusData.index === myIndex){
           setHighlighted(true)
         }
+      }else{
+        // cancel the highlight
+        setHighlighted(false)
       }
       break
     case CARD_STATUS.none:

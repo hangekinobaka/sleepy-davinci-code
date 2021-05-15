@@ -67,6 +67,12 @@ export default function Game() {
     case GAME_STATUS.PUT_IN_LINE_INIT:
       dispatch(setDisableDrag(false))
       break
+    case GAME_STATUS.USER_1_PUT_IN_LINE:
+      if(user == 1) dispatch(setDisableDrag(false))
+      break
+    case GAME_STATUS.USER_2_PUT_IN_LINE:
+      if(user == 2) dispatch(setDisableDrag(false))
+      break
     case GAME_STATUS.USER_1_GUESS_MUST:
       if(user == 1) dispatch(setDisableSelect(false))
       break

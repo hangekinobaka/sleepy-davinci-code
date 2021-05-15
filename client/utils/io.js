@@ -93,6 +93,14 @@ export default function SocketClient(socket){
     })
   }
 
+  this.iSee = () => {
+    this.socket.emit('iSee', (error) => {
+      if(error) {
+        console.error(error)
+      }
+    })
+  }
+
   this.exit = (callback)=>{
     this.socket.emit('exit', (error) => {
       if(error) {

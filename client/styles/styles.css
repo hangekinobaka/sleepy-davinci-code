@@ -16,8 +16,12 @@ body{
   pointer-events: all;
 }
 
+/* special font classes */
 .highlight{
   font-weight: 700;
   font-size: 26px;
   color: #f0ce60;
+}
+.error{
+  color: #de0b0b;
 }

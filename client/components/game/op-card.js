@@ -63,7 +63,7 @@ export default function OpCard({cardTextures, id}){
         setMyColor(color)
         setDisplayMe(true)
 
-        // Check if I am guessing a card
+        // Check if I am the guessing card
         // If yes highlight the card and show the guessing number
         if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 2) || 
         statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 1){
@@ -105,18 +105,6 @@ export default function OpCard({cardTextures, id}){
 
   }, [opLine, opDraggingLine, statusObj])
 
-  useEffect(() => {
-    switch(statusObj.status){
-    case GAME_STATUS.PUT_IN_LINE_INIT:
-    case GAME_STATUS.USER_1_PUT_IN_LINE:
-    case GAME_STATUS.USER_2_PUT_IN_LINE:
-      setCardStatus(CARD_STATUS.dragable)
-      break
-    default: 
-      break
-    }
-  }, [statusObj.status])
-
   // Handle drag status triggered by line change
   useEffect(() => {
     if( cardStatus === CARD_STATUS.dragable){
@@ -137,7 +125,7 @@ export default function OpCard({cardTextures, id}){
 
   useEffect(() => {
     statusHandler()
-  },[cardStatus, opDrawingCardColor ])
+  },[cardStatus, opDrawingCardColor, statusObj])
 
   const statusHandler = () => {
     if( cardStatus === null ) return
@@ -148,7 +136,6 @@ export default function OpCard({cardTextures, id}){
       break
     case CARD_STATUS.draw:
       if(opDrawingCardColor === null || opLine === null) return
-
       if(opDrawingCardColor === 'w'){
         pos = {
           x: (DESIGN_WIDTH-CARD_PILE.CARD_MARGIN_BETWWEN)/2 + 100, y: DESIGN_HEIGHT/2 - 60
@@ -169,7 +156,21 @@ export default function OpCard({cardTextures, id}){
       break
     case CARD_STATUS.standShow:
     case CARD_STATUS.stand:
+      if(
+        statusObj.status !== GAME_STATUS.USER_1_GUESS_MUST &&
+        statusObj.status !== GAME_STATUS.USER_1_GUESS &&
+        statusObj.status !== GAME_STATUS.USER_2_GUESS_MUST &&
+        statusObj.status !== GAME_STATUS.USER_2_GUESS
+      ){
+        setSelected(false)
+      }
+      break
     case CARD_STATUS.none:
+      if(statusObj.status === GAME_STATUS.PUT_IN_LINE_INIT || 
+        statusObj.status === GAME_STATUS.USER_1_PUT_IN_LINE || 
+        statusObj.status === GAME_STATUS.USER_2_PUT_IN_LINE){
+        setCardStatus(CARD_STATUS.dragable)
+      }
       break
     default: 
       setCardPosition(pos)

@@ -11,11 +11,14 @@ export const GAME_INFO = {
   drawCardNotification: 'Please draw a card...',
   waitDrawNotification: 'Opponent is drawing card.',
   putCardNotification: 'Please put the cards in your line',
-  waitPutNotification: 'Your opponent didn\'t finish yet, please wait.',
+  waitOpFinishNotification: 'Your opponent didn\'t finish yet, please wait.',
   guessCardNotification: 'Please guess a card in your opponent\'s line...',
   waitGuessNotification: 'Opponent is guessing your card. Please wait.',
   waitOpConfirmNotification: 'Opponent is confirming your guess. Please wait.',
-
+  isCorrectNotification: 'Nice, you are correct!',
+  makeDecisionNotification: 'Opponent is making decisions. Please wait.',
+  putCardWhenWrongNotification: 'Sorry, <span class="error">wrong guess</span>. Please put your card in line.', 
+  waitOpPutNotification: 'Your opponent is inserting the card, please wait.',
   // functions
   confirmNumInfoGenerator: num => `
   <span>Your opponent thinks that this card is a</span> 

@@ -38,6 +38,8 @@ module.exports = function(io){
         switch(data.game.status){
         case GAME_STATUS.USER_1_ANSWER:
         case GAME_STATUS.USER_2_ANSWER:
+        case GAME_STATUS.USER_1_GUESS:
+        case GAME_STATUS.USER_2_GUESS:
           statusData = data.game.guessing_card;
           break;
         default:
@@ -262,6 +264,51 @@ module.exports = function(io){
         socket.emit("submitSelectionRes", {
           code: API_STATUS.API_CODE_FAIL
         });
+      }
+    });
+
+    socket.on("iSee", async (callback) => {
+      try {
+        // Fetch data
+        let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
+        data = JSON.parse(data);
+        
+        // See which user it is
+        let user, opponent;
+        if(data.user_1.session_id === _sessionId){
+          user = 1;
+          opponent = 2;
+        }else{
+          user = 2;
+          opponent = 1;
+        }
+
+        // Set the corresponding card to revealed
+        const guessing_card = data.game.guessing_card;
+        if(guessing_card.isCorrect){
+          data.game.lines[user][guessing_card.index].revealed = true;
+
+          // Set status
+          data.game.status = user === 1 ? GAME_STATUS.USER_2_GUESS : GAME_STATUS.USER_1_GUESS;
+        }else{
+          // Set status
+          data.game.status = user === 1 ? GAME_STATUS.USER_2_PUT_IN_LINE : GAME_STATUS.USER_1_PUT_IN_LINE;
+        }
+        
+        
+        // Save data
+        await client.set(
+          `${redis_keys.ROOM_DATA}${_room}`, 
+          JSON.stringify(data)
+        );
+
+        io.to(_room).emit("status", {
+          status: data.game.status,
+          statusData: data.game.guessing_card
+        });
+      }
+      catch (error) {
+        callback(error);
       }
     });
 

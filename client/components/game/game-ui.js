@@ -77,7 +77,7 @@ export default function GameUI() {
       break
     case GAME_STATUS.PUT_IN_LINE_INIT:
       if(myDraggingLine !== null && myDraggingLine.length !== 0) setGameInfo(GAME_INFO.putCardNotification)
-      else if(myDraggingLine !== null && myDraggingLine.length === 0) setGameInfo(GAME_INFO.waitPutNotification)
+      else if(myDraggingLine !== null && myDraggingLine.length === 0) setGameInfo(GAME_INFO.waitOpFinishNotification)
       break
     case GAME_STATUS.USER_1_GUESS_MUST:
       if(user == 1) setGameInfo(GAME_INFO.guessCardNotification)
@@ -94,6 +94,22 @@ export default function GameUI() {
     case GAME_STATUS.USER_2_ANSWER:
       if(user == 1) setGameInfo(GAME_INFO.waitOpConfirmNotification)
       else setGameInfo(GAME_INFO.confirmNumInfoGenerator(statusObj.statusData.number))
+      break
+    case GAME_STATUS.USER_1_GUESS:
+      if(user == 1) setGameInfo(GAME_INFO.isCorrectNotification)
+      else setGameInfo(GAME_INFO.makeDecisionNotification)
+      break
+    case GAME_STATUS.USER_2_GUESS:
+      if(user == 2) setGameInfo(GAME_INFO.isCorrectNotification)
+      else setGameInfo(GAME_INFO.makeDecisionNotification)
+      break
+    case GAME_STATUS.USER_1_PUT_IN_LINE:
+      if(user == 1) setGameInfo(GAME_INFO.putCardWhenWrongNotification)
+      else setGameInfo(GAME_INFO.waitOpPutNotification)
+      break
+    case GAME_STATUS.USER_2_PUT_IN_LINE:
+      if(user == 2) setGameInfo(GAME_INFO.putCardWhenWrongNotification)
+      else setGameInfo(GAME_INFO.waitOpPutNotification)
       break
     default:
       break
@@ -145,7 +161,7 @@ export default function GameUI() {
   }
 
   const iSeeHandler = () => {
-
+    socketClient.iSee()
   }
 
   return (

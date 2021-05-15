@@ -113,7 +113,13 @@ export default function Game() {
   },[])
 
   useEffect(async () => {
-    const data = await sendInit()
+    let data
+    try{
+      data = await sendInit()
+      
+    }catch (err){
+      console.error(err)
+    }
     if(!data) return
     const {room_code, room_num, user_num } = data
     const username = data.user_num === 1 ? data.user_1.username : data.user_2.username

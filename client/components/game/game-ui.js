@@ -114,7 +114,7 @@ export default function GameUI() {
     default:
       break
     }
-  }, [statusObj])
+  }, [statusObj, room_code])
 
   // APIs
   const sendExit = async () => {

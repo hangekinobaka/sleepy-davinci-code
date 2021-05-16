@@ -111,8 +111,8 @@ export default function OpCard({cardTextures, id}){
 
   // If select staus has changed, display different things
   useEffect(() => {
-    if(myColor === null || cardStatus !== CARD_STATUS.stand) return
-    if(selected){
+    if(myColor === null) return
+    if(selected && cardStatus === CARD_STATUS.stand){
       setCardTexture(cardTextures.select[myColor])
       setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE_SELECT)
       setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE_SELECT)
@@ -122,11 +122,19 @@ export default function OpCard({cardTextures, id}){
       setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE)
       setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE)
 
-      if(numSprite) {
+      if(numSprite && !myRevealed) {
         numSprite.visible = false
       }
     }
   }, [selected])
+
+  // Handle revealed show separately
+  useEffect(() => {
+    if(!myNumber) return
+    if(myRevealed){
+      addNumber(myNumber) 
+    }
+  }, [myRevealed, myNumber])
 
   useEffect(() => {
     statusHandler()
@@ -218,6 +226,18 @@ export default function OpCard({cardTextures, id}){
       }else{
         // cancel the highlight
         setSelected(false)
+      }
+
+      // If it is under the second or more GUESS status
+      if((statusObj.status === GAME_STATUS.USER_1_GUESS && user === 1) || 
+        statusObj.status === GAME_STATUS.USER_2_GUESS && user === 2){
+        // Check if I am the guessing card
+        // If yes, double check if the guess is correct( normally yes ),
+        // if yes, show me 
+        if(statusObj.statusData.index === myIndex && statusObj.statusData.isCorrect){
+          setMyRevealed(true)
+          setCardStatus(CARD_STATUS.standShow)
+        }
       }
       break
     case CARD_STATUS.disabled:

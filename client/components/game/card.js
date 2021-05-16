@@ -210,6 +210,12 @@ export default function Card({cardTextures, id}){
       setCardPosition(pos)
       break
     case CARD_STATUS.stand:
+      // Check if i am a revealed card, if yes, put me down
+      if(myRevealed){
+        setCardStatus(CARD_STATUS.lay)
+        return
+      }
+
       // If it is under the ANSWER status
       if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 1) || 
         statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 2){
@@ -223,9 +229,15 @@ export default function Card({cardTextures, id}){
         setHighlighted(false)
       }
 
-      // Check if i am a revealed card, if yes, put me down
-      if(myRevealed){
-        setCardStatus(CARD_STATUS.lay)
+      // If it is under the second or more GUESS status
+      if((statusObj.status === GAME_STATUS.USER_1_GUESS && user === 2) || 
+        statusObj.status === GAME_STATUS.USER_2_GUESS && user === 1){
+        // Check if I am the guessing card
+        // If yes, double check if the guess is correct( normally yes ),
+        // if yes, put me down 
+        if(statusObj.statusData.index === myIndex && statusObj.statusData.isCorrect){
+          setMyRevealed(true)
+        }
       }
       break
     case CARD_STATUS.lay:

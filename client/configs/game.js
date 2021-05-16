@@ -16,8 +16,7 @@ export const BLACK_CARD_NUM = 12
 
 export const CARD_WIDTH = 180
 export const CARD_HEIGHT = 252
-export const CARD_WIDTH_LAY = 250
-export const CARD_HEIGHT_LAY = 200
+export const CARD_HEIGHT_LAY = 150
 
 export const LINE_X = 120
 export const LINE_Y = DESIGN_HEIGHT - 160

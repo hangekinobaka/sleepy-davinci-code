@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Sprite } from '@inlet/react-pixi'
-import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, 
+import { CARD_WIDTH, CARD_HEIGHT, CARD_HEIGHT_LAY, 
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
   LINE_X, LINE_Y, GAME_STATUS } from 'configs/game'
 import { setIsDrawing, setIsDragging, setIsInteractive, 
@@ -61,15 +61,20 @@ export default function Card({cardTextures, id}){
         setMyColor(color)
         setMyNumber(num) 
         setMyRevealed(revealed)
-        setCardStatus(CARD_STATUS.stand)  
-        // Check if I am the guessing card
-        // If yes highlight the card
-        if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 1) || 
-        statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 2){
-          if(statusObj.statusData.index === i){
-            setHighlighted(true)
+        if(revealed){
+          setCardStatus(CARD_STATUS.lay)
+        }else{
+          setCardStatus(CARD_STATUS.stand)  
+          // Check if I am the guessing card
+          // If yes highlight the card
+          if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 1) || 
+          statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 2){
+            if(statusObj.statusData.index === i){
+              setHighlighted(true)
+            }
           }
         }
+        
         return setCardInit(true)  
       }
     }    
@@ -119,7 +124,7 @@ export default function Card({cardTextures, id}){
 
   useEffect(() => {
     if(myLine === null || myIndex === null) return
-    if(cardStatus === CARD_STATUS.stand &&
+    if((cardStatus === CARD_STATUS.stand || cardStatus === CARD_STATUS.lay) &&
       myLine[myIndex].id !== myId){
       positionByIndex(myIndex+1)
       setMyIndex(myIndex+1)
@@ -175,6 +180,13 @@ export default function Card({cardTextures, id}){
     switch (cardStatus){
     case CARD_STATUS.dragable:
       dispatch(setIsDrawing(false))
+
+      // If it is under the PUT_IN_LINE status
+      if((statusObj.status === GAME_STATUS.USER_1_PUT_IN_LINE && user === 1) || 
+      statusObj.status === GAME_STATUS.USER_2_PUT_IN_LINE && user === 2){
+        setMyRevealed(!statusObj.statusData.isCorrect)
+      }
+
       break
     case CARD_STATUS.draw:
       if(!drawingNum) return
@@ -206,15 +218,19 @@ export default function Card({cardTextures, id}){
         if(statusObj.statusData.index === myIndex){
           setHighlighted(true)
         }
-
-        // Check if I should be put down
-        if(myRevealed){
-          putDownCard(myColor, myNumber)
-        }
       }else{
         // cancel the highlight
         setHighlighted(false)
       }
+
+      // Check if i am a revealed card, if yes, put me down
+      if(myRevealed){
+        setCardStatus(CARD_STATUS.lay)
+      }
+      break
+    case CARD_STATUS.lay:
+      putDownCard(myColor, myNumber)
+      positionByIndex(myIndex, true)
       break
     case CARD_STATUS.none:
     default: 
@@ -285,19 +301,18 @@ export default function Card({cardTextures, id}){
     if(!myColor || !myNumber) return
     // Set card texture
     setCardTexture(cardTextures.lay[myColor])
-    setCardWidth(CARD_WIDTH_LAY)
     setCardHeight(CARD_HEIGHT_LAY)
     // Set number texture
     if(!numSprite) {
       const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${color}${number}_l`]])
-      sprite.width = CARD_WIDTH_LAY / 2
+      sprite.width = cardWidth / 2
       sprite.height = CARD_HEIGHT_LAY / 2
       sprite.anchor.set(0.5)
       setNumSprite(sprite)
       me.current.addChild(sprite)
     }else{
       numSprite.texture = numSheetTextures[NUM_SHEET_MAP[`${color}${number}_l`]]
-      numSprite.width = CARD_WIDTH_LAY / 2
+      numSprite.width = cardWidth / 2
       numSprite.height = CARD_HEIGHT_LAY / 2
     }
   }
@@ -331,10 +346,10 @@ export default function Card({cardTextures, id}){
   }
 
   // Positioning by index
-  const positionByIndex = index => {
+  const positionByIndex = (index, isLay=false) => {
     setCardPosition({
       x: LINE_X + cardWidth/2 + index * cardWidth + 2, 
-      y: LINE_Y
+      y: isLay ? LINE_Y + CARD_HEIGHT_LAY / 4 + 12 : LINE_Y
     })
   }
 

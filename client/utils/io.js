@@ -101,6 +101,14 @@ export default function SocketClient(socket){
     })
   }
 
+  this.continue = isContinue => {
+    this.socket.emit('continue', {isContinue}, (error) => {
+      if(error) {
+        console.error(error)
+      }
+    })
+  }
+
   this.exit = (callback)=>{
     this.socket.emit('exit', (error) => {
       if(error) {

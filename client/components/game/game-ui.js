@@ -166,11 +166,11 @@ export default function GameUI() {
   }
 
   const continueHandler = () => {
-
+    socketClient.continue(true)
   }
 
   const notContinueHandler = () => {
-
+    socketClient.continue(false)
   }
 
   return (

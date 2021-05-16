@@ -42,6 +42,7 @@ export default function OpCard({cardTextures, id}){
   const [myIndex, setMyIndex] = useState(null)
   const [cardInit, setCardInit] = useState(false)
   const [selected, setSelected] = useState(false)
+  const [myRevealed, setMyRevealed] = useState(false)
 
   const me = useRef()
 
@@ -71,8 +72,9 @@ export default function OpCard({cardTextures, id}){
 
         // Check if I am revealed
         // If yes, show the number and becomes immutable
+        setMyRevealed(revealed)
         if(revealed){
-          addNumber(num, color)
+          setMyNumber(num)
           setCardStatus(CARD_STATUS.standShow)
         }else{
           setCardStatus(CARD_STATUS.stand)
@@ -92,7 +94,8 @@ export default function OpCard({cardTextures, id}){
           setMyColor(color)
           setDisplayMe(true)
           drawSuccessHandler()
-          if(revealed){addNumber(num, color)}
+          setMyRevealed(revealed)
+          if(revealed){setMyNumber(num)}
 
           // [IMPORTANT!] Change the status in the end 
           setCardStatus(CARD_STATUS.disabled)
@@ -106,9 +109,28 @@ export default function OpCard({cardTextures, id}){
 
   }, [opLine, opDraggingLine, statusObj, me])
 
+  // If select staus has changed, display different things
+  useEffect(() => {
+    if(myColor === null || cardStatus !== CARD_STATUS.stand) return
+    if(selected){
+      setCardTexture(cardTextures.select[myColor])
+      setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE_SELECT)
+      setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE_SELECT)
+      return
+    }else{
+      setCardTexture(cardTextures.stand[myColor])
+      setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE)
+      setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE)
+
+      if(numSprite) {
+        numSprite.visible = false
+      }
+    }
+  }, [selected])
+
   useEffect(() => {
     statusHandler()
-  },[cardStatus, opLine, opDrawingCardColor, statusObj, selected])
+  },[cardStatus, opLine, opDrawingCardColor, statusObj])
 
   const statusHandler = () => {
     if( cardStatus === null ) return
@@ -120,7 +142,7 @@ export default function OpCard({cardTextures, id}){
       if((statusObj.status === GAME_STATUS.USER_1_PUT_IN_LINE && user === 2) ||
       (statusObj.status === GAME_STATUS.USER_2_PUT_IN_LINE && user === 1)){
         if(!statusObj.statusData.isCorrect){
-          addNumber(statusObj.statusData.opDraggingNum)
+          setMyNumber(statusObj.statusData.opDraggingNum)
         }
       }
 
@@ -130,7 +152,11 @@ export default function OpCard({cardTextures, id}){
         if( myId === opLine[i].id){
           positionByIndex(i)
           setMyIndex(i)
-          setCardStatus(CARD_STATUS.stand)  
+          if(myRevealed){
+            setCardStatus(CARD_STATUS.standShow)  
+          }else{
+            setCardStatus(CARD_STATUS.stand)  
+          }
         }
       }    
       break
@@ -157,8 +183,19 @@ export default function OpCard({cardTextures, id}){
       setCardStatus(CARD_STATUS.disabled)
       break
     case CARD_STATUS.standShow:
+      // When the opLine is updated, rearrage this card
+      if(statusObj.status === GAME_STATUS.USER_1_DRAW ||
+        statusObj.status === GAME_STATUS.USER_2_DRAW ){
+        insertIntoLine()
+      }
       break
     case CARD_STATUS.stand:
+      // When the opLine is updated, rearrage this card
+      if(statusObj.status === GAME_STATUS.USER_1_DRAW ||
+        statusObj.status === GAME_STATUS.USER_2_DRAW ){
+        insertIntoLine()
+      }
+
       // If it is not under the guessing status, remove all the selections
       if(
         statusObj.status !== GAME_STATUS.USER_1_GUESS_MUST &&
@@ -169,21 +206,18 @@ export default function OpCard({cardTextures, id}){
         setSelected(false)
       }
 
-      // If select staus has changed, display different things
-      if(myColor === null) return
-      if(selected){
-        setCardTexture(cardTextures.select[myColor])
-        setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE_SELECT)
-        setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE_SELECT)
-        return
-      }else{
-        setCardTexture(cardTextures.stand[myColor])
-        setCardWidth(CARD_WIDTH*SCALE_CARD_SIZE)
-        setCardHeight(CARD_HEIGHT*SCALE_CARD_SIZE)
-
-        if(numSprite) {
-          numSprite.visible = false
+      // If it is under the ANSWER status
+      if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 2) || 
+        statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 1){
+        // Check if I am the guessing card
+        // If yes select the card and show the guessing number
+        if(statusObj.statusData.index === myIndex){
+          setSelected(true)
+          addNumber(statusObj.statusData.number)
         }
+      }else{
+        // cancel the highlight
+        setSelected(false)
       }
       break
     case CARD_STATUS.disabled:
@@ -209,6 +243,11 @@ export default function OpCard({cardTextures, id}){
     dispatch(setShowConfirmBtn(true, CONFIRM_TYPE.NUM_SELECT))
     
   }, [selectNum])
+
+  useEffect(() => {
+    if(myNumber === null) return
+    addNumber(myNumber)
+  }, [myNumber])
 
   const drawAnimation = () => {
     // Add the card to the waiting line
@@ -280,7 +319,6 @@ export default function OpCard({cardTextures, id}){
     ((statusObj.status === GAME_STATUS.USER_2_GUESS_MUST || statusObj.status === GAME_STATUS.USER_1_GUESS) && user === 2 )){
 
       if(selectIndex !== myIndex && selected){
-      
         setSelected(!selected)
       }
     }
@@ -298,12 +336,24 @@ export default function OpCard({cardTextures, id}){
       return
     }
 
-    const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${color}${number}_s`]])
+    const sprite = PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${color}${number}_s`]])
     sprite.width = cardWidth / 2
     sprite.height = cardHeight / 2
     sprite.anchor.set(0.5)
     setNumSprite(sprite)
     me.current.addChild(sprite)
+  }
+
+  // (Re)insert cards into the op line
+  const insertIntoLine = () => {
+    if( opLine === null ) return
+    for(let i = 0; i < opLine.length; i++ ){
+      if( myId === opLine[i].id){
+        positionByIndex(i)
+        setMyIndex(i)
+        return
+      }
+    }    
   }
 
   return (

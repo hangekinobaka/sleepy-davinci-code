@@ -204,7 +204,7 @@ module.exports = function(io){
           status = GAME_STATUS.USER_2_DRAW;
           break;
         case GAME_STATUS.USER_2_PUT_IN_LINE:
-          status = GAME_STATUS.USER_2_DRAW;
+          status = GAME_STATUS.USER_1_DRAW;
           break;
         default:
           break;

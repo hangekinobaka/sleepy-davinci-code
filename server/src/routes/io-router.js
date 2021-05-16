@@ -52,9 +52,19 @@ module.exports = function(io){
           wNum: data.game.wArr.length,
           bNum: data.game.bArr.length,
           line: data.game.lines[user],
-          drawingLine: data.game.draggingLines[user],
-          opLine: (data.game.lines[opponent]).map(card => ({color: card.color, id: card.id})),
-          opDraggingLine: (data.game.draggingLines[opponent]).map(card => ({color: card.color, id: card.id})),
+          draggingLine: data.game.draggingLines[user],
+          opLine: (data.game.lines[opponent]).map(card => ({
+            color: card.color, 
+            id: card.id, 
+            revealed: card.revealed, 
+            num: card.revealed ? card.num : null
+          })),
+          opDraggingLine: (data.game.draggingLines[opponent]).map(card => ({
+            color: card.color, 
+            id: card.id, 
+            revealed: card.revealed, 
+            num: card.revealed ? card.num : null
+          })),
           score: data.game.score
         });
 

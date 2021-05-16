@@ -2,7 +2,6 @@ export const RESET = 'RESET'
 export const OP_DRAWING_CARD_COLOR_ALTER = 'OP_DRAWING_CARD_COLOR_ALTER'
 export const OP_LINE_ALTER = 'OP_LINE_ALTER'
 export const OP_DRAG_LINE_ALTER = 'OP_DRAG_LINE_ALTER'
-export const OP_DRAG_LINE_TEMP_ALTER = 'OP_DRAG_LINE_TEMP_ALTER'
 export const DISABLE_SELECT_ALTER = 'DISABLE_SELECT_ALTER'
 export const SELECT_INDEX_ALTER = 'SELECT_INDEX_ALTER'
 export const SELECT_NUM_ALTER = 'SELECT_NUM_ALTER'
@@ -13,15 +12,14 @@ export const initialState = {
   /**
    * opLine example:  
    * [
-   *   { color: 'b', id: 1},
-   *   { color: 'b', id: 3},
-   *   { color: 'w', id: 4},
-   *   { color: 'b', id: 2}
+   *   { color: 'b', id: 1, revealed: false},
+   *   { color: 'b', id: 3, revealed: true, num: 2},
+   *   { color: 'w', id: 4, revealed: false},
+   *   { color: 'b', id: 2, revealed: false}
    * ]
    */
   opLine: null,
   opDraggingLine: null,
-  opDraggingLineTemp: null,
   disableSelect: true,
   selectIndex: null,
   selectNum: null,
@@ -45,12 +43,6 @@ export const setOpLine = newLine => ({
 })
 export const setOpDarggingLine = newLine => ({
   type: OP_DRAG_LINE_ALTER,
-  payload:{
-    newLine
-  }
-})
-export const setOpDarggingLineTemp = newLine => ({
-  type: OP_DRAG_LINE_TEMP_ALTER,
   payload:{
     newLine
   }
@@ -96,11 +88,6 @@ export const reducer = (state = initialState, action) => {
     return {
       ...state,
       opDraggingLine: [...action.payload.newLine]
-    }
-  case OP_DRAG_LINE_TEMP_ALTER:
-    return {
-      ...state,
-      opDraggingLineTemp: [...action.payload.newLine]
     }
   case DISABLE_SELECT_ALTER:
     return {

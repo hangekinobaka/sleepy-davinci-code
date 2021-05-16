@@ -103,7 +103,7 @@ export const setMyLine = newLine => ({
     newLine
   }
 })
-export const setMyDarggingLine = newLine => ({
+export const setMyDraggingLine = newLine => ({
   type: MY_DRAG_LINE_ALTER,
   payload:{
     newLine

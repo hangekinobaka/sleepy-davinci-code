@@ -5,12 +5,12 @@ import { io } from 'socket.io-client'
 import { Pane, Spinner } from 'evergreen-ui'
 import { setWinW, setWinH } from 'redux/win/actions'
 import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive, 
-  setCanDrawCard, setMyLine, resetAll, setMyDarggingLine, setDisableDrag } from 'redux/card/actions'
+  setCanDrawCard, setMyLine, resetAll, setMyDraggingLine, setDisableDrag } from 'redux/card/actions'
 import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient,
   setScore} from 'redux/user/actions'
 import { setShowConfirmBtn, resetUi } from 'redux/ui/actions'
-import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine, setDisableSelect,
-  setOpDarggingLineTemp, setOpUsername, setSelectIndex } from 'redux/opponent/actions'
+import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine, setDisableSelect, 
+  setOpUsername, setSelectIndex } from 'redux/opponent/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { API_STATUS } from 'configs/variables'
@@ -144,14 +144,13 @@ export default function Game() {
       console.log('run init')
       console.log(initData)
       dispatch(setMyLine(initData.line))
-      dispatch(setMyDarggingLine(initData.drawingLine))
+      dispatch(setMyDraggingLine(initData.draggingLine))
       dispatch(setIsInteractive(true))
       dispatch(setScore(initData.score))
 
       // Opponent data
       dispatch(setOpLine(initData.opLine))
       dispatch(setOpDarggingLine(initData.opDraggingLine))
-      dispatch(setOpDarggingLineTemp(initData.opDraggingLine))
 
       // Game data
       dispatch(setCardNumW(initData.wNum))
@@ -186,7 +185,9 @@ export default function Game() {
 
     // Receive opponent line update
     sc.opUpdateLine(({newLine}) => {
+      if(newLine === null || newLine.length === 0 ) return
       dispatch(setOpLine(newLine))
+      dispatch(setOpDarggingLine([]))
     })
 
     dispatch(setSocketClient(sc))

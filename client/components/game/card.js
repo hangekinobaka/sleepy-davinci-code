@@ -5,7 +5,7 @@ import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY,
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
   LINE_X, LINE_Y, GAME_STATUS } from 'configs/game'
 import { setIsDrawing, setIsDragging, setIsInteractive, 
-  setInsertPlace, setMyDarggingLine } from 'redux/card/actions'
+  setInsertPlace, setMyDraggingLine } from 'redux/card/actions'
 import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
 
@@ -109,7 +109,7 @@ export default function Card({cardTextures, id}){
       const index = myId - myLine.length - 1
       const newLine = [...myDraggingLine]
       newLine.splice(index, 1)
-      dispatch(setMyDarggingLine(newLine))
+      dispatch(setMyDraggingLine(newLine))
 
       dispatch(setInsertPlace(null))
     }else{
@@ -252,7 +252,7 @@ export default function Card({cardTextures, id}){
     // Add the card to the waiting line
     const newLine = [...myDraggingLine]
     newLine.push({num: drawingNum, drawingCardColor})
-    dispatch(setMyDarggingLine(newLine))
+    dispatch(setMyDraggingLine(newLine))
   }
 
   // Set drag status

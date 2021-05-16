@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
-import { Pane, Spinner, Overlay, toaster, Dialog, Button, LogOutIcon, Icon, TickIcon } from 'evergreen-ui'
+import { Pane, Spinner, Overlay, toaster, Dialog, Button, 
+  LogOutIcon, Icon, TickIcon, Heading } from 'evergreen-ui'
 import { setShowConfirmBtn } from 'redux/ui/actions'
 
 import api from 'utils/api'
@@ -79,11 +80,11 @@ export default function GameUI() {
       if(myDraggingLine !== null && myDraggingLine.length !== 0) setGameInfo(GAME_INFO.putCardNotification)
       else if(myDraggingLine !== null && myDraggingLine.length === 0) setGameInfo(GAME_INFO.waitOpFinishNotification)
       break
-    case GAME_STATUS.USER_1_GUESS_MUST:
+    case GAME_STATUS.USER_1_GUESS:
       if(user == 1) setGameInfo(GAME_INFO.guessCardNotification)
       else setGameInfo(GAME_INFO.waitGuessNotification)
       break
-    case GAME_STATUS.USER_2_GUESS_MUST:
+    case GAME_STATUS.USER_2_GUESS:
       if(user == 2) setGameInfo(GAME_INFO.guessCardNotification)
       else setGameInfo(GAME_INFO.waitGuessNotification)
       break
@@ -95,11 +96,11 @@ export default function GameUI() {
       if(user == 1) setGameInfo(GAME_INFO.waitOpConfirmNotification)
       else setGameInfo(GAME_INFO.confirmNumInfoGenerator(statusObj.statusData.number))
       break
-    case GAME_STATUS.USER_1_GUESS:
+    case GAME_STATUS.USER_1_CHOOSE:
       if(user == 1) setGameInfo(GAME_INFO.isCorrectNotification)
       else setGameInfo(GAME_INFO.makeDecisionNotification)
       break
-    case GAME_STATUS.USER_2_GUESS:
+    case GAME_STATUS.USER_2_CHOOSE:
       if(user == 2) setGameInfo(GAME_INFO.isCorrectNotification)
       else setGameInfo(GAME_INFO.makeDecisionNotification)
       break
@@ -162,6 +163,14 @@ export default function GameUI() {
 
   const iSeeHandler = () => {
     socketClient.iSee()
+  }
+
+  const continueHandler = () => {
+
+  }
+
+  const notContinueHandler = () => {
+
   }
 
   return (
@@ -261,7 +270,55 @@ export default function GameUI() {
           :
           <></>
       }
-         
+
+      {/* ask if continue window */}      
+      <Pane
+        elevation={2}
+        position="absolute"
+        top={50}
+        right={20}
+        width={240}
+        background="tint1"
+        borderRadius={10}
+        padding={10}
+        className={`
+            events-all
+             ${styles['game-continue-dialog']}`}
+        data-show={
+          (statusObj.status === GAME_STATUS.USER_1_CHOOSE && user === 1) || 
+              (statusObj.status === GAME_STATUS.USER_2_CHOOSE && user === 2)
+        }
+      >
+        <Heading textAlign="center">Do you want to guess another round?</Heading>
+        <Pane 
+          marginTop={18}
+          display="flex"
+          alignItems="center"
+          width='100%'
+          justifyContent="space-evenly"
+        >
+          <Button 
+            appearance="primary"
+            intent="success"
+            width="40%"
+            padding={5}
+            display="flex" alignItems="center" justifyContent="center"
+            onClick={continueHandler}
+          >
+            Yes
+          </Button>
+
+          <Button 
+            padding={5}
+            width="40%"
+            display="flex" alignItems="center" justifyContent="center"
+            onClick={notContinueHandler}
+          >
+            No
+          </Button>
+        </Pane> 
+      </Pane>
+
       {/* Loading overlay */}
       <Overlay 
         isShown={loading} 

@@ -82,4 +82,18 @@
     }
   }
 
+  &-continue-dialog{
+    &[data-show='true']{
+      transform: translateY(0);
+      opacity: 1;
+    }
+    &[data-show='false']{
+      transform: translateY(30%);
+      opacity: 0;
+    }
+
+    -webkit-transition: -webkit-transform 0.8s;
+    transition: all 0.6s;
+  }
+
 }

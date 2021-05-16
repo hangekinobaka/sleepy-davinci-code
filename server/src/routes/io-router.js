@@ -38,8 +38,8 @@ module.exports = function(io){
         switch(data.game.status){
         case GAME_STATUS.USER_1_ANSWER:
         case GAME_STATUS.USER_2_ANSWER:
-        case GAME_STATUS.USER_1_GUESS:
-        case GAME_STATUS.USER_2_GUESS:
+        case GAME_STATUS.USER_1_CHOOSE:
+        case GAME_STATUS.USER_2_CHOOSE:
         case GAME_STATUS.USER_1_PUT_IN_LINE:
         case GAME_STATUS.USER_2_PUT_IN_LINE:
           statusData = data.game.guessing_card;
@@ -138,10 +138,10 @@ module.exports = function(io){
           else data.game.status = GAME_STATUS.PUT_IN_LINE_INIT;
           break;
         case GAME_STATUS.USER_1_DRAW:
-          data.game.status = GAME_STATUS.USER_1_GUESS_MUST;
+          data.game.status = GAME_STATUS.USER_1_GUESS;
           break;
         case GAME_STATUS.USER_2_DRAW:
-          data.game.status = GAME_STATUS.USER_2_GUESS_MUST;
+          data.game.status = GAME_STATUS.USER_2_GUESS;
           break;
         default:
           break;
@@ -315,7 +315,7 @@ module.exports = function(io){
           data.game.lines[user][guessing_card.index].revealed = true;
 
           // Set status
-          data.game.status = user === 1 ? GAME_STATUS.USER_2_GUESS : GAME_STATUS.USER_1_GUESS;
+          data.game.status = user === 1 ? GAME_STATUS.USER_2_CHOOSE : GAME_STATUS.USER_1_CHOOSE;
         }else{
           data.game.guessing_card.opDraggingNum = data.game.draggingLines[opponent][0].num;
 

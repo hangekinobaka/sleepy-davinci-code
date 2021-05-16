@@ -206,10 +206,7 @@ export default function OpCard({cardTextures, id}){
 
       // If it is not under the guessing status, remove all the selections
       if(
-        statusObj.status !== GAME_STATUS.USER_1_GUESS_MUST &&
-        statusObj.status !== GAME_STATUS.USER_1_GUESS &&
-        statusObj.status !== GAME_STATUS.USER_2_GUESS_MUST &&
-        statusObj.status !== GAME_STATUS.USER_2_GUESS
+        statusObj.status !== GAME_STATUS.USER_1_GUESS && statusObj.status !== GAME_STATUS.USER_2_GUESS 
       ){
         setSelected(false)
       }
@@ -229,8 +226,8 @@ export default function OpCard({cardTextures, id}){
       }
 
       // If it is under the second or more GUESS status
-      if((statusObj.status === GAME_STATUS.USER_1_GUESS && user === 1) || 
-        statusObj.status === GAME_STATUS.USER_2_GUESS && user === 2){
+      if((statusObj.status === GAME_STATUS.USER_1_CHOOSE && user === 1) || 
+        statusObj.status === GAME_STATUS.USER_2_CHOOSE && user === 2){
         // Check if I am the guessing card
         // If yes, double check if the guess is correct( normally yes ),
         // if yes, show me 
@@ -317,9 +314,8 @@ export default function OpCard({cardTextures, id}){
     // Only available for standing card
     if(cardStatus !== CARD_STATUS.stand) return
 
-    if( ((statusObj.status === GAME_STATUS.USER_1_GUESS_MUST || statusObj.status === GAME_STATUS.USER_1_GUESS ) && user === 1 ) || 
-    ((statusObj.status === GAME_STATUS.USER_2_GUESS_MUST || statusObj.status === GAME_STATUS.USER_1_GUESS) && user === 2 )){
-      
+    if((statusObj.status === GAME_STATUS.USER_1_GUESS && user === 1 ) || 
+    (statusObj.status === GAME_STATUS.USER_2_GUESS && user === 2 )){
       if(selected){
         dispatch(setSelectIndex(null))
       }else{
@@ -335,8 +331,8 @@ export default function OpCard({cardTextures, id}){
     // Only available for standing card
     if(cardStatus !== CARD_STATUS.stand) return
 
-    if( ((statusObj.status === GAME_STATUS.USER_1_GUESS_MUST || statusObj.status === GAME_STATUS.USER_1_GUESS ) && user === 1 ) || 
-    ((statusObj.status === GAME_STATUS.USER_2_GUESS_MUST || statusObj.status === GAME_STATUS.USER_1_GUESS) && user === 2 )){
+    if((statusObj.status === GAME_STATUS.USER_1_GUESS && user === 1 ) || 
+    (statusObj.status === GAME_STATUS.USER_2_GUESS && user === 2 )){
 
       if(selectIndex !== myIndex && selected){
         setSelected(!selected)

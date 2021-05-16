@@ -271,54 +271,57 @@ export default function GameUI() {
           <></>
       }
 
-      {/* ask if continue window */}      
-      <Pane
-        elevation={2}
-        position="absolute"
-        top={50}
-        right={20}
-        width={240}
-        background="tint1"
-        borderRadius={10}
-        padding={10}
-        className={`
-            events-all
-             ${styles['game-continue-dialog']}`}
-        data-show={
-          (statusObj.status === GAME_STATUS.USER_1_CHOOSE && user === 1) || 
-              (statusObj.status === GAME_STATUS.USER_2_CHOOSE && user === 2)
-        }
-      >
-        <Heading textAlign="center">Do you want to guess another round?</Heading>
-        <Pane 
-          marginTop={18}
-          display="flex"
-          alignItems="center"
-          width='100%'
-          justifyContent="space-evenly"
-        >
-          <Button 
-            appearance="primary"
-            intent="success"
-            width="40%"
-            padding={5}
-            display="flex" alignItems="center" justifyContent="center"
-            onClick={continueHandler}
+      {/* ask if continue window */}    
+      {
+        (statusObj.status === GAME_STATUS.USER_1_CHOOSE && user === 1) || 
+        (statusObj.status === GAME_STATUS.USER_2_CHOOSE && user === 2)
+          ?
+          <Pane
+            elevation={2}
+            position="absolute"
+            top={50}
+            right={20}
+            width={240}
+            background="tint1"
+            borderRadius={10}
+            padding={10}
+            className={`
+              events-all
+              ${styles['game-continue-dialog']}`}
           >
-            Yes
-          </Button>
+            <Heading textAlign="center">Do you want to guess another round?</Heading>
+            <Pane 
+              marginTop={18}
+              display="flex"
+              alignItems="center"
+              width='100%'
+              justifyContent="space-evenly"
+            >
+              <Button 
+                appearance="primary"
+                intent="success"
+                width="40%"
+                padding={5}
+                display="flex" alignItems="center" justifyContent="center"
+                onClick={continueHandler}
+              >
+              Yes
+              </Button>
 
-          <Button 
-            padding={5}
-            width="40%"
-            display="flex" alignItems="center" justifyContent="center"
-            onClick={notContinueHandler}
-          >
-            No
-          </Button>
-        </Pane> 
-      </Pane>
-
+              <Button 
+                padding={5}
+                width="40%"
+                display="flex" alignItems="center" justifyContent="center"
+                onClick={notContinueHandler}
+              >
+              No
+              </Button>
+            </Pane> 
+          </Pane>
+          :
+          <></>
+      }  
+      
       {/* Loading overlay */}
       <Overlay 
         isShown={loading} 

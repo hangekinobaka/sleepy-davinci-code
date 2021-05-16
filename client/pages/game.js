@@ -36,7 +36,7 @@ export default function Game() {
   const myLine = useSelector(state => state.card.myLine)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const confirmUpdateLine = useSelector(state => state.card.confirmUpdateLine)
-  const globalStatus = useSelector(state => state.user.statusObj.status)
+  const statusObj = useSelector(state => state.user.statusObj)
   const user = useSelector(state => state.user.user)
   const socketClient = useSelector(state => state.user.socketClient)
   const opDraggingLine = useSelector(state => state.opponent.opDraggingLine)
@@ -49,9 +49,11 @@ export default function Game() {
 
   // Set game status based on the game turn
   useEffect(() => {
-    console.log(`status change ${globalStatus}`)
+    if(!statusObj) return
+    console.log(`status change ${statusObj.status}`)
+    console.log(statusObj.statusData)
     console.log(`user ${user}`)
-    switch(globalStatus){
+    switch(statusObj.status){
     case null:
       break
     case GAME_STATUS.USER_1_DRAW:
@@ -94,7 +96,7 @@ export default function Game() {
     default:
       break
     }
-  }, [globalStatus])
+  }, [statusObj])
 
   useEffect(()=>{
     dispatch(setWinW(window.innerWidth))
@@ -210,7 +212,7 @@ export default function Game() {
   useEffect(() => {
     if(myDraggingLine === null) return
     if(myDraggingLine.length !== 0) return
-    switch (globalStatus){
+    switch (statusObj.status){
     case GAME_STATUS.PUT_IN_LINE_INIT:
     case GAME_STATUS.USER_1_PUT_IN_LINE:
     case GAME_STATUS.USER_2_PUT_IN_LINE:

@@ -104,11 +104,11 @@ export default function GameUI() {
       else setGameInfo(GAME_INFO.makeDecisionNotification)
       break
     case GAME_STATUS.USER_1_PUT_IN_LINE:
-      if(user == 1) setGameInfo(GAME_INFO.putCardWhenWrongNotification)
+      if(user == 1) setGameInfo(GAME_INFO.putCardInfoGenerator(statusObj.statusData.isCorrect))
       else setGameInfo(GAME_INFO.waitOpPutNotification)
       break
     case GAME_STATUS.USER_2_PUT_IN_LINE:
-      if(user == 2) setGameInfo(GAME_INFO.putCardWhenWrongNotification)
+      if(user == 2) setGameInfo(GAME_INFO.putCardInfoGenerator(statusObj.statusData.isCorrect))
       else setGameInfo(GAME_INFO.waitOpPutNotification)
       break
     default:

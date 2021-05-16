@@ -17,10 +17,12 @@ export const GAME_INFO = {
   waitOpConfirmNotification: 'Opponent is confirming your guess. Please wait.',
   isCorrectNotification: 'Nice, you are correct!',
   makeDecisionNotification: 'Opponent is making decisions. Please wait.',
-  putCardWhenWrongNotification: 'Sorry, <span class="error">wrong guess</span>. Please put your card in line.', 
   waitOpPutNotification: 'Your opponent is inserting the card, please wait.',
   // functions
   confirmNumInfoGenerator: num => `
   <span>Your opponent thinks that this card is a</span> 
   <span class="highlight" style="margin-left: 8px;">${num}</span>`,
+  putCardInfoGenerator: isCorrect => isCorrect ? 
+    'Please put your card in line.' :
+    'Sorry, <span class="error">wrong guess</span>. Please put your card in line.', 
 }

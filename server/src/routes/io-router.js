@@ -263,7 +263,7 @@ module.exports = function(io){
         }
 
         // Check if the guessing is correct
-        const isCorrect = data.game.lines[opponent][index].num === number;
+        const isCorrect = data.game.lines[opponent][index].num == number;
 
         data.game.guessing_card = {
           number, 

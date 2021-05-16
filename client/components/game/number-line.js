@@ -107,7 +107,7 @@ export default function NumberLine(){
             }_l`]]}
             width={NUM_WIDTH}
             height={100}
-            data-num={index === WHITE_CARD_NUM - 1 ? 'J' : index+1}
+            data-num={index === WHITE_CARD_NUM - 1 ? 'J' : (index+1).toString()}
             position={numPositions[index]}
 
             interactive={

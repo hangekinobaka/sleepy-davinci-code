@@ -18,6 +18,7 @@ export const GAME_INFO = {
   isCorrectNotification: 'Nice, you are correct!',
   makeDecisionNotification: 'Opponent is making decisions. Please wait.',
   waitOpPutNotification: 'Your opponent is inserting the card, please wait.',
+  waitOpRestartNotification: 'Your opponent didn\'t restart yet, please wait.',
   // functions
   confirmNumInfoGenerator: num => `
   <span>Your opponent thinks that this card is a</span> 

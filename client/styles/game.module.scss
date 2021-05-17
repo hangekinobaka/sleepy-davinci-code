@@ -127,7 +127,7 @@
       @include background-image('end-win.png');
     }
     &-lose{
-      // @include background-image('end-lose.png');
+      @include background-image('end-lose.png');
     }
     &-content{
       text-align: center;

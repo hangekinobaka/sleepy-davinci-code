@@ -43,9 +43,20 @@ module.exports = function(io){
         case GAME_STATUS.USER_2_CHOOSE:
         case GAME_STATUS.USER_1_PUT_IN_LINE:
         case GAME_STATUS.USER_2_PUT_IN_LINE:
+          statusData = data.game.guessing_card;
+          break;
         case GAME_STATUS.USER_1_WIN:
         case GAME_STATUS.USER_2_WIN:
-          statusData = data.game.guessing_card;
+          statusData = {
+            ...data.game.guessing_card,
+            isWinning: data.game.isWinning
+          };
+          break;
+        case GAME_STATUS.USER_1_WAIT_RESTART:
+        case GAME_STATUS.USER_2_WAIT_RESTART:
+          statusData = {
+            isWinning: data.game.isWinning
+          };
           break;
         default:
           break;
@@ -216,7 +227,7 @@ module.exports = function(io){
         case GAME_STATUS.PUT_IN_LINE_INIT:
           if(data.game.draggingLines[opponent].length !== 0) break;
           else if(data.senTe === 1) status = GAME_STATUS.USER_1_DRAW;
-          else if(data.senTe === 2) status = GAME_STATUS.USER_2_DRAG;
+          else if(data.senTe === 2) status = GAME_STATUS.USER_2_DRAW;
           break;
         case GAME_STATUS.USER_1_PUT_IN_LINE:
           status = GAME_STATUS.USER_2_DRAW;
@@ -345,12 +356,14 @@ module.exports = function(io){
             };
 
             // Change sante
-            data.sanTe = data.sanTe === 1 ? 2 : 1;
+            data.senTe = data.senTe === 1 ? 2 : 1;
 
             if(user === 1){
+              data.game.isWinning = 2;
               data.status = GAME_STATUS.USER_2_WIN;
               data.score[2] += 1;
             }else{
+              data.game.isWinning = 1;
               data.status = GAME_STATUS.USER_1_WIN; 
               data.score[1] += 1;
             }
@@ -376,7 +389,8 @@ module.exports = function(io){
           status: data.status,
           statusData:{
             ...data.game.guessing_card,
-            score: data.score
+            score: data.score,
+            isWinning: data.game.isWinning
           }
         });
       }
@@ -448,8 +462,11 @@ module.exports = function(io){
         if(restart){
           // init data
           data.game = initData();
-
-          data.status = 0;
+          // set status to start
+          data.status = data.senTe === 1 ? GAME_STATUS.USER_1_DRAW_INIT : GAME_STATUS.USER_2_DRAW_INIT;
+        } else{
+          // set status to wait
+          data.status = user === 1 ? GAME_STATUS.USER_1_WAIT_RESTART : GAME_STATUS.USER_2_WAIT_RESTART;
         }
 
         // Save data
@@ -458,9 +475,22 @@ module.exports = function(io){
           JSON.stringify(data)
         );
 
+        if(restart){
+          io.to(_room).emit("init", {
+            wNum: data.game.wArr.length,
+            bNum: data.game.bArr.length,
+            line: [],
+            draggingLine: [],
+            opLine: [],
+            opDraggingLine: [],
+            score: data.score
+          });
+        } 
         io.to(_room).emit("status", {
           status: data.status,
-          statusData:data.game.guessing_card
+          statusData: {
+            isWinning: data.game.isWinning
+          }
         });
       }
       catch (error) {

@@ -67,7 +67,8 @@ const initData = () => {
     restart:{
       1: false,
       2: false
-    }
+    },
+    isWinning: null
   };
 };
 

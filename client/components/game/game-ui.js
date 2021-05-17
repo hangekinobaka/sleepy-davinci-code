@@ -71,11 +71,13 @@ export default function GameUI() {
       break
     case GAME_STATUS.USER_1_DRAW_INIT:
     case GAME_STATUS.USER_1_DRAW:
+      setShowEndWin(false)
       if(user == 1) setGameInfo(GAME_INFO.drawCardNotification)
       else setGameInfo(GAME_INFO.waitDrawNotification)
       break
     case GAME_STATUS.USER_2_DRAW_INIT:
     case GAME_STATUS.USER_2_DRAW:
+      setShowEndWin(false)
       if(user == 2) setGameInfo(GAME_INFO.drawCardNotification)
       else setGameInfo(GAME_INFO.waitDrawNotification)
       break
@@ -119,6 +121,26 @@ export default function GameUI() {
     case GAME_STATUS.USER_2_WIN:
       setShowEndWin(true)
       setGameInfo('')
+      break
+    case GAME_STATUS.USER_1_WAIT_RESTART:
+      if(user == 1){
+        setFullScreenInfoTitle(GAME_INFO.initTitle)
+        setFullScreenInfo(GAME_INFO.waitOpRestartNotification)
+        setFullScreenRoomInfo('')
+      }else{
+        setShowEndWin(true)
+        setGameInfo('')
+      }
+      break
+    case GAME_STATUS.USER_2_WAIT_RESTART:
+      if(user == 2){
+        setFullScreenInfoTitle(GAME_INFO.initTitle)
+        setFullScreenInfo(GAME_INFO.waitOpRestartNotification)
+        setFullScreenRoomInfo('')
+      }else{
+        setShowEndWin(true)
+        setGameInfo('')
+      }
       break
     default:
       break
@@ -182,6 +204,7 @@ export default function GameUI() {
   }
 
   const restartHandler = () => {
+    setShowEndWin(false)
     socketClient.restart()
   }
 
@@ -337,7 +360,7 @@ export default function GameUI() {
       }  
 
       {/* Game end window */}
-      { showEndWin ?
+      { showEndWin && statusObj.statusData ?
         <Portal>
           <Pane 
             className={styles['game-end-overlay']}
@@ -348,13 +371,10 @@ export default function GameUI() {
               className={[
                 styles['game-end-box'],
                 
-                (statusObj.status === GAME_STATUS.USER_1_WIN && user === 1) ||
-                (statusObj.status === GAME_STATUS.USER_2_WIN && user === 2) ?
-                  styles['game-end-win'] : '',
-
-                (statusObj.status === GAME_STATUS.USER_1_WIN && user === 2) ||
-                (statusObj.status === GAME_STATUS.USER_2_WIN && user === 1) ?
-                  styles['game-end-lose'] : '',
+                (statusObj.statusData.isWinning ===  user) ? 
+                  styles['game-end-win'] 
+                  : 
+                  styles['game-end-lose'],
               ]}
             >
               <Pane
@@ -433,6 +453,8 @@ export default function GameUI() {
           || statusObj.status === null
           || statusObj.status === GAME_STATUS.USER_LEFT
           || statusObj.status === GAME_STATUS.USER_EXIT
+          || (statusObj.status === GAME_STATUS.USER_1_WAIT_RESTART && user === 1)
+          || (statusObj.status === GAME_STATUS.USER_2_WAIT_RESTART && user === 2)
         )}
         title={fullScreenInfoTitle}
         hasFooter={false}
@@ -444,7 +466,7 @@ export default function GameUI() {
         <Button appearance="primary"
           className={styles['game-exit-fullscreen']}
           onClick={sendExit}
-          padding={5}
+          padding={7}
           display="flex" alignItems="center" justifyContent="center"
           marginTop={10}
           marginRight={10}

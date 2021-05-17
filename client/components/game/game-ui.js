@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
 import { Pane, Spinner, Overlay, toaster, Dialog, Button, 
-  LogOutIcon, Icon, TickIcon, Heading, Portal } from 'evergreen-ui'
+  LogOutIcon, TickIcon, Heading, Portal, ResetIcon } from 'evergreen-ui'
 import { setShowConfirmBtn } from 'redux/ui/actions'
 
 import api from 'utils/api'
@@ -179,6 +179,10 @@ export default function GameUI() {
 
   const notContinueHandler = () => {
     socketClient.continue(false)
+  }
+
+  const restartHandler = () => {
+    socketClient.restart()
   }
 
   return (
@@ -381,8 +385,10 @@ export default function GameUI() {
                     width="40%"
                     padding={5}
                     display="flex" alignItems="center" justifyContent="center"
+                    iconAfter={ResetIcon}
+                    onClick={restartHandler}
                   >
-                  Continue
+                  Restart
                   </Button>
 
                   <Button 

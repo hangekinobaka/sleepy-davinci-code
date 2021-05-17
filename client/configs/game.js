@@ -6,8 +6,9 @@ export const CARD_STATUS = {
   draw: 1,
   dragable: 2,
   stand:3,
-  lay:4,
-  disabled: 5
+  standShow:4,
+  lay:5,
+  disabled: 6
 }
 
 export const WHITE_CARD_NUM = 12
@@ -15,16 +16,15 @@ export const BLACK_CARD_NUM = 12
 
 export const CARD_WIDTH = 180
 export const CARD_HEIGHT = 252
-export const CARD_WIDTH_LAY = 250
-export const CARD_HEIGHT_LAY = 200
+export const CARD_HEIGHT_LAY = 150
 
 export const LINE_X = 120
 export const LINE_Y = DESIGN_HEIGHT - 160
 export const LINE_WIDTH = CARD_WIDTH * 12 + 20
 export const LINE_HEIGHT = 140
 
-export const OP_LINE_X = 500
-export const OP_LINE_Y = 270
+export const OP_LINE_X = 530
+export const OP_LINE_Y = 250
 
 export const CARD_PILE = {
   CARD_MARGIN_BETWWEN: 800
@@ -89,10 +89,10 @@ export const GAME_STATUS = {
   USER_2_PUT_IN_LINE: 4,
   USER_1_DRAW: 5,
   USER_2_DRAW: 6,
-  USER_1_GUESS_MUST: 7,
-  USER_2_GUESS_MUST: 8,
-  USER_1_GUESS: 9,
-  USER_2_GUESS: 10,
+  USER_1_GUESS: 7,
+  USER_2_GUESS: 8,
+  USER_1_CHOOSE: 9,
+  USER_2_CHOOSE: 10,
   USER_1_ANSWER: 11,
   USER_2_ANSWER: 12,
   USER_1_DRAG: 13,

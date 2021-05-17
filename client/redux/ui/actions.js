@@ -2,13 +2,17 @@ export const SHOW_CONFIRMA_BTN_ALTER = 'SHOW_CONFIRMA_BTN_ALTER'
 export const RESET = 'RESET'
 
 export const initialState = {
-  showConfirmBtn: false,
+  showConfirmBtn: {
+    show: false,
+    type: null
+  },
   
 }
-export const setShowConfirmBtn = show => ({
+export const setShowConfirmBtn = (show, type=null) => ({
   type: SHOW_CONFIRMA_BTN_ALTER,
   payload:{
-    show
+    show,
+    type
   }
 })
 export const resetUi = () => ({
@@ -20,7 +24,10 @@ export const reducer = (state = initialState, action) => {
   case SHOW_CONFIRMA_BTN_ALTER:
     return {
       ...state,
-      showConfirmBtn: action.payload.show
+      showConfirmBtn: {
+        show: action.payload.show,
+        type: action.payload.type
+      }
     }
   case RESET:
     return {

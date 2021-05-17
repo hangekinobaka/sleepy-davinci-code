@@ -5,16 +5,17 @@ import { io } from 'socket.io-client'
 import { Pane, Spinner } from 'evergreen-ui'
 import { setWinW, setWinH } from 'redux/win/actions'
 import { setDrawingNum, setCardNumW, setCardNumB, setIsInteractive, 
-  setCanDrawCard, setMyLine, resetAll, setMyDarggingLine, setDisableDrag } from 'redux/card/actions'
+  setCanDrawCard, setMyLine, resetAll, setMyDraggingLine, setDisableDrag } from 'redux/card/actions'
 import { setUser, setUsername , setRoom, setGlobalStatus, resetUser, setSocketClient,
   setScore} from 'redux/user/actions'
 import { setShowConfirmBtn, resetUi } from 'redux/ui/actions'
-import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine, setDisableSelect,
-  setOpDarggingLineTemp, setOpUsername } from 'redux/opponent/actions'
+import { resetOp, setOpDrawingCardColor, setOpLine, setOpDarggingLine, setDisableSelect, 
+  setOpUsername, setSelectIndex } from 'redux/opponent/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import { API_STATUS } from 'configs/variables'
 import { GAME_STATUS } from 'configs/game'
+import { CONFIRM_TYPE } from 'configs/ui'
 import api from 'utils/api'
 import SocketClient from 'utils/io'
 import GameLayout from 'layouts/game-layout'
@@ -35,12 +36,11 @@ export default function Game() {
   const myLine = useSelector(state => state.card.myLine)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const confirmUpdateLine = useSelector(state => state.card.confirmUpdateLine)
-  const globalStatus = useSelector(state => state.user.status)
+  const statusObj = useSelector(state => state.user.statusObj)
   const user = useSelector(state => state.user.user)
   const socketClient = useSelector(state => state.user.socketClient)
   const opDraggingLine = useSelector(state => state.opponent.opDraggingLine)
   const opLine = useSelector(state => state.opponent.opLine)
-  const opDraggingLineTemp = useSelector(state => state.opponent.opDraggingLineTemp)
   const dispatch = useDispatch()
 
   const router = useRouter()
@@ -49,9 +49,11 @@ export default function Game() {
 
   // Set game status based on the game turn
   useEffect(() => {
-    console.log(`status change ${globalStatus}`)
+    if(!statusObj) return
+    console.log(`status change ${statusObj.status}`)
+    console.log(statusObj.statusData)
     console.log(`user ${user}`)
-    switch(globalStatus){
+    switch(statusObj.status){
     case null:
       break
     case GAME_STATUS.USER_1_DRAW:
@@ -67,16 +69,34 @@ export default function Game() {
     case GAME_STATUS.PUT_IN_LINE_INIT:
       dispatch(setDisableDrag(false))
       break
-    case GAME_STATUS.USER_1_GUESS_MUST:
+    case GAME_STATUS.USER_1_PUT_IN_LINE:
+      if(user == 1) dispatch(setDisableDrag(false))
+      break
+    case GAME_STATUS.USER_2_PUT_IN_LINE:
+      if(user == 2) dispatch(setDisableDrag(false))
+      break
+    case GAME_STATUS.USER_1_GUESS:
       if(user == 1) dispatch(setDisableSelect(false))
       break
-    case GAME_STATUS.USER_2_GUESS_MUST:
+    case GAME_STATUS.USER_2_GUESS:
       if(user == 2) dispatch(setDisableSelect(false))
+      break
+    case GAME_STATUS.USER_1_ANSWER:
+      if(user == 2){ 
+        dispatch(setDisableSelect(true))
+        dispatch(setSelectIndex(null))
+      }
+      break
+    case GAME_STATUS.USER_2_ANSWER:
+      if(user == 1) {
+        dispatch(setDisableSelect(true))
+        dispatch(setSelectIndex(null))
+      }
       break
     default:
       break
     }
-  }, [globalStatus])
+  }, [statusObj])
 
   useEffect(()=>{
     dispatch(setWinW(window.innerWidth))
@@ -95,7 +115,13 @@ export default function Game() {
   },[])
 
   useEffect(async () => {
-    const data = await sendInit()
+    let data
+    try{
+      data = await sendInit()
+      
+    }catch (err){
+      console.error(err)
+    }
     if(!data) return
     const {room_code, room_num, user_num } = data
     const username = data.user_num === 1 ? data.user_1.username : data.user_2.username
@@ -120,19 +146,17 @@ export default function Game() {
       console.log('run init')
       console.log(initData)
       dispatch(setMyLine(initData.line))
-      dispatch(setMyDarggingLine(initData.drawingLine))
+      dispatch(setMyDraggingLine(initData.draggingLine))
       dispatch(setIsInteractive(true))
       dispatch(setScore(initData.score))
 
       // Opponent data
       dispatch(setOpLine(initData.opLine))
-      dispatch(setOpDarggingLine(initData.opDrawingLine))
-      dispatch(setOpDarggingLineTemp(initData.opDrawingLine))
+      dispatch(setOpDarggingLine(initData.opDraggingLine))
 
       // Game data
       dispatch(setCardNumW(initData.wNum))
       dispatch(setCardNumB(initData.bNum))
-      dispatch(setGlobalStatus(initData.status))
     })
 
     // Receive opponent username
@@ -152,8 +176,8 @@ export default function Game() {
     })
 
     // Receive the gaem status change
-    sc.status(status => {
-      dispatch(setGlobalStatus(status))
+    sc.status(res => {
+      dispatch(setGlobalStatus(res))
     })
 
     // Receive opponent card
@@ -163,7 +187,9 @@ export default function Game() {
 
     // Receive opponent line update
     sc.opUpdateLine(({newLine}) => {
+      if(newLine === null || newLine.length === 0 ) return
       dispatch(setOpLine(newLine))
+      dispatch(setOpDarggingLine([]))
     })
 
     dispatch(setSocketClient(sc))
@@ -186,20 +212,16 @@ export default function Game() {
   useEffect(() => {
     if(myDraggingLine === null) return
     if(myDraggingLine.length !== 0) return
-    switch (globalStatus){
+    switch (statusObj.status){
     case GAME_STATUS.PUT_IN_LINE_INIT:
-      dispatch(setShowConfirmBtn(true))
+    case GAME_STATUS.USER_1_PUT_IN_LINE:
+    case GAME_STATUS.USER_2_PUT_IN_LINE:
+      dispatch(setShowConfirmBtn(true, CONFIRM_TYPE.LINE_UPDATE))
       break
     default:
       break
     }
   }, [myDraggingLine])
-
-  // Handle the receive opponent line side effect
-  useEffect(() => {
-    if(opDraggingLine === null || opDraggingLine.length === 0 || opLine === null || opLine.length === 0) return
-    dispatch(setOpDarggingLine([]))
-  }, [opLine, opDraggingLine])
 
   // methods
   const sendInit = async () => {

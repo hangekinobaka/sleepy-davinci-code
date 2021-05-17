@@ -20,8 +20,8 @@ export default function SocketClient(socket){
   }
 
   this.status = (callback)=>{
-    this.socket.on('status', ({status}) => {
-      callback(status)
+    this.socket.on('status', (res) => {
+      callback(res)
     })
   }
 
@@ -80,8 +80,32 @@ export default function SocketClient(socket){
   }
 
   this.updateLineRes = (callback) => {
-    this.socket.on('updateLineRes', ({res}) => {
+    this.socket.on('updateLineRes', (res) => {
       callback(res)
+    })
+  }
+
+  this.submitSelection = (number, index) => {
+    this.socket.emit('submitSelection', {number, index}, (error) => {
+      if(error) {
+        console.error(error)
+      }
+    })
+  }
+
+  this.iSee = () => {
+    this.socket.emit('iSee', (error) => {
+      if(error) {
+        console.error(error)
+      }
+    })
+  }
+
+  this.continue = isContinue => {
+    this.socket.emit('continue', {isContinue}, (error) => {
+      if(error) {
+        console.error(error)
+      }
     })
   }
 

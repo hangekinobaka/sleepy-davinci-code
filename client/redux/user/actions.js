@@ -12,12 +12,13 @@ export const initialState = {
   room_num: 0,
   room_code: '',
   /**
-   * 1 for user1 draw, 
-   * 2 for user2 draw, 
-   * 
    * null for not satrt yet
+   * some status comes with complementary data [statusData]
    */
-  status: null,
+  statusObj: {
+    status: null,
+    statusData: null
+  },
   socketClient: null,
   score: null
 }
@@ -40,10 +41,10 @@ export const setRoom = ({room_num, room_code}) => ({
     room_code
   }
 })
-export const setGlobalStatus = status => ({
+export const setGlobalStatus = statusObj => ({
   type: STATUS_ALTER,
   payload:{
-    status
+    statusObj
   }
 })
 export const setSocketClient = sc => ({
@@ -83,7 +84,7 @@ export const reducer = (state = initialState, action) => {
   case STATUS_ALTER:
     return {
       ...state,
-      status: action.payload.status
+      statusObj: {...action.payload.statusObj}
     }
   case SOCKET_ALTER:
     return {

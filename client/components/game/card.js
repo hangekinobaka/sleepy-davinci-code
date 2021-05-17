@@ -1,14 +1,15 @@
 import { useEffect, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Sprite } from '@inlet/react-pixi'
-import { CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH_LAY, CARD_HEIGHT_LAY, 
+import { CARD_WIDTH, CARD_HEIGHT, CARD_HEIGHT_LAY, 
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
-  LINE_X, LINE_Y } from 'configs/game'
+  LINE_X, LINE_Y, GAME_STATUS } from 'configs/game'
 import { setIsDrawing, setIsDragging, setIsInteractive, 
-  setInsertPlace, setMyDarggingLine } from 'redux/card/actions'
+  setInsertPlace, setMyDraggingLine } from 'redux/card/actions'
 import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
 
+const SCALE_CARD_HIGHLIGHT = 1.1
 let isDraggingLocal = false
 export default function Card({cardTextures, id}){
   // Stores
@@ -22,6 +23,8 @@ export default function Card({cardTextures, id}){
   const socketClient = useSelector(state => state.user.socketClient)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const disableDrag = useSelector(state => state.card.disableDrag)
+  const statusObj = useSelector(state => state.user.statusObj)
+  const user = useSelector(state => state.user.user)
   const dispatch = useDispatch()
   // States
   const [cardPosition, setCardPosition] = useState({x: 0, y: 0})
@@ -37,6 +40,9 @@ export default function Card({cardTextures, id}){
   const [myIndex, setMyIndex] = useState(null)
   const [cardInit, setCardInit] = useState(false)
   const [dragIndex, setDragIndex] = useState(null)
+  const [highlighted, setHighlighted] = useState(false)
+  const [myRevealed, setMyRevealed] = useState(false)
+
 
   const me = useRef()
 
@@ -47,14 +53,28 @@ export default function Card({cardTextures, id}){
     // If yes means this card is an init stand card, directly go to the line
     for(let i = 0; i < myLine.length; i++ ){
       if(myId === myLine[i].id){
-        const { num, color } = myLine[i]
+        const { num, color, revealed } = myLine[i]
         positionByIndex(i)
         setMyIndex(i)
         setCardTexture(cardTextures.stand[color])
         addNumber(color, num)
         setMyColor(color)
         setMyNumber(num) 
-        setCardStatus(CARD_STATUS.stand)  
+        setMyRevealed(revealed)
+        if(revealed){
+          setCardStatus(CARD_STATUS.lay)
+        }else{
+          setCardStatus(CARD_STATUS.stand)  
+          // Check if I am the guessing card
+          // If yes highlight the card
+          if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 1) || 
+          statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 2){
+            if(statusObj.statusData.index === i){
+              setHighlighted(true)
+            }
+          }
+        }
+        
         return setCardInit(true)  
       }
     }    
@@ -81,10 +101,6 @@ export default function Card({cardTextures, id}){
   }, [myLine, myDraggingLine])
 
   useEffect(() => {
-    statusHandler()
-  },[cardStatus, drawingNum])
-
-  useEffect(() => {
     if(dragResult === null || cardStatus !== CARD_STATUS.dragable || myId !== window.glDraggingId) return
 
     // Insert card success
@@ -98,7 +114,7 @@ export default function Card({cardTextures, id}){
       const index = myId - myLine.length - 1
       const newLine = [...myDraggingLine]
       newLine.splice(index, 1)
-      dispatch(setMyDarggingLine(newLine))
+      dispatch(setMyDraggingLine(newLine))
 
       dispatch(setInsertPlace(null))
     }else{
@@ -108,7 +124,7 @@ export default function Card({cardTextures, id}){
 
   useEffect(() => {
     if(myLine === null || myIndex === null) return
-    if(cardStatus === CARD_STATUS.stand &&
+    if((cardStatus === CARD_STATUS.stand || cardStatus === CARD_STATUS.lay) &&
       myLine[myIndex].id !== myId){
       positionByIndex(myIndex+1)
       setMyIndex(myIndex+1)
@@ -119,12 +135,12 @@ export default function Card({cardTextures, id}){
     if(cardStatus !== CARD_STATUS.stand && cardStatus !== CARD_STATUS.lay && myIndex === null) return
     
     if(insertPlace === null){
-      positionByIndex(myIndex)
+      positionByIndex(myIndex, cardStatus === CARD_STATUS.lay)
       return
     }
 
     if(insertPlace <= myIndex){
-      positionByIndex(myIndex+1)
+      positionByIndex(myIndex+1, cardStatus === CARD_STATUS.lay)
     }
 
   }, [insertPlace])
@@ -136,16 +152,45 @@ export default function Card({cardTextures, id}){
     setDisplayMe(true)
   }, [myNumber, myColor, myId])
 
+  useEffect(() => {
+    if(myColor === null) return
+
+    if(highlighted){
+      setCardTexture(cardTextures.select[myColor])
+      setCardWidth(CARD_WIDTH*SCALE_CARD_HIGHLIGHT)
+      setCardHeight(CARD_HEIGHT*SCALE_CARD_HIGHLIGHT)
+      return
+    }else{
+      setCardTexture(cardTextures.stand[myColor])
+      setCardWidth(CARD_WIDTH)
+      setCardHeight(CARD_HEIGHT)
+    }
+  }, [highlighted, myColor])
+
+  useEffect(() => {
+    statusHandler()
+  },[cardStatus, drawingNum, statusObj, myRevealed])
+
   // Methods
   const statusHandler = () => {
     if(cardStatus === null) return
+    // pos init
     let pos = { x: 0, y: 0 }
+
     switch (cardStatus){
     case CARD_STATUS.dragable:
       dispatch(setIsDrawing(false))
+
+      // If it is under the PUT_IN_LINE status
+      if((statusObj.status === GAME_STATUS.USER_1_PUT_IN_LINE && user === 1) || 
+      statusObj.status === GAME_STATUS.USER_2_PUT_IN_LINE && user === 2){
+        setMyRevealed(!statusObj.statusData.isCorrect)
+      }
+
       break
     case CARD_STATUS.draw:
       if(!drawingNum) return
+      
       if(drawingCardColor === 'w'){
         pos = {
           x: (DESIGN_WIDTH-CARD_PILE.CARD_MARGIN_BETWWEN)/2 + 100, y: DESIGN_HEIGHT/2 - 60
@@ -165,6 +210,39 @@ export default function Card({cardTextures, id}){
       setCardPosition(pos)
       break
     case CARD_STATUS.stand:
+      // Check if i am a revealed card, if yes, put me down
+      if(myRevealed){
+        setCardStatus(CARD_STATUS.lay)
+        return
+      }
+
+      // If it is under the ANSWER status
+      if((statusObj.status === GAME_STATUS.USER_1_ANSWER && user === 1) || 
+        statusObj.status === GAME_STATUS.USER_2_ANSWER && user === 2){
+        // Check if I am the guessing card
+        // If yes highlight the card
+        if(statusObj.statusData.index === myIndex){
+          setHighlighted(true)
+        }
+      }else{
+        // cancel the highlight
+        setHighlighted(false)
+      }
+
+      // If it is under the second or more GUESS status
+      if((statusObj.status === GAME_STATUS.USER_1_CHOOSE && user === 2) || 
+        statusObj.status === GAME_STATUS.USER_2_CHOOSE && user === 1){
+        // Check if I am the guessing card
+        // If yes, double check if the guess is correct( normally yes ),
+        // if yes, put me down 
+        if(statusObj.statusData.index === myIndex && statusObj.statusData.isCorrect){
+          setMyRevealed(true)
+        }
+      }
+      break
+    case CARD_STATUS.lay:
+      putDownCard(myColor, myNumber)
+      positionByIndex(myIndex, true)
       break
     case CARD_STATUS.none:
     default: 
@@ -202,7 +280,7 @@ export default function Card({cardTextures, id}){
     // Add the card to the waiting line
     const newLine = [...myDraggingLine]
     newLine.push({num: drawingNum, drawingCardColor})
-    dispatch(setMyDarggingLine(newLine))
+    dispatch(setMyDraggingLine(newLine))
   }
 
   // Set drag status
@@ -224,23 +302,31 @@ export default function Card({cardTextures, id}){
 
     const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${color}${number}_s`]])
     sprite.width = cardWidth / 2
-    sprite.height = CARD_HEIGHT / 2
+    sprite.height = cardHeight / 2
     sprite.anchor.set(0.5)
     setNumSprite(sprite)
     me.current.addChild(sprite)
   }
 
   // Make the card lay down 
-  const putDownCard = () => {
-    if(!myColor || !myNumber) return
+  const putDownCard = (color, number) => {
+    if(!myColor || !myNumber || cardTexture === cardTextures.lay[myColor]) return
     // Set card texture
     setCardTexture(cardTextures.lay[myColor])
-    setCardWidth(CARD_WIDTH_LAY)
     setCardHeight(CARD_HEIGHT_LAY)
     // Set number texture
-    numSprite.texture = numSheetTextures[NUM_SHEET_MAP[`${myColor}${myNumber}_l`]]
-    numSprite.width = CARD_WIDTH_LAY / 2
-    numSprite.height = CARD_HEIGHT_LAY / 2
+    if(!numSprite) {
+      const sprite =  PIXI.Sprite.from(numSheetTextures[NUM_SHEET_MAP[`${color}${number}_l`]])
+      sprite.width = cardWidth / 2
+      sprite.height = CARD_HEIGHT_LAY / 2
+      sprite.anchor.set(0.5)
+      setNumSprite(sprite)
+      me.current.addChild(sprite)
+    }else{
+      numSprite.texture = numSheetTextures[NUM_SHEET_MAP[`${color}${number}_l`]]
+      numSprite.width = cardWidth / 2
+      numSprite.height = CARD_HEIGHT_LAY / 2
+    }
   }
 
   // Card drag handlers
@@ -272,10 +358,10 @@ export default function Card({cardTextures, id}){
   }
 
   // Positioning by index
-  const positionByIndex = index => {
+  const positionByIndex = (index, isLay=false) => {
     setCardPosition({
       x: LINE_X + cardWidth/2 + index * cardWidth + 2, 
-      y: LINE_Y
+      y: isLay ? LINE_Y + CARD_HEIGHT_LAY / 4 + 12 : LINE_Y
     })
   }
 

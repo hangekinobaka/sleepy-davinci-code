@@ -43,10 +43,10 @@
     color: #fff;
     font-size: 20px;
     position: absolute;
-    top: 6%;
+    top: 3%;
     left: 50%;
     transform: translate(-50%, 0);
-    width: 55%;
+    max-width: 55%;
     text-align: center;
   }
 
@@ -61,9 +61,14 @@
       }
     }
     &-confirm{
-      @include data-show; 
       position: absolute;
-      top: 55%;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    &-isee{
+      position: absolute;
+      top: 60%;
       left: 50%;
       transform: translate(-50%, -50%);
     }
@@ -75,6 +80,21 @@
       top: 0;
       right: 0;
     }
+  }
+
+  &-continue-dialog{
+    animation: fadein 0.8s;
+  }
+
+  @keyframes fadein {
+    from { 
+      transform: translateY(30%);
+      opacity: 0; 
+    }
+    to   { 
+      transform: translateY(0);
+      opacity: 1;
+    }      
   }
 
 }

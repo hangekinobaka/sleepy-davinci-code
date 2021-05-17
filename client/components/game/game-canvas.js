@@ -33,7 +33,7 @@ export default function GameCanvas() {
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
   const cardNumW = useSelector(state => state.card.cardNumW)
   const cardNumB = useSelector(state => state.card.cardNumB)
-  const globalStatus = useSelector(state => state.user.status)
+  const globalStatus = useSelector(state => state.user.statusObj.status)
   const user = useSelector(state => state.user.user)
   const opLine = useSelector(state => state.opponent.opLine)
   const opDraggingLine = useSelector(state => state.opponent.opDraggingLine)
@@ -57,6 +57,20 @@ export default function GameCanvas() {
 
   // Refs
   const isMounted = useRef(false)
+
+  // card amount init
+  useEffect(() => {
+    if(cardInit || myLine === null || myDraggingLine === null || opLine === null || opDraggingLine === null) return
+    // if my line number not fit the local card count, meaning that it is an init state
+    if(myCardNum < myLine.length + myDraggingLine.length){
+      setMyCardNum(myLine.length + myDraggingLine.length)
+    }
+    if(opCardNum < opLine.length + opDraggingLine.length){
+      setOpCardNum(opLine.length + opDraggingLine.length)
+    }
+    setCardInit(true)
+  }, [myLine, myDraggingLine, opLine, opDraggingLine])
+
 
   // Setup app initialization
   useEffect(()=>{
@@ -85,8 +99,9 @@ export default function GameCanvas() {
     }
   },[])
 
+  // When a card is draw by one player, handle the cards modification
   useEffect(() => {
-    if(cardNumW + cardNumB === WHITE_CARD_NUM + BLACK_CARD_NUM) return
+    if(!cardInit || cardNumW + cardNumB === WHITE_CARD_NUM + BLACK_CARD_NUM) return
 
     const cardOnUse = WHITE_CARD_NUM + BLACK_CARD_NUM - (cardNumW + cardNumB)
     if(cardOnUse === myCardNum + opCardNum) return
@@ -105,19 +120,7 @@ export default function GameCanvas() {
     default:
       break
     }
-  }, [cardNumW, cardNumB])
-
-  useEffect(() => {
-    if(cardInit || myLine === null || myDraggingLine === null || opLine === null || opDraggingLine === null) return
-    // if my line number not fit the local card count, meaning that it is an init state
-    if(myCardNum < myLine.length + myDraggingLine.length){
-      setMyCardNum(myLine.length + myDraggingLine.length)
-    }
-    if(opCardNum < opLine.length + opDraggingLine.length){
-      setOpCardNum(opLine.length + opDraggingLine.length)
-    }
-    setCardInit(true)
-  }, [myLine, myDraggingLine, opLine, opDraggingLine])
+  }, [cardNumW, cardNumB, cardInit])
 
   // Methods
   const textureLoader = ()=>{

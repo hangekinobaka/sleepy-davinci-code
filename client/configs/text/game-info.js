@@ -26,12 +26,15 @@ export const GAME_INFO = {
     'Please put your card in line.' :
     'Sorry, <span class="error">wrong guess</span>. Please put your card in line.', 
   waitGuessInfoGenerator: statusData => {
-    switch(statusData.isCorrect){
-    case false:
-      return 'Sorry, <span class="error">wrong guess</span>. Opponent is guessing your card. Please wait.'
-    case true:
-    default:
-      return 'Opponent is guessing your card. Please wait.'
+    if(statusData){
+      switch(statusData.isCorrect){
+      case false:
+        return 'Sorry, <span class="error">wrong guess</span>. Opponent is guessing your card. Please wait.'
+      case true:
+      default:
+        return 'Opponent is guessing your card. Please wait.'
+      }
     }
+    return 'Opponent is guessing your card. Please wait.'
   }  
 }

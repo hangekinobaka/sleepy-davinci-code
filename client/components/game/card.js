@@ -135,12 +135,12 @@ export default function Card({cardTextures, id}){
     if(cardStatus !== CARD_STATUS.stand && cardStatus !== CARD_STATUS.lay && myIndex === null) return
     
     if(insertPlace === null){
-      positionByIndex(myIndex)
+      positionByIndex(myIndex, cardStatus === CARD_STATUS.lay)
       return
     }
 
     if(insertPlace <= myIndex){
-      positionByIndex(myIndex+1)
+      positionByIndex(myIndex+1, cardStatus === CARD_STATUS.lay)
     }
 
   }, [insertPlace])
@@ -310,7 +310,7 @@ export default function Card({cardTextures, id}){
 
   // Make the card lay down 
   const putDownCard = (color, number) => {
-    if(!myColor || !myNumber) return
+    if(!myColor || !myNumber || cardTexture === cardTextures.lay[myColor]) return
     // Set card texture
     setCardTexture(cardTextures.lay[myColor])
     setCardHeight(CARD_HEIGHT_LAY)

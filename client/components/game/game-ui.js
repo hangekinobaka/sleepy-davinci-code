@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useRouter } from 'next/router'
 import { Pane, Spinner, Overlay, toaster, Dialog, Button, 
-  LogOutIcon, Icon, TickIcon, Heading } from 'evergreen-ui'
+  LogOutIcon, TickIcon, Heading, Portal, ResetIcon } from 'evergreen-ui'
 import { setShowConfirmBtn } from 'redux/ui/actions'
 
 import api from 'utils/api'
@@ -20,6 +20,8 @@ const userFontArr = {
 
 export default function GameUI() {
   // Stores
+  const w = useSelector(state => state.win.w)
+  const canvasHeight = useSelector(state => state.win.canvasHeight)
   const username = useSelector(state => state.user.username)
   const user = useSelector(state => state.user.user)
   const room_code = useSelector(state => state.user.room_code)
@@ -40,6 +42,7 @@ export default function GameUI() {
   const [fullScreenInfo, setFullScreenInfo] = useState('')
   const [fullScreenInfoTitle, setFullScreenInfoTitle] = useState('')
   const [fullScreenRoomInfo, setFullScreenRoomInfo] = useState('')
+  const [showEndWin, setShowEndWin] = useState(false)
 
   const router = useRouter()
 
@@ -68,11 +71,13 @@ export default function GameUI() {
       break
     case GAME_STATUS.USER_1_DRAW_INIT:
     case GAME_STATUS.USER_1_DRAW:
+      setShowEndWin(false)
       if(user == 1) setGameInfo(GAME_INFO.drawCardNotification)
       else setGameInfo(GAME_INFO.waitDrawNotification)
       break
     case GAME_STATUS.USER_2_DRAW_INIT:
     case GAME_STATUS.USER_2_DRAW:
+      setShowEndWin(false)
       if(user == 2) setGameInfo(GAME_INFO.drawCardNotification)
       else setGameInfo(GAME_INFO.waitDrawNotification)
       break
@@ -82,11 +87,11 @@ export default function GameUI() {
       break
     case GAME_STATUS.USER_1_GUESS:
       if(user == 1) setGameInfo(GAME_INFO.guessCardNotification)
-      else setGameInfo(GAME_INFO.waitGuessNotification)
+      else setGameInfo(GAME_INFO.waitGuessInfoGenerator(statusObj.statusData))
       break
     case GAME_STATUS.USER_2_GUESS:
       if(user == 2) setGameInfo(GAME_INFO.guessCardNotification)
-      else setGameInfo(GAME_INFO.waitGuessNotification)
+      else setGameInfo(GAME_INFO.waitGuessInfoGenerator(statusObj.statusData))
       break
     case GAME_STATUS.USER_1_ANSWER:
       if(user == 2) setGameInfo(GAME_INFO.waitOpConfirmNotification)
@@ -111,6 +116,31 @@ export default function GameUI() {
     case GAME_STATUS.USER_2_PUT_IN_LINE:
       if(user == 2) setGameInfo(GAME_INFO.putCardInfoGenerator(statusObj.statusData.isCorrect))
       else setGameInfo(GAME_INFO.waitOpPutNotification)
+      break
+    case GAME_STATUS.USER_1_WIN:
+    case GAME_STATUS.USER_2_WIN:
+      setShowEndWin(true)
+      setGameInfo('')
+      break
+    case GAME_STATUS.USER_1_WAIT_RESTART:
+      if(user == 1){
+        setFullScreenInfoTitle(GAME_INFO.initTitle)
+        setFullScreenInfo(GAME_INFO.waitOpRestartNotification)
+        setFullScreenRoomInfo('')
+      }else{
+        setShowEndWin(true)
+        setGameInfo('')
+      }
+      break
+    case GAME_STATUS.USER_2_WAIT_RESTART:
+      if(user == 2){
+        setFullScreenInfoTitle(GAME_INFO.initTitle)
+        setFullScreenInfo(GAME_INFO.waitOpRestartNotification)
+        setFullScreenRoomInfo('')
+      }else{
+        setShowEndWin(true)
+        setGameInfo('')
+      }
       break
     default:
       break
@@ -173,6 +203,11 @@ export default function GameUI() {
     socketClient.continue(false)
   }
 
+  const restartHandler = () => {
+    setShowEndWin(false)
+    socketClient.restart()
+  }
+
   return (
     <Pane className={[styles['game-ui'], 'events-none']} >
       {/* Menu board */}
@@ -183,6 +218,7 @@ export default function GameUI() {
           && statusObj.status !== null 
           && statusObj.status !== GAME_STATUS.USER_LEFT
           && statusObj.status !== GAME_STATUS.USER_EXIT
+          && !showEndWin
         }
         paddingTop={30}
         paddingLeft={20}
@@ -196,14 +232,15 @@ export default function GameUI() {
           <Button 
             className={`events-all ${styles['game-btn-exit']}`}
             onClick={sendExit}
-            padding={5}
+            padding={8}
+            fontSize={10}
             display="flex" alignItems="center" justifyContent="center"
+            iconAfter={LogOutIcon}
           >
             <span
               className={styles['game-btn-exit-text']}>
               exit 
             </span>
-            <Icon icon={LogOutIcon} marginLeft={4} size={12} />
           </Button>
           {/* room number text */}
           <span
@@ -321,6 +358,79 @@ export default function GameUI() {
           :
           <></>
       }  
+
+      {/* Game end window */}
+      { showEndWin && statusObj.statusData ?
+        <Portal>
+          <Pane 
+            className={styles['game-end-overlay']}
+          >
+            <Pane
+              width={w}
+              height={canvasHeight}
+              className={[
+                styles['game-end-box'],
+                
+                (statusObj.statusData.isWinning ===  user) ? 
+                  styles['game-end-win'] 
+                  : 
+                  styles['game-end-lose'],
+              ]}
+            >
+              <Pane
+                className={styles['game-end-content']}
+              > 
+                <p
+                  className={`${styles['game-end-text']}`}
+                >
+                  {username} VS {opUsername}
+                </p>
+
+                <p
+                  className={`${styles['game-end-text']}`} 
+                >
+                  {score === null ? '' : `${score[user]} : ${score[user===1?2:1]}`}
+                </p>
+
+                <Pane 
+                  display="flex"
+                  alignItems="center"
+                  width='100%'
+                  justifyContent="space-evenly"
+                  marginTop={10}
+                >
+                  <Button 
+                    appearance="primary"
+                    intent="success"
+                    width="40%"
+                    padding={5}
+                    display="flex" alignItems="center" justifyContent="center"
+                    iconAfter={ResetIcon}
+                    onClick={restartHandler}
+                  >
+                  Restart
+                  </Button>
+
+                  <Button 
+                    appearance="primary"
+                    padding={5}
+                    width="40%"
+                    display="flex" alignItems="center" justifyContent="center"
+                    iconAfter={LogOutIcon}
+                    onClick={sendExit}
+                  >
+                  Exit
+                  </Button>
+                </Pane> 
+
+              </Pane>
+            </Pane>
+          </Pane>
+        </Portal>
+        :
+        <></>
+      }
+      
       
       {/* Loading overlay */}
       <Overlay 
@@ -343,6 +453,8 @@ export default function GameUI() {
           || statusObj.status === null
           || statusObj.status === GAME_STATUS.USER_LEFT
           || statusObj.status === GAME_STATUS.USER_EXIT
+          || (statusObj.status === GAME_STATUS.USER_1_WAIT_RESTART && user === 1)
+          || (statusObj.status === GAME_STATUS.USER_2_WAIT_RESTART && user === 2)
         )}
         title={fullScreenInfoTitle}
         hasFooter={false}
@@ -354,12 +466,13 @@ export default function GameUI() {
         <Button appearance="primary"
           className={styles['game-exit-fullscreen']}
           onClick={sendExit}
-          padding={5}
+          padding={7}
           display="flex" alignItems="center" justifyContent="center"
           marginTop={10}
           marginRight={10}
+          iconAfter={LogOutIcon}
         >
-            exit <Icon icon={LogOutIcon} marginLeft={4} size={10} />
+            exit 
         </Button>
         {fullScreenInfo}<br />
         {fullScreenRoomInfo}

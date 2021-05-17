@@ -3,6 +3,7 @@ const PromiseClient = require("../utils/redis");
 const client = new PromiseClient();
 const {redis_keys} = require("../variables/config");
 const { GAME_STATUS, API_STATUS } = require("../variables/consts");
+const { initData } = require("../utils/user");
 
 module.exports = function(io){
   // Run when client connects
@@ -35,7 +36,7 @@ module.exports = function(io){
         }
 
         let statusData = null;
-        switch(data.game.status){
+        switch(data.status){
         case GAME_STATUS.USER_1_ANSWER:
         case GAME_STATUS.USER_2_ANSWER:
         case GAME_STATUS.USER_1_CHOOSE:
@@ -43,6 +44,19 @@ module.exports = function(io){
         case GAME_STATUS.USER_1_PUT_IN_LINE:
         case GAME_STATUS.USER_2_PUT_IN_LINE:
           statusData = data.game.guessing_card;
+          break;
+        case GAME_STATUS.USER_1_WIN:
+        case GAME_STATUS.USER_2_WIN:
+          statusData = {
+            ...data.game.guessing_card,
+            isWinning: data.game.isWinning
+          };
+          break;
+        case GAME_STATUS.USER_1_WAIT_RESTART:
+        case GAME_STATUS.USER_2_WAIT_RESTART:
+          statusData = {
+            isWinning: data.game.isWinning
+          };
           break;
         default:
           break;
@@ -65,7 +79,7 @@ module.exports = function(io){
             revealed: card.revealed, 
             num: card.revealed ? card.num : null
           })),
-          score: data.game.score
+          score: data.score
         });
 
         io.to(_room).emit("usernames", {
@@ -74,7 +88,7 @@ module.exports = function(io){
         });
 
         io.to(_room).emit("status", {
-          status: data.game.status,
+          status: data.status,
           statusData
         });
 
@@ -128,17 +142,17 @@ module.exports = function(io){
         // Push to the dragging line
         data.game.draggingLines[user].push({num, color, id: drawId});
 
-        switch(data.game.status){
+        switch(data.status){
         case GAME_STATUS.USER_1_DRAW_INIT:
-          if(data.game.draggingLines[2].length < 4) data.game.status = GAME_STATUS.USER_2_DRAW_INIT;
-          else data.game.status = GAME_STATUS.PUT_IN_LINE_INIT;
+          if(data.game.draggingLines[2].length < 4) data.status = GAME_STATUS.USER_2_DRAW_INIT;
+          else data.status = GAME_STATUS.PUT_IN_LINE_INIT;
           break;
         case GAME_STATUS.USER_2_DRAW_INIT:
-          if(data.game.draggingLines[1].length < 4) data.game.status = GAME_STATUS.USER_1_DRAW_INIT;
-          else data.game.status = GAME_STATUS.PUT_IN_LINE_INIT;
+          if(data.game.draggingLines[1].length < 4) data.status = GAME_STATUS.USER_1_DRAW_INIT;
+          else data.status = GAME_STATUS.PUT_IN_LINE_INIT;
           break;
         case GAME_STATUS.USER_1_DRAW:
-          data.game.status = GAME_STATUS.USER_1_GUESS;
+          data.status = GAME_STATUS.USER_1_GUESS;
           // reset the guessing card data
           data.game.guessing_card = {
             number: null, 
@@ -149,7 +163,7 @@ module.exports = function(io){
 
           break;
         case GAME_STATUS.USER_2_DRAW:
-          data.game.status = GAME_STATUS.USER_2_GUESS;
+          data.status = GAME_STATUS.USER_2_GUESS;
           // reset the guessing card data
           data.game.guessing_card = {
             number: null, 
@@ -176,7 +190,7 @@ module.exports = function(io){
         );
 
         io.to(_room).emit("status", {
-          status: data.game.status
+          status: data.status
         });
       }
       catch (error) {
@@ -208,23 +222,29 @@ module.exports = function(io){
         data.game.draggingLines[user] = [];
 
         // Update status
-        let status = data.game.status;
-        switch(data.game.status){
+        let status = data.status;
+        switch(data.status){
         case GAME_STATUS.PUT_IN_LINE_INIT:
           if(data.game.draggingLines[opponent].length !== 0) break;
-          else if(data.game.senTe === 1) status = GAME_STATUS.USER_1_DRAW;
-          else if(data.game.senTe === 2) status = GAME_STATUS.USER_2_DRAG;
+          else if(data.senTe === 1) status = GAME_STATUS.USER_1_DRAW;
+          else if(data.senTe === 2) status = GAME_STATUS.USER_2_DRAW;
           break;
         case GAME_STATUS.USER_1_PUT_IN_LINE:
-          status = GAME_STATUS.USER_2_DRAW;
+          status = data.game.wArr.length + data.game.bArr.length !== 0 ? 
+            GAME_STATUS.USER_2_DRAW
+            :
+            GAME_STATUS.USER_2_GUESS;
           break;
         case GAME_STATUS.USER_2_PUT_IN_LINE:
-          status = GAME_STATUS.USER_1_DRAW;
+          status = data.game.wArr.length + data.game.bArr.length !== 0 ? 
+            GAME_STATUS.USER_1_DRAW
+            :
+            GAME_STATUS.USER_1_GUESS;
           break;
         default:
           break;
         }
-        data.game.status = status;
+        data.status = status;
 
         // Reset guessing card
         data.game.guessing_card = {
@@ -287,7 +307,7 @@ module.exports = function(io){
         };
 
         // Set status
-        data.game.status = user === 1 ? GAME_STATUS.USER_2_ANSWER : GAME_STATUS.USER_1_ANSWER;
+        data.status = user === 1 ? GAME_STATUS.USER_2_ANSWER : GAME_STATUS.USER_1_ANSWER;
         
         // Save data
         await client.set(
@@ -296,7 +316,7 @@ module.exports = function(io){
         );
 
         io.to(_room).emit("status", {
-          status: data.game.status,
+          status: data.status,
           statusData: data.game.guessing_card
         });
       }
@@ -330,14 +350,44 @@ module.exports = function(io){
           data.game.lines[user][guessing_card.index].revealed = true;
 
           // Set status
-          data.game.status = user === 1 ? GAME_STATUS.USER_2_CHOOSE : GAME_STATUS.USER_1_CHOOSE;
-        }else{
-          data.game.guessing_card.opDraggingNum = data.game.draggingLines[opponent][0].num;
+          // First check if one of the user is win
+          const userWin = !data.game.lines[user].find(card => card.revealed === false);
+          if(userWin){
+            // reset the guessing card data
+            data.game.guessing_card = {
+              number: null, 
+              index: null,
+              isCorrect: null,
+              opDraggingNum: null
+            };
 
-          // Set status
-          data.game.status = user === 1 ? GAME_STATUS.USER_2_PUT_IN_LINE : GAME_STATUS.USER_1_PUT_IN_LINE;
+            // Change sante
+            data.senTe = data.senTe === 1 ? 2 : 1;
+
+            if(user === 1){
+              data.game.isWinning = 2;
+              data.status = GAME_STATUS.USER_2_WIN;
+              data.score[2] += 1;
+            }else{
+              data.game.isWinning = 1;
+              data.status = GAME_STATUS.USER_1_WIN; 
+              data.score[1] += 1;
+            }
+          }else{
+            // If nobody wins, go to the CHOOSE status
+            data.status = user === 1 ? GAME_STATUS.USER_2_CHOOSE : GAME_STATUS.USER_1_CHOOSE;
+          }
+        }else{
+          // If the opponent is holding a dragging card
+          if(data.game.draggingLines[opponent].length){
+            data.game.guessing_card.opDraggingNum = data.game.draggingLines[opponent][0].num;
+            // Set status
+            data.status = user === 1 ? GAME_STATUS.USER_2_PUT_IN_LINE : GAME_STATUS.USER_1_PUT_IN_LINE;
+          }else{
+            // Set status
+            data.status = user === 1 ? GAME_STATUS.USER_1_GUESS : GAME_STATUS.USER_2_GUESS;
+          }
         }
-        
         
         // Save data
         await client.set(
@@ -346,8 +396,12 @@ module.exports = function(io){
         );
 
         io.to(_room).emit("status", {
-          status: data.game.status,
-          statusData:data.game.guessing_card
+          status: data.status,
+          statusData:{
+            ...data.game.guessing_card,
+            score: data.score,
+            isWinning: data.game.isWinning
+          }
         });
       }
       catch (error) {
@@ -373,9 +427,13 @@ module.exports = function(io){
 
         // set status
         if(isContinue){
-          data.game.status = user === 1 ? GAME_STATUS.USER_1_GUESS : GAME_STATUS.USER_2_GUESS;
+          data.status = user === 1 ? GAME_STATUS.USER_1_GUESS : GAME_STATUS.USER_2_GUESS;
         }else{
-          data.game.status = user === 1 ? GAME_STATUS.USER_1_PUT_IN_LINE : GAME_STATUS.USER_2_PUT_IN_LINE;
+          if(data.game.draggingLines[user].length) {
+            data.status = user === 1 ? GAME_STATUS.USER_1_PUT_IN_LINE : GAME_STATUS.USER_2_PUT_IN_LINE;
+          }else{
+            data.status = user === 1 ? GAME_STATUS.USER_2_GUESS : GAME_STATUS.USER_1_GUESS;
+          }
         }
         
         // Save data
@@ -385,8 +443,68 @@ module.exports = function(io){
         );
 
         io.to(_room).emit("status", {
-          status: data.game.status,
+          status: data.status,
           statusData:data.game.guessing_card
+        });
+      }
+      catch (error) {
+        callback(error);
+      }
+    });
+
+    socket.on("restart", async (callback) => {
+      try {
+        // Fetch data
+        let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
+        data = JSON.parse(data);
+        
+        // See which user it is
+        let user, opponent;
+        if(data.user_1.session_id === _sessionId){
+          user = 1;
+          opponent = 2;
+        }else{
+          user = 2;
+          opponent = 1;
+        }
+        
+        // Check if both users are ready to restart
+        data.game.restart[user] = true;
+        const restart = data.game.restart[1] && data.game.restart[2];
+
+        // Set corresponding status
+        if(restart){
+          // init data
+          data.game = initData();
+          // set status to start
+          data.status = data.senTe === 1 ? GAME_STATUS.USER_1_DRAW_INIT : GAME_STATUS.USER_2_DRAW_INIT;
+        } else{
+          // set status to wait
+          data.status = user === 1 ? GAME_STATUS.USER_1_WAIT_RESTART : GAME_STATUS.USER_2_WAIT_RESTART;
+        }
+
+        // Save data
+        await client.set(
+          `${redis_keys.ROOM_DATA}${_room}`, 
+          JSON.stringify(data)
+        );
+
+        if(restart){
+          io.to(_room).emit("init", {
+            wNum: data.game.wArr.length,
+            bNum: data.game.bArr.length,
+            line: [],
+            draggingLine: [],
+            opLine: [],
+            opDraggingLine: [],
+            score: data.score
+          });
+        } 
+        io.to(_room).emit("status", {
+          status: data.status,
+          statusData: {
+            isWinning: data.game.isWinning
+          }
         });
       }
       catch (error) {

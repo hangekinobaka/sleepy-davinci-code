@@ -58,18 +58,17 @@ const initData = () => {
       1: [],
       2: []
     },
-    status: null,
-    senTe: 1,
-    score: {
-      1: 0,
-      2: 0
-    },
     guessing_card: {
       number: null, 
       index: null,
       isCorrect: null,
       opDraggingNum: null
-    }
+    },
+    restart:{
+      1: false,
+      2: false
+    },
+    isWinning: null
   };
 };
 

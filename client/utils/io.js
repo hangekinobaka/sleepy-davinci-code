@@ -109,6 +109,14 @@ export default function SocketClient(socket){
     })
   }
 
+  this.restart = () => {
+    this.socket.emit('restart', (error) => {
+      if(error) {
+        console.error(error)
+      }
+    })
+  }
+
   this.exit = (callback)=>{
     this.socket.emit('exit', (error) => {
       if(error) {

@@ -55,6 +55,9 @@
       background: #ba261c !important;
       box-shadow: #333 2px 2px 3px, inset 1px 1px 3px #fff !important;
       color: #fff !important;
+      &>div{
+        margin-left: 5px !important;
+      }
       &-text{
         font-size: 15px;
         font-weight: 700;
@@ -96,5 +99,51 @@
       opacity: 1;
     }      
   }
+
+  &-end{
+    &-overlay{
+      position: fixed;
+      height: 100vh;
+      width: 100vw;
+      top: 0;
+      left: 0;
+      &::before{
+        content: '';
+        height: 100%;
+        width: 100%;
+        position: fixed;
+        background-color: rgba(0,0,0,0.3);
+      }
+    }
+    &-box{
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-size: 100% 100%;
+      transform-origin: 50% 0;
+    }
+    &-win{
+      @include background-image('end-win.png');
+    }
+    &-lose{
+      @include background-image('end-lose.png');
+    }
+    &-content{
+      text-align: center;
+      position: fixed;
+      top: 58%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 35%;
+    }
+    &-text{
+      font-size: 18px;
+      color: rgba(22,38,76, 1);
+      font-weight: 700;
+      text-shadow: 1px 0px 5px rgba(22,38,76, 0.2);
+    }
+  }
+
 
 }

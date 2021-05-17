@@ -3,7 +3,7 @@ version: '3.3'
 
 services:
   client:
-    image: hangekinobaka/dvc-app-client:0.0.1
+    image: hangekinobaka/dvc-app-client:1.0.0
     build:
       context: .
       dockerfile: docker/client/Dockerfile.prod
@@ -11,7 +11,7 @@ services:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
         
   server:
-    image: hangekinobaka/dvc-app-server:0.0.1
+    image: hangekinobaka/dvc-app-server:1.0.0
     build:
       context: .
       dockerfile: docker/server/Dockerfile.prod

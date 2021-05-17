@@ -52,6 +52,14 @@ const login = async (req, res)=>{
         room_num: room.room_num,
         room_code: room.room_code,
         is_public: isPrivate,
+
+        status: null,
+        senTe: 1,
+        score: {
+          1: 0,
+          2: 0
+        },
+        
         game:data,
         user_1:{
           session_id: req.sessionID,
@@ -118,7 +126,7 @@ const join = async (req, res)=>{
     }
     // save the user 2 to the room
     room_data = JSON.parse(room_data);
-    room_data.game.status = GAME_STATUS.USER_1_DRAW_INIT;
+    room_data.status = GAME_STATUS.USER_1_DRAW_INIT;
     // If for some reason the room is already taken, return a msg
     if("user_2" in room_data) {res.status(200).json({code: API_STATUS.API_CODE_ROOM_TAKEN, msg:"the room is taken"}); return;}
     await client.setex(

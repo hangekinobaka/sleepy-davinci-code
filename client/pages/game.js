@@ -96,6 +96,9 @@ export default function Game() {
     default:
       break
     }
+
+    // If a new score is sent with the statusData, renew the score
+    if(statusObj.statusData && statusObj.statusData.score) dispatch(setScore(statusObj.statusData.score))
   }, [statusObj])
 
   useEffect(()=>{
@@ -145,6 +148,7 @@ export default function Game() {
     sc.init(initData => {
       console.log('run init')
       console.log(initData)
+      setInitState(false)
       dispatch(setMyLine(initData.line))
       dispatch(setMyDraggingLine(initData.draggingLine))
       dispatch(setIsInteractive(true))
@@ -157,6 +161,7 @@ export default function Game() {
       // Game data
       dispatch(setCardNumW(initData.wNum))
       dispatch(setCardNumB(initData.bNum))
+      setInitState(true)
     })
 
     // Receive opponent username
@@ -233,12 +238,10 @@ export default function Game() {
       router.push('/')
       return Promise.resolve()
     case API_STATUS.API_CODE_SUCCESS:
-      setInitState(true)
       return Promise.resolve(res.data)
     default:
       break
     }
-    setInitState(true)
     return Promise.resolve()
   }
 
@@ -247,7 +250,7 @@ export default function Game() {
       {
         initState ? 
           <Pane display="flex" alignItems="center" justifyContent="center" height={h} background="#2a2d38">
-            <GameUI initState/>
+            <GameUI />
             <GameCanvas w={w} h={h}/>
           </Pane>
           : 

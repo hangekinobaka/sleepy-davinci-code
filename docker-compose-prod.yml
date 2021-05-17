@@ -3,12 +3,12 @@ version: '3.3'
 
 services:
   client:
-    image: hangekinobaka/dvc-app-client:0.0.1
+    image: hangekinobaka/dvc-app-client:1.0.0
     container_name: dvc_node_client
     restart: unless-stopped
 
   server:
-    image: hangekinobaka/dvc-app-server:0.0.1
+    image: hangekinobaka/dvc-app-server:1.0.0
     container_name: dvc_node_server
     environment:
       - CLIENT_ENDPOINT=${CLIENT_ENDPOINT}

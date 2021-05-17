@@ -151,6 +151,7 @@ export default function OpCard({cardTextures, id}){
       (statusObj.status === GAME_STATUS.USER_2_PUT_IN_LINE && user === 1)){
         if(!statusObj.statusData.isCorrect){
           setMyNumber(statusObj.statusData.opDraggingNum)
+          setMyRevealed(true)
         }
       }
 

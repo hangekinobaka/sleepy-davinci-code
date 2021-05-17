@@ -87,11 +87,11 @@ export default function GameUI() {
       break
     case GAME_STATUS.USER_1_GUESS:
       if(user == 1) setGameInfo(GAME_INFO.guessCardNotification)
-      else setGameInfo(GAME_INFO.waitGuessNotification)
+      else setGameInfo(GAME_INFO.waitGuessInfoGenerator(statusObj.statusData))
       break
     case GAME_STATUS.USER_2_GUESS:
       if(user == 2) setGameInfo(GAME_INFO.guessCardNotification)
-      else setGameInfo(GAME_INFO.waitGuessNotification)
+      else setGameInfo(GAME_INFO.waitGuessInfoGenerator(statusObj.statusData))
       break
     case GAME_STATUS.USER_1_ANSWER:
       if(user == 2) setGameInfo(GAME_INFO.waitOpConfirmNotification)

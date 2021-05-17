@@ -230,10 +230,16 @@ module.exports = function(io){
           else if(data.senTe === 2) status = GAME_STATUS.USER_2_DRAW;
           break;
         case GAME_STATUS.USER_1_PUT_IN_LINE:
-          status = GAME_STATUS.USER_2_DRAW;
+          status = data.game.wArr.length + data.game.bArr.length !== 0 ? 
+            GAME_STATUS.USER_2_DRAW
+            :
+            GAME_STATUS.USER_2_GUESS;
           break;
         case GAME_STATUS.USER_2_PUT_IN_LINE:
-          status = GAME_STATUS.USER_1_DRAW;
+          status = data.game.wArr.length + data.game.bArr.length !== 0 ? 
+            GAME_STATUS.USER_1_DRAW
+            :
+            GAME_STATUS.USER_1_GUESS;
           break;
         default:
           break;
@@ -372,12 +378,16 @@ module.exports = function(io){
             data.status = user === 1 ? GAME_STATUS.USER_2_CHOOSE : GAME_STATUS.USER_1_CHOOSE;
           }
         }else{
-          data.game.guessing_card.opDraggingNum = data.game.draggingLines[opponent][0].num;
-
-          // Set status
-          data.status = user === 1 ? GAME_STATUS.USER_2_PUT_IN_LINE : GAME_STATUS.USER_1_PUT_IN_LINE;
+          // If the opponent is holding a dragging card
+          if(data.game.draggingLines[opponent].length){
+            data.game.guessing_card.opDraggingNum = data.game.draggingLines[opponent][0].num;
+            // Set status
+            data.status = user === 1 ? GAME_STATUS.USER_2_PUT_IN_LINE : GAME_STATUS.USER_1_PUT_IN_LINE;
+          }else{
+            // Set status
+            data.status = user === 1 ? GAME_STATUS.USER_1_GUESS : GAME_STATUS.USER_2_GUESS;
+          }
         }
-        
         
         // Save data
         await client.set(
@@ -419,7 +429,11 @@ module.exports = function(io){
         if(isContinue){
           data.status = user === 1 ? GAME_STATUS.USER_1_GUESS : GAME_STATUS.USER_2_GUESS;
         }else{
-          data.status = user === 1 ? GAME_STATUS.USER_1_PUT_IN_LINE : GAME_STATUS.USER_2_PUT_IN_LINE;
+          if(data.game.draggingLines[user].length) {
+            data.status = user === 1 ? GAME_STATUS.USER_1_PUT_IN_LINE : GAME_STATUS.USER_2_PUT_IN_LINE;
+          }else{
+            data.status = user === 1 ? GAME_STATUS.USER_2_GUESS : GAME_STATUS.USER_1_GUESS;
+          }
         }
         
         // Save data

@@ -13,7 +13,6 @@ export const GAME_INFO = {
   putCardNotification: 'Please put the cards in your line',
   waitOpFinishNotification: 'Your opponent didn\'t finish yet, please wait.',
   guessCardNotification: 'Please guess a card in your opponent\'s line...',
-  waitGuessNotification: 'Opponent is guessing your card. Please wait.',
   waitOpConfirmNotification: 'Opponent is confirming your guess. Please wait.',
   isCorrectNotification: 'Nice, you are correct!',
   makeDecisionNotification: 'Opponent is making decisions. Please wait.',
@@ -26,4 +25,13 @@ export const GAME_INFO = {
   putCardInfoGenerator: isCorrect => isCorrect ? 
     'Please put your card in line.' :
     'Sorry, <span class="error">wrong guess</span>. Please put your card in line.', 
+  waitGuessInfoGenerator: statusData => {
+    switch(statusData.isCorrect){
+    case false:
+      return 'Sorry, <span class="error">wrong guess</span>. Opponent is guessing your card. Please wait.'
+    case true:
+    default:
+      return 'Opponent is guessing your card. Please wait.'
+    }
+  }  
 }

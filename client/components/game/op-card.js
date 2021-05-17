@@ -226,8 +226,9 @@ export default function OpCard({cardTextures, id}){
       }
 
       // If it is under the second or more GUESS status
-      if((statusObj.status === GAME_STATUS.USER_1_CHOOSE && user === 1) || 
-        statusObj.status === GAME_STATUS.USER_2_CHOOSE && user === 2){
+      // OR one of the user is won
+      if(((statusObj.status === GAME_STATUS.USER_1_CHOOSE || statusObj.status === GAME_STATUS.USER_1_WIN) && user === 1) || 
+        (statusObj.status === GAME_STATUS.USER_2_CHOOSE || statusObj.status === GAME_STATUS.USER_2_WIN) && user === 2){
         // Check if I am the guessing card
         // If yes, double check if the guess is correct( normally yes ),
         // if yes, show me 

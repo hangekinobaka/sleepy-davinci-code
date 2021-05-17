@@ -42,6 +42,8 @@ module.exports = function(io){
         case GAME_STATUS.USER_2_CHOOSE:
         case GAME_STATUS.USER_1_PUT_IN_LINE:
         case GAME_STATUS.USER_2_PUT_IN_LINE:
+        case GAME_STATUS.USER_1_WIN:
+        case GAME_STATUS.USER_2_WIN:
           statusData = data.game.guessing_card;
           break;
         default:
@@ -330,7 +332,28 @@ module.exports = function(io){
           data.game.lines[user][guessing_card.index].revealed = true;
 
           // Set status
-          data.game.status = user === 1 ? GAME_STATUS.USER_2_CHOOSE : GAME_STATUS.USER_1_CHOOSE;
+          // First check if one of the user is win
+          const userWin = !data.game.lines[user].find(card => card.revealed === false);
+          if(userWin){
+            // reset the guessing card data
+            data.game.guessing_card = {
+              number: null, 
+              index: null,
+              isCorrect: null,
+              opDraggingNum: null
+            };
+
+            if(user === 1){
+              data.game.status = GAME_STATUS.USER_2_WIN;
+              data.game.score[2] += 1;
+            }else{
+              data.game.status = GAME_STATUS.USER_1_WIN; 
+              data.game.score[1] += 1;
+            }
+          }else{
+            // If nobody wins, go to the CHOOSE status
+            data.game.status = user === 1 ? GAME_STATUS.USER_2_CHOOSE : GAME_STATUS.USER_1_CHOOSE;
+          }
         }else{
           data.game.guessing_card.opDraggingNum = data.game.draggingLines[opponent][0].num;
 
@@ -347,7 +370,10 @@ module.exports = function(io){
 
         io.to(_room).emit("status", {
           status: data.game.status,
-          statusData:data.game.guessing_card
+          statusData:{
+            ...data.game.guessing_card,
+            score: data.game.score
+          }
         });
       }
       catch (error) {

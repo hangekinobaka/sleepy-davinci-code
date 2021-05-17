@@ -96,6 +96,9 @@ export default function Game() {
     default:
       break
     }
+
+    // If a new score is sent with the statusData, renew the score
+    if(statusObj.statusData && statusObj.statusData.score) dispatch(setScore(statusObj.statusData.score))
   }, [statusObj])
 
   useEffect(()=>{

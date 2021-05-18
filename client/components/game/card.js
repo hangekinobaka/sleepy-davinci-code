@@ -5,7 +5,7 @@ import { CARD_WIDTH, CARD_HEIGHT, CARD_HEIGHT_LAY,
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
   LINE_X, LINE_Y, GAME_STATUS } from 'configs/game'
 import { setIsDrawing, setIsDragging, setIsInteractive, 
-  setInsertPlace, setMyDraggingLine } from 'redux/card/actions'
+  setInsertPlace, setMyDraggingLine, setMyLine } from 'redux/card/actions'
 import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
 
@@ -212,6 +212,10 @@ export default function Card({cardTextures, id}){
     case CARD_STATUS.stand:
       // Check if i am a revealed card, if yes, put me down
       if(myRevealed){
+        // update the line
+        let newLine = [...myLine]
+        newLine[myIndex].revealed = true
+        dispatch(setMyLine(newLine))
         setCardStatus(CARD_STATUS.lay)
         return
       }

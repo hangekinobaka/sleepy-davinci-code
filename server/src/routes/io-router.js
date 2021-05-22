@@ -61,7 +61,10 @@ module.exports = function(io){
         default:
           break;
         }
-        statusData.insertingIndex = data.game.insertingIndex;
+        statusData = {
+          ...statusData,
+          insertingIndex: data.game.insertingIndex
+        };
         
         socket.emit("init", {
           wNum: data.game.wArr.length,

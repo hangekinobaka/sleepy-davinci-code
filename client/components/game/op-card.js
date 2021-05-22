@@ -193,15 +193,19 @@ export default function OpCard({cardTextures, id}){
       break
     case CARD_STATUS.standShow:
       // When the opLine is updated, rearrage this card
-      if(statusObj.status === GAME_STATUS.USER_1_DRAW ||
-        statusObj.status === GAME_STATUS.USER_2_DRAW ){
+      if(
+        (user === 1 && (statusObj.status === GAME_STATUS.USER_1_DRAW || statusObj.status === GAME_STATUS.USER_1_GUESS))
+        || (user === 2 && (statusObj.status === GAME_STATUS.USER_2_DRAW || statusObj.status === GAME_STATUS.USER_2_GUESS))
+      ){
         insertIntoLine()
       }
       break
     case CARD_STATUS.stand:
       // When the opLine is updated, rearrage this card
-      if(statusObj.status === GAME_STATUS.USER_1_DRAW ||
-        statusObj.status === GAME_STATUS.USER_2_DRAW ){
+      if(
+        (user === 1 && (statusObj.status === GAME_STATUS.USER_1_DRAW || statusObj.status === GAME_STATUS.USER_1_GUESS))
+        || (user === 2 && (statusObj.status === GAME_STATUS.USER_2_DRAW || statusObj.status === GAME_STATUS.USER_2_GUESS))
+      ){
         insertIntoLine()
       }
 
@@ -303,10 +307,10 @@ export default function OpCard({cardTextures, id}){
   }
 
   // Positioning by index
-  const positionByIndex = index => {
+  const positionByIndex = (index, lift=false) => {
     setCardPosition({
-      x: OP_LINE_X + cardWidth/2 + index * cardWidth + 3, 
-      y: OP_LINE_Y
+      x: OP_LINE_X + CARD_WIDTH*SCALE_CARD_SIZE/2 + index * CARD_WIDTH*SCALE_CARD_SIZE + 3, 
+      y: lift ? OP_LINE_Y - 30 : OP_LINE_Y
     })
   }
 
@@ -367,8 +371,14 @@ export default function OpCard({cardTextures, id}){
     if( opLine === null ) return
     for(let i = 0; i < opLine.length; i++ ){
       if( myId === opLine[i].id){
-        positionByIndex(i)
         setMyIndex(i)
+        if(statusObj.statusData && 
+          !isNaN(statusObj.statusData.insertingIndex) &&
+          statusObj.statusData.insertingIndex === i){
+          positionByIndex(i, true)
+        }else{
+          positionByIndex(i)
+        }
         return
       }
     }    

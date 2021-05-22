@@ -61,6 +61,10 @@ module.exports = function(io){
         default:
           break;
         }
+        statusData = {
+          ...statusData,
+          insertingIndex: data.game.insertingIndex
+        };
         
         socket.emit("init", {
           wNum: data.game.wArr.length,
@@ -198,7 +202,7 @@ module.exports = function(io){
       }
     });
 
-    socket.on("updateLine", async ({ newLine }, callback) => {
+    socket.on("updateLine", async ({ newLine, insertingIndex }, callback) => {
       try {
         // Fetch data
         let data = await client.get(`${redis_keys.ROOM_DATA}${_room}`);
@@ -234,12 +238,16 @@ module.exports = function(io){
             GAME_STATUS.USER_2_DRAW
             :
             GAME_STATUS.USER_2_GUESS;
+          // Remember inserting place
+          data.game.insertingIndex = insertingIndex;
           break;
         case GAME_STATUS.USER_2_PUT_IN_LINE:
           status = data.game.wArr.length + data.game.bArr.length !== 0 ? 
             GAME_STATUS.USER_1_DRAW
             :
             GAME_STATUS.USER_1_GUESS;
+          // Remember inserting place
+          data.game.insertingIndex = insertingIndex;
           break;
         default:
           break;
@@ -269,7 +277,10 @@ module.exports = function(io){
         });
 
         io.to(_room).emit("status", {
-          status
+          status,
+          statusData: {
+            insertingIndex: data.game.insertingIndex 
+          }
         });
       }
       catch (error) {
@@ -296,6 +307,9 @@ module.exports = function(io){
           user = 2;
           opponent = 1;
         }
+
+        // Reset insert index
+        data.game.insertingIndex = null;
 
         // Check if the guessing is correct
         const isCorrect = data.game.lines[opponent][index].num == number;

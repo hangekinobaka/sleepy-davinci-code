@@ -68,7 +68,8 @@ const initData = () => {
       1: false,
       2: false
     },
-    isWinning: null
+    isWinning: null,
+    insertingIndex: null
   };
 };
 

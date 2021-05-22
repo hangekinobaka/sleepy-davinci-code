@@ -16,6 +16,7 @@ export const INSERT_PLACE_ALTER = 'INSERT_PLACE_ALTER'
 export const CAN_DRAW_CARD_ALTER = 'CAN_DRAW_CARD_ALTER'
 export const CONFIRM_UPDATE_LINE_ALTER = 'CONFIRM_UPDATE_LINE_ALTER'
 export const DISABLE_DRAG_ALTER = 'DISABLE_DRAG_ALTER'
+export const INSERTING_INDEX_ALTER = 'INSERTING_INDEX_ALTER'
 
 export const initialState = {
   cardNumW: WHITE_CARD_NUM,
@@ -48,7 +49,8 @@ export const initialState = {
   canDrawCard: false,
   myDraggingLine:null,
   confirmUpdateLine: false,
-  disableDrag: true
+  disableDrag: true,
+  insertingIndex: null,
 }
 
 
@@ -145,6 +147,12 @@ export const setDisableDrag = isDisable => ({
     isDisable
   }
 })
+export const setInsertingIndex = index => ({
+  type: INSERTING_INDEX_ALTER,
+  payload:{
+    index
+  }
+})
 
 export const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -223,6 +231,11 @@ export const reducer = (state = initialState, action) => {
     return{
       ...state,
       disableDrag: action.payload.isDisable
+    }
+  case INSERTING_INDEX_ALTER:
+    return{
+      ...state,
+      insertingIndex: action.payload.index
     }
   case RESET_ALL:
     return initialState

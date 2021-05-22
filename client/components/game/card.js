@@ -5,7 +5,7 @@ import { CARD_WIDTH, CARD_HEIGHT, CARD_HEIGHT_LAY,
   CARD_STATUS, CARD_PILE, NUM_SHEET_MAP, DESIGN_WIDTH,DESIGN_HEIGHT,
   LINE_X, LINE_Y, GAME_STATUS } from 'configs/game'
 import { setIsDrawing, setIsDragging, setIsInteractive, 
-  setInsertPlace, setMyDraggingLine, setMyLine } from 'redux/card/actions'
+  setInsertPlace, setInsertingIndex, setMyDraggingLine, setMyLine } from 'redux/card/actions'
 import { gsap } from 'gsap'
 import * as PIXI from 'pixi.js'
 
@@ -115,7 +115,8 @@ export default function Card({cardTextures, id}){
       const newLine = [...myDraggingLine]
       newLine.splice(index, 1)
       dispatch(setMyDraggingLine(newLine))
-
+      // Save insert index temporarily
+      dispatch(setInsertingIndex(insertPlace))
       dispatch(setInsertPlace(null))
     }else{
       setDrag()

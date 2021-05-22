@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { Pane, Spinner, Overlay, toaster, Dialog, Button, 
   LogOutIcon, TickIcon, Heading, Portal, ResetIcon } from 'evergreen-ui'
 import { setShowConfirmBtn } from 'redux/ui/actions'
+import { setInsertingIndex } from 'redux/card/actions'
 
 import api from 'utils/api'
 import styles from 'styles/game.module.scss'
@@ -31,6 +32,7 @@ export default function GameUI() {
   const showConfirmBtn = useSelector(state => state.ui.showConfirmBtn)
   const myLine = useSelector(state => state.card.myLine)
   const myDraggingLine = useSelector(state => state.card.myDraggingLine)
+  const insertingIndex = useSelector(state => state.card.insertingIndex)
   const opUsername = useSelector(state => state.opponent.opUsername)
   const selectIndex = useSelector(state => state.opponent.selectIndex)
   const selectNum = useSelector(state => state.opponent.selectNum)
@@ -174,7 +176,9 @@ export default function GameUI() {
     case CONFIRM_TYPE.LINE_UPDATE:
       if(myLine.length === 0) return
 
-      socketClient.updateLine(myLine)
+      socketClient.updateLine(myLine, insertingIndex)
+      dispatch(setInsertingIndex(null))
+
       socketClient.updateLineRes(res => {
         if(res.code === API_STATUS.API_CODE_SUCCESS){
           dispatch(setShowConfirmBtn(false))

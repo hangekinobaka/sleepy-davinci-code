@@ -71,8 +71,8 @@ export default function SocketClient(socket){
     })
   }
 
-  this.updateLine = newLine => {
-    this.socket.emit('updateLine', {newLine}, (error) => {
+  this.updateLine = (newLine, insertingIndex) => {
+    this.socket.emit('updateLine', {newLine, insertingIndex}, (error) => {
       if(error) {
         console.error(error)
       }
